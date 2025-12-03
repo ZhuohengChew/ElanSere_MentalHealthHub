@@ -1,0 +1,46 @@
+<!-- Assessments List -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-2">Self-Assessment</h1>
+            <p class="text-muted">Track your mental health through structured assessments</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/assessments/new" class="btn btn-primary">
+                <i class="bi bi-plus"></i> New Assessment
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Your Assessments</h6>
+                </div>
+                <div class="card-body">
+                    <div th:if="${assessments.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: #ddd;"></i>
+                        <p class="text-muted mt-3">No assessments yet. Start your first assessment!</p>
+                        <a href="/assessments/new" class="btn btn-primary btn-sm">Take Assessment</a>
+                    </div>
+                    <div th:unless="${assessments.isEmpty()}" class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center" th:each="assessment : ${assessments}">
+                            <div>
+                                <h6 class="mb-1" th:text="${assessment.title}">Assessment Title</h6>
+                                <small class="text-muted" th:text="${assessment.description}">Description</small>
+                                <br>
+                                <small class="text-success" th:if="${assessment.score != null}">Score: <span th:text="${assessment.score}"></span>/100</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted" th:text="${#temporals.format(assessment.createdAt, 'dd MMM yyyy')}">Date</small>
+                                <br>
+                                <a th:href="@{/assessments/{id}(id=${assessment.id})}" class="btn btn-sm btn-outline-primary mt-2">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

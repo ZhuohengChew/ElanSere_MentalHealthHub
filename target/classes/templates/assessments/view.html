@@ -1,0 +1,45 @@
+<!-- Assessment View -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="/assessments" class="btn btn-sm btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Assessments
+            </a>
+            <h1 class="mb-2" th:text="${assessment.title}">Assessment Title</h1>
+            <p class="text-muted" th:text="${assessment.description}">Description</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-text" th:utext="${assessment.content}">Content</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Assessment Details</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        <strong>Completed:</strong> <br>
+                        <span th:text="${#temporals.format(assessment.createdAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                    </p>
+                    <th:block th:if="${assessment.score != null}">
+                        <p class="text-muted mb-3">
+                            <strong>Score:</strong> <br>
+                            <span class="h5 text-success" th:text="${assessment.score}"></span>/100
+                        </p>
+                        <p class="text-muted mb-3">
+                            <strong>Result:</strong> <br>
+                            <span th:text="${assessment.result}"></span>
+                        </p>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

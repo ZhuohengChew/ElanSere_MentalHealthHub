@@ -1,0 +1,72 @@
+<!-- Professional Dashboard -->
+<div th:if="${user.role == 'PROFESSIONAL'}" class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-2">Professional Dashboard</h1>
+            <p class="text-muted">Manage client sessions and clinical records</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Active Clients</h6>
+                <div class="stat-number">18</div>
+                <small class="text-muted">This month</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Sessions Completed</h6>
+                <div class="stat-number">145</div>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> 12 this month</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Scheduled Today</h6>
+                <div class="stat-number">3</div>
+                <small class="text-info">Sessions</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Client Satisfaction</h6>
+                <div class="stat-number">4.8</div>
+                <small class="text-success">/5.0 average</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Today's Schedule</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Muhammad Hassan - 2:00 PM</h6>
+                                    <small class="text-muted">30-minute session</small>
+                                </div>
+                                <span class="badge bg-success">Confirmed</span>
+                            </div>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">Noor Amira - 3:30 PM</h6>
+                                    <small class="text-muted">60-minute session</small>
+                                </div>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,95 @@
+<!-- Staff Dashboard -->
+<div th:if="${user.role == 'STAFF'}" class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-2">Staff Dashboard</h1>
+            <p class="text-muted">Support student mental health and manage resources</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Active Tickets</h6>
+                <div class="stat-number">24</div>
+                <small class="text-danger"><i class="bi bi-arrow-up"></i> 3 urgent</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Students Supported</h6>
+                <div class="stat-number">156</div>
+                <small class="text-muted">This month</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Resources Created</h6>
+                <div class="stat-number">42</div>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> 5 new this month</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Response Time</h6>
+                <div class="stat-number">2.4h</div>
+                <small class="text-muted">Average</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Recent Student Referrals</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Issue</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ali Zainal</td>
+                                    <td>Exam stress</td>
+                                    <td>Today</td>
+                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Fatima Ahmad</td>
+                                    <td>Sleep issues</td>
+                                    <td>Yesterday</td>
+                                    <td><span class="badge bg-success">Resolved</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> New Referral
+                        </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-folder-plus"></i> Add Resource
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

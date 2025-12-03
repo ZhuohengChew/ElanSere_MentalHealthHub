@@ -1,0 +1,155 @@
+<!-- Student Dashboard -->
+<div th:if="${user.role == 'STUDENT'}" class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-2">Welcome back, <span th:text="${user.name}"></span>!</h1>
+            <p class="text-muted">Track your mental wellness journey and access support resources</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Your progress is private and secure
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Assessments Completed</h6>
+                <div class="stat-number">12</div>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> 2 this month</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Appointments</h6>
+                <div class="stat-number">3</div>
+                <small class="text-warning"><i class="bi bi-clock"></i> 1 pending</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Forum Posts</h6>
+                <div class="stat-number">8</div>
+                <small class="text-info"><i class="bi bi-chat-left"></i> Community active</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h6 class="text-muted">Streak</h6>
+                <div class="stat-number">15</div>
+                <small class="text-success"><i class="bi bi-fire"></i> days active</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row mb-4">
+        <!-- Recent Activities -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h5 class="mb-0"><i class="bi bi-activity"></i> Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Completed Depression Self-Assessment</h6>
+                                <small class="text-muted">Score: 22/63 - Mild symptoms</small>
+                            </div>
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Telehealth appointment scheduled</h6>
+                                <small class="text-muted">with Dr. Sarah Johnson</small>
+                            </div>
+                            <small class="text-muted">5 hours ago</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Posted on Peer Support Forum</h6>
+                                <small class="text-muted">"Managing exam stress"</small>
+                            </div>
+                            <small class="text-muted">1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="/assessments/new" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus"></i> New Assessment
+                        </a>
+                        <a href="/appointments/book" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-calendar-plus"></i> Book Appointment
+                        </a>
+                        <a href="/forum/new" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pen"></i> Create Forum Post
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mental Health Tip -->
+            <div class="card mt-3 bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title">💡 Daily Tip</h6>
+                    <p class="card-text small mb-0">Practice deep breathing for 5 minutes daily to reduce stress and anxiety.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resources Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h5 class="mb-0"><i class="bi bi-book"></i> Recommended Resources</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Stress Management</h6>
+                                    <p class="card-text small">Learn effective techniques to manage daily stress</p>
+                                    <a href="#" class="btn btn-sm btn-link">Learn more →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Sleep Hygiene</h6>
+                                    <p class="card-text small">Improve your sleep quality and overall health</p>
+                                    <a href="#" class="btn btn-sm btn-link">Learn more →</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Mindfulness</h6>
+                                    <p class="card-text small">Discover mindfulness practices for wellbeing</p>
+                                    <a href="#" class="btn btn-sm btn-link">Learn more →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

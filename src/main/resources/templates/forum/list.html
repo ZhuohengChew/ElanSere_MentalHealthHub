@@ -1,0 +1,50 @@
+<!-- Forum Posts List -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-2">Peer Support Forum</h1>
+            <p class="text-muted">Connect with peers and share your experiences in a safe community</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/forum/new" class="btn btn-primary">
+                <i class="bi bi-pencil-square"></i> New Post
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div th:if="${posts.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-chat-dots" style="font-size: 3rem; color: #ddd;"></i>
+                        <p class="text-muted mt-3">No posts yet. Be the first to start a discussion!</p>
+                        <a href="/forum/new" class="btn btn-primary btn-sm">Create Post</a>
+                    </div>
+                    <div th:unless="${posts.isEmpty()}" class="list-group list-group-flush">
+                        <a th:each="post : ${posts}" th:href="@{/forum/{id}(id=${post.id})}" 
+                           class="list-group-item list-group-item-action p-3 text-decoration-none">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-dark" th:text="${post.title}">Post Title</h6>
+                                    <p class="text-muted small mb-2" th:text="${post.content.substring(0, min(100, post.content.length()))}"></p>
+                                    <small class="text-muted">
+                                        by <strong th:text="${post.user.name}"></strong> •
+                                        <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy')}"></span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="small text-muted mb-2">
+                                        <span class="badge bg-light text-dark" th:text="${post.views} + ' views'"></span>
+                                        <span class="badge bg-light text-dark" th:text="${post.replies} + ' replies'"></span>
+                                    </div>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

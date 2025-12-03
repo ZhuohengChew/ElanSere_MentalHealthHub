@@ -1,0 +1,58 @@
+<!-- Forum Post View -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="/forum" class="btn btn-sm btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Forum
+            </a>
+            <h1 class="mb-2" th:text="${post.title}">Post Title</h1>
+            <p class="text-muted">
+                by <strong th:text="${post.user.name}"></strong> •
+                <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}"></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="card-text" th:text="${post.content}">Content</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Replies (<span th:text="${post.replies}"></span>)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-chat-left"></i> No replies yet. Be the first to respond!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Post Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="text-muted small">Views</div>
+                        <div class="h5 text-primary" th:text="${post.views}">0</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="text-muted small">Replies</div>
+                        <div class="h5 text-success" th:text="${post.replies}">0</div>
+                    </div>
+                    <hr>
+                    <button class="btn btn-primary btn-sm w-100" onclick="alert('Reply feature coming soon!')">
+                        <i class="bi bi-reply"></i> Reply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

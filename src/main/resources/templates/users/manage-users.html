@@ -1,0 +1,66 @@
+<!-- Manage Users -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-2">Manage Users</h1>
+            <p class="text-muted">View and manage all system users</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">All Users (<span th:text="${users.size()}"></span>)</h6>
+                        <div>
+                            <input type="text" class="form-control form-control-sm" 
+                                   placeholder="Search users..." style="width: 200px;">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="usr : ${users}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-light rounded-circle p-2 me-2">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                            <strong th:text="${usr.name}">Name</strong>
+                                        </div>
+                                    </td>
+                                    <td th:text="${usr.email}">Email</td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${usr.role == 'ADMIN' ? 'bg-danger' : usr.role == 'PROFESSIONAL' ? 'bg-primary' : usr.role == 'STAFF' ? 'bg-warning text-dark' : 'bg-success'}"
+                                              th:text="${usr.role.displayName}">Role</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success" th:if="${usr.active}">Active</span>
+                                        <span class="badge bg-secondary" th:unless="${usr.active}">Inactive</span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/users/{id}(id=${usr.id})}" class="btn btn-sm btn-outline-primary">View</a>
+                                        <a href="#" class="btn btn-sm btn-outline-danger">Deactivate</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
