@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Mental Health Hub - Spring Boot + Thymeleaf Backend
 
 A complete backend implementation of the Digital Mental Health Literacy Hub for universities, built with Spring Boot 3.2 and Thymeleaf templating engine.
@@ -353,3 +354,4 @@ For questions or support, please contact the development team.
 **Version**: 1.0.0  
 **Last Updated**: December 2024  
 **Framework**: Spring Boot 3.2 + Thymeleaf
+
