@@ -48,7 +48,7 @@ public class AuthController {
         session.setAttribute("userId", user.getId());
         session.setAttribute("userRole", user.getRole().toString());
         
-        return "redirect:/dashboard";
+        return "layout";
     }
 
     @GetMapping("/logout")
@@ -69,7 +69,7 @@ public class AuthController {
         String dashboardPage;
         switch (user.getRole()) {
             case STUDENT:
-                dashboardPage = "dashboard/student/dashboard";
+                dashboardPage = "dashboard/student-dashboard";
                 break;
             case STAFF:
                 dashboardPage = "dashboard/staff-dashboard";
@@ -83,6 +83,7 @@ public class AuthController {
             default:
                 return "redirect:/login";
         }
+        model.addAttribute("user", user);
         model.addAttribute("page", dashboardPage);
         model.addAttribute("activePage", "dashboard");
         model.addAttribute("title", "Dashboard");
