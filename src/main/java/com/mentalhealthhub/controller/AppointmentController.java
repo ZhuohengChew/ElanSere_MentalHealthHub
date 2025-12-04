@@ -60,6 +60,23 @@ public class AppointmentController {
         return "layout";
     }
 
+    @GetMapping("/my-schedule")
+    public String mySchedule(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        List<Appointment> appointments = appointmentRepository.findByProfessional(user);
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("user", user);
+        
+        model.addAttribute("page", "appointments/schedule");
+        model.addAttribute("title", "My Schedule");
+
+        return "layout";
+    }
+
     @PostMapping("/save")
     public String saveAppointment(@RequestParam Long professionalId,
                                   @RequestParam String appointmentDate,

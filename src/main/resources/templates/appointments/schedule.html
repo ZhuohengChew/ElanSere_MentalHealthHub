@@ -1,0 +1,65 @@
+<!-- Professional Schedule -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-2">My Schedule</h1>
+            <p class="text-muted">View and manage your upcoming appointments</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Scheduled Appointments</h6>
+                </div>
+                <div class="card-body">
+                    <div th:if="${appointments.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ddd;"></i>
+                        <p class="text-muted mt-3">No appointments scheduled yet</p>
+                    </div>
+                    <div th:unless="${appointments.isEmpty()}" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="apt : ${appointments}">
+                                    <td>
+                                        <h6 class="mb-0" th:text="${apt.student.name}">Name</h6>
+                                        <small class="text-muted" th:text="${apt.student.email}">Email</small>
+                                    </td>
+                                    <td th:text="${#temporals.format(apt.appointmentDate, 'dd MMM yyyy HH:mm')}">Date</td>
+                                    <td>
+                                        <span class="badge bg-success" th:if="${apt.status == 'SCHEDULED'}">Scheduled</span>
+                                        <span class="badge bg-info" th:if="${apt.status == 'COMPLETED'}">Completed</span>
+                                        <span class="badge bg-danger" th:if="${apt.status == 'CANCELLED'}">Cancelled</span>
+                                    </td>
+                                    <td>
+                                        <small th:text="${apt.notes} ?: 'No notes'" class="text-muted"></small>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">Join Call</a>
+                                        <a href="#" class="btn btn-sm btn-outline-danger">Cancel</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</div>
