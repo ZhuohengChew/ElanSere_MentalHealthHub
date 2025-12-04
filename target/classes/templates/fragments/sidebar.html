@@ -1,29 +1,29 @@
 <div th:fragment="sidebar">
     <div class="sidebar">
         <div class="nav flex-column nav-pills" role="tablist">
-            <a href="/dashboard" class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
+            <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
                 <i class="bi bi-house-door"></i> Dashboard
             </a>
             
             <!-- Student & Common Links -->
-            <a href="/assessments" class="nav-link" th:classappend="${activePage == 'assessments' ? 'active' : ''}">
+            <a th:href="@{/assessments}" class="nav-link" th:classappend="${activePage == 'assessments' ? 'active' : ''}">
                 <i class="bi bi-chat-dots"></i> Self-Assessment
             </a>
             
-            <a href="/appointments/book" class="nav-link" th:classappend="${activePage == 'appointments' ? 'active' : ''}">
+            <a th:href="@{/appointments/book}" class="nav-link" th:classappend="${activePage == 'appointments' ? 'active' : ''}">
                 <i class="bi bi-calendar-check"></i> Telehealth
             </a>
             
-            <a href="/forum" class="nav-link" th:classappend="${activePage == 'forum' ? 'active' : ''}">
+            <a th:href="@{/forum}" class="nav-link" th:classappend="${activePage == 'forum' ? 'active' : ''}">
                 <i class="bi bi-chat-left-dots"></i> Peer Support
             </a>
 
             <!-- Admin Only -->
             <div th:if="${user != null and user.role == 'ADMIN'}" style="border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px;">
-                <a href="/users" class="nav-link" th:classappend="${activePage == 'users' ? 'active' : ''}">
+                <a th:href="@{/users}" class="nav-link" th:classappend="${activePage == 'users' ? 'active' : ''}">
                     <i class="bi bi-people"></i> Manage Users
                 </a>
-                <a href="/settings" class="nav-link" th:classappend="${activePage == 'settings' ? 'active' : ''}">
+                <a th:href="@{/settings}" class="nav-link" th:classappend="${activePage == 'settings' ? 'active' : ''}">
                     <i class="bi bi-gear"></i> System Settings
                 </a>
             </div>
@@ -32,10 +32,10 @@
             <hr style="margin: 15px 0; opacity: 0.2;">
 
             <!-- Footer Links -->
-            <a href="/settings" class="nav-link small">
+            <a th:href="@{/settings}" class="nav-link small">
                 <i class="bi bi-sliders"></i> Settings
             </a>
-            <a href="/logout" class="nav-link small" style="color: #dc3545;">
+            <a th:href="@{/logout}" class="nav-link small" style="color: #dc3545;">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </a>
         </div>

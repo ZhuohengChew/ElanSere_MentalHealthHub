@@ -1,5 +1,5 @@
 <!-- Student Dashboard -->
-<div class="container-fluid">
+<div th:fragment="content" class="container-fluid">
 
     <div class="row mb-4">
         <div class="col-md-8">
@@ -89,13 +89,13 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="/assessments/new" class="btn btn-outline-primary btn-sm">
+                        <a th:href="@{/assessments/new}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-plus"></i> New Assessment
                         </a>
-                        <a href="/appointments/book" class="btn btn-outline-primary btn-sm">
+                        <a th:href="@{/appointments/book}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-calendar-plus"></i> Book Appointment
                         </a>
-                        <a href="/forum/new" class="btn btn-outline-primary btn-sm">
+                        <a th:href="@{/forum/new}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-pen"></i> Create Forum Post
                         </a>
                     </div>

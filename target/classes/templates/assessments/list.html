@@ -6,7 +6,7 @@
             <p class="text-muted">Track your mental health through structured assessments</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="/assessments/new" class="btn btn-primary">
+            <a th:href="@{assessments/new}" class="btn btn-primary">
                 <i class="bi bi-plus"></i> New Assessment
             </a>
         </div>
@@ -22,7 +22,7 @@
                     <div th:if="${assessments.isEmpty()}" class="text-center py-5">
                         <i class="bi bi-inbox" style="font-size: 3rem; color: #ddd;"></i>
                         <p class="text-muted mt-3">No assessments yet. Start your first assessment!</p>
-                        <a href="/assessments/new" class="btn btn-primary btn-sm">Take Assessment</a>
+                        <a th:href="@{/assessments/new}" class="btn btn-primary btn-sm">Take Assessment</a>
                     </div>
                     <div th:unless="${assessments.isEmpty()}" class="list-group list-group-flush">
                         <div class="list-group-item d-flex justify-content-between align-items-center" th:each="assessment : ${assessments}">

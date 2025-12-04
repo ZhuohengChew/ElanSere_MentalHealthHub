@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -12,10 +13,11 @@
         <relativePath/>
     </parent>
 
+    <!-- ==== Application Identification ==== -->
     <groupId>com.mentalhealthhub</groupId>
-    <artifactId>mental-health-hub</artifactId>
+    <artifactId>mentalhealthhub</artifactId> <!-- renamed -->
     <version>1.0.0</version>
-    <name>Mental Health Hub</name>
+    <name>mentalhealthhub</name> <!-- renamed -->
     <description>Digital Mental Health Literacy Hub for Universities</description>
 
     <properties>
@@ -23,7 +25,8 @@
     </properties>
 
     <dependencies>
-        <!-- Spring Boot Web -->
+
+        <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -47,14 +50,14 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- H2 Database (for development) -->
+        <!-- H2 Database (Development) -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- MySQL Driver (for production) -->
+        <!-- MySQL Driver -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -68,7 +71,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Thymeleaf Extras for Spring Security -->
+        <!-- Thymeleaf Extras (Security) -->
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
@@ -86,10 +89,20 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

@@ -34,7 +34,10 @@ public class AppointmentController {
         model.addAttribute("appointments", appointments);
         model.addAttribute("user", user);
         
-        return "appointments/list";
+        model.addAttribute("page", "appointments/list");
+        model.addAttribute("title", "My Appointments");
+
+        return "layout";
     }
 
     @GetMapping("/book")
@@ -50,8 +53,11 @@ public class AppointmentController {
 
         model.addAttribute("professionals", professionals);
         model.addAttribute("user", user);
+
+        model.addAttribute("page", "appointments/book");
+        model.addAttribute("title", "Book Appointment");
         
-        return "appointments/book";
+        return "layout";
     }
 
     @PostMapping("/save")

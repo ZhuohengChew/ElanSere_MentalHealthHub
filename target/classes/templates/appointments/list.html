@@ -6,7 +6,7 @@
             <p class="text-muted">Manage your appointments with mental health professionals</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="/appointments/book" class="btn btn-primary">
+            <a th:href="@{/appointments/book}" class="btn btn-primary">
                 <i class="bi bi-calendar-plus"></i> Book Appointment
             </a>
         </div>
@@ -22,7 +22,7 @@
                     <div th:if="${appointments.isEmpty()}" class="text-center py-5">
                         <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ddd;"></i>
                         <p class="text-muted mt-3">No appointments scheduled yet</p>
-                        <a href="/appointments/book" class="btn btn-primary btn-sm">Schedule Now</a>
+                        <a th:href="@{/appointments/book}" class="btn btn-primary btn-sm">Schedule Now</a>
                     </div>
                     <div th:unless="${appointments.isEmpty()}" class="table-responsive">
                         <table class="table table-hover">

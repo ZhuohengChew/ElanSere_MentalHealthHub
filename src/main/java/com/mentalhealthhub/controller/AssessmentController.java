@@ -33,7 +33,10 @@ public class AssessmentController {
         model.addAttribute("assessments", assessments);
         model.addAttribute("user", user);
         
-        return "assessments/list";
+        model.addAttribute("page", "assessments/list");
+        model.addAttribute("title", "My Assessments");
+
+        return "layout";
     }
 
     @GetMapping("/new")
@@ -44,7 +47,11 @@ public class AssessmentController {
         }
 
         model.addAttribute("user", user);
-        return "assessments/new";
+
+        model.addAttribute("page", "assessments/new");
+        model.addAttribute("title", "New Assessment");
+
+        return "layout";
     }
 
     @PostMapping("/save")
@@ -85,6 +92,9 @@ public class AssessmentController {
         model.addAttribute("assessment", assessment);
         model.addAttribute("user", user);
         
-        return "assessments/view";
+        model.addAttribute("page", "assessments/view");
+        model.addAttribute("title", "View Assessment");
+
+        return "layout";
     }
 }

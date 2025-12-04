@@ -48,7 +48,7 @@ public class AuthController {
         session.setAttribute("userId", user.getId());
         session.setAttribute("userRole", user.getRole().toString());
         
-        return "layout";
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/logout")
