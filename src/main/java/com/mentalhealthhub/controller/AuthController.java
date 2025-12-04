@@ -26,28 +26,37 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String email, 
-                        @RequestParam String password,
-                        @RequestParam(required = false) String role,
-                        HttpSession session, 
-                        Model model) {
-        // For demo purposes, create or fetch user
+    public String login(@RequestParam String email,
+            @RequestParam String password,
+            @RequestParam(required = false) String role,
+            HttpSession session,
+            Model model) {
+        // Determine selected role (default to STUDENT)
+        UserRole selectedRole = role != null
+                ? UserRole.valueOf(role.toUpperCase())
+                : UserRole.STUDENT;
+
+        // Create or fetch user
         User user = userRepository.findByEmail(email)
-            .orElseGet(() -> {
-                User newUser = User.builder()
-                    .email(email)
-                    .password(password)
-                    .name(email.split("@")[0])
-                    .role(role != null ? UserRole.valueOf(role.toUpperCase()) : UserRole.STUDENT)
-                    .active(true)
-                    .build();
-                return userRepository.save(newUser);
-            });
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(email)
+                            .password(password)
+                            .name(email.split("@")[0])
+                            .role(selectedRole)
+                            .active(true)
+                            .build();
+                    return userRepository.save(newUser);
+                });
+
+        // Always update user's role to match the latest selection
+        user.setRole(selectedRole);
+        user = userRepository.save(user);
 
         session.setAttribute("user", user);
         session.setAttribute("userId", user.getId());
         session.setAttribute("userRole", user.getRole().toString());
-        
+
         return "redirect:/dashboard";
     }
 
@@ -65,7 +74,7 @@ public class AuthController {
         }
 
         model.addAttribute("user", user);
-        
+
         String dashboardPage;
         switch (user.getRole()) {
             case STUDENT:

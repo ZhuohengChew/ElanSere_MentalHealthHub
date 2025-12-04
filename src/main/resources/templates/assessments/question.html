@@ -1,0 +1,190 @@
+<!-- Assessment Question Page -->
+<div class="container-fluid">
+
+    <!-- Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a th:href="@{/dashboard}" class="btn btn-link text-decoration-none p-0">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Assessment Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    
+                    <!-- Header -->
+                    <div class="mb-4">
+                        <h3 class="mb-3">
+                            <span style="font-size: 1.5rem;">🧠</span>
+                            Mental Health Self-Assessment
+                        </h3>
+                        <p class="text-muted mb-0">
+                            This confidential assessment will help us understand your current mental health status and provide personalized recommendations
+                        </p>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Question <span th:text="${currentQuestion}">1</span> of <span th:text="${totalQuestions}">8</span></small>
+                            <small class="text-muted"><span th:text="${#numbers.formatDecimal(progressPercentage, 0, 0)}">13</span>% Complete</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${#numbers.formatDecimal(progressPercentage, 0, 0)} + '%'" style="background-color: #3B82F6;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Form -->
+                    <form th:action="@{/assessments/answer}" method="post">
+                        <input type="hidden" name="questionNumber" th:value="${currentQuestion}">
+                        
+                        <!-- Question -->
+                        <div class="question-section mb-4 p-4" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #E5E7EB;">
+                            <div class="d-flex align-items-start mb-3">
+                                <i class="bi bi-chat-left-text me-3 mt-1" style="color: #9C27B0; font-size: 1.5rem;"></i>
+                                <div>
+                                    <h5 class="mb-2" th:text="${question.questionText}">How often have you felt overwhelmed in the past week?</h5>
+                                    <p class="text-muted small mb-0">Select the option that best describes your experience</p>
+                                </div>
+                            </div>
+
+                            <!-- Answer Options -->
+                            <div class="answer-options mt-4">
+                                <!-- Option 1 -->
+                                <div class="answer-option mb-3">
+                                    <input type="radio" name="answer" id="option0" value="0" class="form-check-input" required>
+                                    <label for="option0" class="form-check-label w-100 d-flex align-items-center">
+                                        <span class="emoji-icon me-3">😊</span>
+                                        <span>Never / Not at all</span>
+                                    </label>
+                                </div>
+
+                                <!-- Option 2 -->
+                                <div class="answer-option mb-3">
+                                    <input type="radio" name="answer" id="option1" value="1" class="form-check-input" required>
+                                    <label for="option1" class="form-check-label w-100 d-flex align-items-center">
+                                        <span class="emoji-icon me-3">🙂</span>
+                                        <span>Rarely / Slightly</span>
+                                    </label>
+                                </div>
+
+                                <!-- Option 3 -->
+                                <div class="answer-option mb-3">
+                                    <input type="radio" name="answer" id="option2" value="2" class="form-check-input" required>
+                                    <label for="option2" class="form-check-label w-100 d-flex align-items-center">
+                                        <span class="emoji-icon me-3">😐</span>
+                                        <span>Sometimes / Moderately</span>
+                                    </label>
+                                </div>
+
+                                <!-- Option 4 -->
+                                <div class="answer-option mb-3">
+                                    <input type="radio" name="answer" id="option3" value="3" class="form-check-input" required>
+                                    <label for="option3" class="form-check-label w-100 d-flex align-items-center">
+                                        <span class="emoji-icon me-3">😟</span>
+                                        <span>Often / Very much</span>
+                                    </label>
+                                </div>
+
+                                <!-- Option 5 -->
+                                <div class="answer-option mb-3">
+                                    <input type="radio" name="answer" id="option4" value="4" class="form-check-input" required>
+                                    <label for="option4" class="form-check-label w-100 d-flex align-items-center">
+                                        <span class="emoji-icon me-3">😰</span>
+                                        <span>Always / Extremely</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a th:href="@{/assessments/question/{prev}(prev=${currentQuestion - 1})}" 
+                               class="btn btn-outline-secondary"
+                               th:classappend="${currentQuestion == 1} ? 'disabled' : ''"
+                               th:if="${currentQuestion > 1}">
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </a>
+                            <div th:if="${currentQuestion == 1}" style="width: 0;"></div>
+                            <button type="submit" class="btn btn-primary px-4 ms-auto">
+                                <span th:text="${currentQuestion == 8} ? 'Submit' : 'Next'">Next</span>
+                                <i class="bi bi-chevron-right" th:if="${currentQuestion < 8}"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Confidentiality Notice -->
+                    <div class="alert alert-info mt-4 d-flex align-items-start border-0" style="background-color: #E3F2FD;">
+                        <i class="bi bi-shield-check me-3 mt-1" style="color: #2196F3; font-size: 1.2rem;"></i>
+                        <div>
+                            <strong>Your responses are confidential</strong>
+                            <p class="mb-0 small">This assessment is designed to help you better understand your mental health and connect you with appropriate resources. Your privacy is important to us.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .answer-option {
+        background-color: white;
+        border: 2px solid #E5E7EB;
+        border-radius: 8px;
+        padding: 16px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .answer-option:hover {
+        border-color: #93C5FD;
+        background-color: #F0F9FF;
+    }
+
+    .answer-option input[type="radio"] {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+
+    .answer-option label {
+        cursor: pointer;
+        margin-left: 30px;
+        margin-bottom: 0;
+    }
+
+    .answer-option:has(input:checked) {
+        border-color: #3B82F6;
+        background-color: #EFF6FF;
+    }
+
+    .answer-option:has(input:checked) label {
+        font-weight: 500;
+    }
+
+    .emoji-icon {
+        font-size: 1.5rem;
+        display: inline-block;
+    }
+
+    .progress-bar {
+        background-color: #3B82F6;
+        border-radius: 10px;
+    }
+
+    .progress {
+        background-color: #E5E7EB;
+        border-radius: 10px;
+    }
+</style>
+

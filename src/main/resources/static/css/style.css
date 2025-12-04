@@ -33,7 +33,7 @@ body {
 }
 
 .sidebar .nav-link {
-    color: #666;
+    color: #000 !important;
     border-left: 3px solid transparent;
     padding: 12px 20px;
     margin-bottom: 5px;
@@ -48,7 +48,7 @@ body {
 
 .sidebar .nav-link.active {
     background-color: var(--light-bg);
-    color: var(--primary-color);
+    color: #000 !important;
     border-left-color: var(--primary-color);
     font-weight: 600;
 }
@@ -250,4 +250,74 @@ h2, h3, h4, h5, h6 {
 
 .input-group > .form-control:focus {
     border-left: 2px solid var(--primary-color);
+}
+
+/* Student dashboard specific styles */
+.wave-emoji {
+    display: inline-block;
+    animation: wave 0.5s ease-in-out;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.student-progress {
+    border-radius: 10px;
+    background-color: #f0f0f0;
+}
+
+.student-progress .progress-bar {
+    border-radius: 10px;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-20deg); }
+}
+
+/* Self-assessment specific styles */
+.assessment-option-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background-color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+}
+
+.assessment-option-card:hover {
+    background-color: #EFF6FF;
+    border-color: #BFDBFE;
+}
+
+.assessment-option-card.selected {
+    background-color: #DBEAFE;
+    border-color: #2563EB;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.4);
+}
+
+.assessment-option-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.assessment-option-emoji {
+    font-size: 1.5rem;
+}
+
+.assessment-option-label {
+    font-weight: 500;
+}
+
+.assessment-option-description {
+    font-size: 0.85rem;
+    color: #6b7280;
 }

@@ -1,7 +1,8 @@
-com\mentalhealthhub\model\AppointmentStatus.class
 com\mentalhealthhub\model\Assessment.class
 com\mentalhealthhub\repository\ForumPostRepository.class
 com\mentalhealthhub\model\Appointment.class
 com\mentalhealthhub\model\UserRole.class
+com\mentalhealthhub\controller\AuthController$1.class
+com\mentalhealthhub\model\AppointmentStatus.class
 com\mentalhealthhub\model\User.class
 com\mentalhealthhub\model\ForumPost.class

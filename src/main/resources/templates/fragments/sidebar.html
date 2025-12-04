@@ -1,6 +1,7 @@
 <div th:fragment="sidebar">
     <div class="sidebar">
         <div class="nav flex-column nav-pills" role="tablist">
+            <!-- Dashboard -->
             <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
                 <i class="bi bi-house-door"></i> Dashboard
             </a>
@@ -8,13 +9,22 @@
             <!--/*===== STUDENT Links =====*/-->
             <div th:if="${session.userRole == 'STUDENT'}">
                 <a th:href="@{/assessments}" class="nav-link" th:classappend="${activePage == 'assessments' ? 'active' : ''}">
-                    <i class="bi bi-chat-dots"></i> Self-Assessment
+                    <i class="bi bi-file-earmark-text"></i> Self-Assessment
                 </a>
-                <a th:href="@{/appointments/book}" class="nav-link" th:classappend="${activePage == 'appointments' ? 'active' : ''}">
-                    <i class="bi bi-calendar-check"></i> Book Appointment
+                <a th:href="@{/self-care}" class="nav-link" th:classappend="${activePage == 'self-care' ? 'active' : ''}">
+                    <i class="bi bi-heart"></i> Self-Care Tools
+                </a>
+                <a th:href="@{/modules}" class="nav-link" th:classappend="${activePage == 'modules' ? 'active' : ''}">
+                    <i class="bi bi-book"></i> Educational Modules
                 </a>
                 <a th:href="@{/forum}" class="nav-link" th:classappend="${activePage == 'forum' ? 'active' : ''}">
-                    <i class="bi bi-chat-left-dots"></i> Peer Support
+                    <i class="bi bi-chat-dots"></i> Peer Support Forum
+                </a>
+                <a th:href="@{/appointments/book}" class="nav-link" th:classappend="${activePage == 'appointments' ? 'active' : ''}">
+                    <i class="bi bi-camera-video"></i> Book Appointment
+                </a>
+                <a th:href="@{/concerns/report}" class="nav-link" th:classappend="${activePage == 'concerns' ? 'active' : ''}">
+                    <i class="bi bi-exclamation-circle"></i> Report Concern
                 </a>
             </div>
 
@@ -41,7 +51,7 @@
             <!--/*===== ADMIN Links =====*/-->
             <div th:if="${session.userRole == 'ADMIN'}">
                 <hr style="margin: 15px 0; opacity: 0.2;">
-                <h6 class="nav-link text-muted" style="font-size: 0.8rem;">Admin</h6>
+                <h6 class="nav-link" style="font-size: 0.8rem; color: #000;">Admin</h6>
                 <a th:href="@{/users}" class="nav-link" th:classappend="${activePage == 'users' ? 'active' : ''}">
                     <i class="bi bi-people"></i> Manage Users
                 </a>
@@ -54,8 +64,11 @@
             <hr style="margin: 15px 0; opacity: 0.2;">
 
             <div class="mt-auto">
-                 <a th:href="@{/settings}" class="nav-link small">
-                    <i class="bi bi-sliders"></i> Settings
+                <a th:href="@{/notifications}" class="nav-link small" th:classappend="${activePage == 'notifications' ? 'active' : ''}">
+                    <i class="bi bi-bell"></i> Notifications
+                </a>
+                <a th:href="@{/settings}" class="nav-link small" th:classappend="${activePage == 'settings' ? 'active' : ''}">
+                    <i class="bi bi-gear"></i> Settings
                 </a>
                 <a th:href="@{/logout}" class="nav-link small" style="color: #dc3545;">
                     <i class="bi bi-box-arrow-right"></i> Logout
