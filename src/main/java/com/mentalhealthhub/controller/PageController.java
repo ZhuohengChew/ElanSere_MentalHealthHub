@@ -2,6 +2,8 @@ package com.mentalhealthhub.controller;
 
 import com.mentalhealthhub.model.User;
 import jakarta.servlet.http.HttpSession;
+
+import org.aspectj.internal.lang.annotation.ajcDeclarePrecedence;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +19,11 @@ public class PageController {
         }
         
         model.addAttribute("user", user);
-        return "settings";
+
+        model.addAttribute("page", "settings");
+        model.addAttribute("title", "Settings");
+
+        return "layout";
     }
 
     @GetMapping("/notifications")
@@ -28,7 +34,10 @@ public class PageController {
         }
         
         model.addAttribute("user", user);
-        return "notifications";
+
+        model.addAttribute("page", "notifications");
+        model.addAttribute("title", "Notifications");
+        return "layout";
     }
 
     @GetMapping("/error")

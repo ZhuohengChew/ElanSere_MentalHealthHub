@@ -4,22 +4,44 @@
             <a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
                 <i class="bi bi-house-door"></i> Dashboard
             </a>
-            
-            <!-- Student & Common Links -->
-            <a th:href="@{/assessments}" class="nav-link" th:classappend="${activePage == 'assessments' ? 'active' : ''}">
-                <i class="bi bi-chat-dots"></i> Self-Assessment
-            </a>
-            
-            <a th:href="@{/appointments/book}" class="nav-link" th:classappend="${activePage == 'appointments' ? 'active' : ''}">
-                <i class="bi bi-calendar-check"></i> Telehealth
-            </a>
-            
-            <a th:href="@{/forum}" class="nav-link" th:classappend="${activePage == 'forum' ? 'active' : ''}">
-                <i class="bi bi-chat-left-dots"></i> Peer Support
-            </a>
 
-            <!-- Admin Only -->
-            <div th:if="${user != null and user.role == 'ADMIN'}" style="border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px;">
+            <!--/*===== STUDENT Links =====*/-->
+            <div th:if="${session.userRole == 'STUDENT'}">
+                <a th:href="@{/assessments}" class="nav-link" th:classappend="${activePage == 'assessments' ? 'active' : ''}">
+                    <i class="bi bi-chat-dots"></i> Self-Assessment
+                </a>
+                <a th:href="@{/appointments/book}" class="nav-link" th:classappend="${activePage == 'appointments' ? 'active' : ''}">
+                    <i class="bi bi-calendar-check"></i> Book Appointment
+                </a>
+                <a th:href="@{/forum}" class="nav-link" th:classappend="${activePage == 'forum' ? 'active' : ''}">
+                    <i class="bi bi-chat-left-dots"></i> Peer Support
+                </a>
+            </div>
+
+            <!--/*===== PROFESSIONAL Links =====*/-->
+            <div th:if="${session.userRole == 'PROFESSIONAL'}">
+                <a th:href="@{/appointments/my-schedule}" class="nav-link" th:classappend="${activePage == 'schedule' ? 'active' : ''}">
+                    <i class="bi bi-calendar-week"></i> My Schedule
+                </a>
+                <a th:href="@{/patients}" class="nav-link" th:classappend="${activePage == 'patients' ? 'active' : ''}">
+                    <i class="bi bi-person-lines-fill"></i> My Patients
+                </a>
+            </div>
+            
+            <!--/*===== STAFF Links =====*/-->
+            <div th:if="${session.userRole == 'STAFF'}">
+                 <a th:href="@{/resources/manage}" class="nav-link" th:classappend="${activePage == 'resources' ? 'active' : ''}">
+                    <i class="bi bi-journal-album"></i> Manage Resources
+                </a>
+                <a th:href="@{/appointments/all}" class="nav-link" th:classappend="${activePage == 'all-appointments' ? 'active' : ''}">
+                    <i class="bi bi-calendar-event"></i> View All Appointments
+                </a>
+            </div>
+
+            <!--/*===== ADMIN Links =====*/-->
+            <div th:if="${session.userRole == 'ADMIN'}">
+                <hr style="margin: 15px 0; opacity: 0.2;">
+                <h6 class="nav-link text-muted" style="font-size: 0.8rem;">Admin</h6>
                 <a th:href="@{/users}" class="nav-link" th:classappend="${activePage == 'users' ? 'active' : ''}">
                     <i class="bi bi-people"></i> Manage Users
                 </a>
@@ -28,16 +50,17 @@
                 </a>
             </div>
 
-            <!-- Divider -->
+            <!--/*===== Common Footer Links =====*/-->
             <hr style="margin: 15px 0; opacity: 0.2;">
 
-            <!-- Footer Links -->
-            <a th:href="@{/settings}" class="nav-link small">
-                <i class="bi bi-sliders"></i> Settings
-            </a>
-            <a th:href="@{/logout}" class="nav-link small" style="color: #dc3545;">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
+            <div class="mt-auto">
+                 <a th:href="@{/settings}" class="nav-link small">
+                    <i class="bi bi-sliders"></i> Settings
+                </a>
+                <a th:href="@{/logout}" class="nav-link small" style="color: #dc3545;">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
         </div>
     </div>
 </div>

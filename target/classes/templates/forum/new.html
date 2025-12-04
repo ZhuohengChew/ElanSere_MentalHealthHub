@@ -2,7 +2,7 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-md-12">
-            <a href="/forum" class="btn btn-sm btn-outline-secondary mb-3">
+            <a th:href="@{/forum}" class="btn btn-sm btn-outline-secondary mb-3">
                 <i class="bi bi-arrow-left"></i> Back to Forum
             </a>
             <h1 class="mb-2">Create New Post</h1>
@@ -14,7 +14,7 @@
         <div class="col-md-8 offset-md-2">
             <div class="card">
                 <div class="card-body">
-                    <form method="post" action="/forum/save">
+                    <form method="post" th:action="@{/forum/save}">
                         <div class="mb-3">
                             <label for="title" class="form-label">Post Title</label>
                             <input type="text" class="form-control" id="title" name="title" 
@@ -36,7 +36,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check"></i> Publish Post
                             </button>
-                            <a href="/forum" class="btn btn-outline-secondary">Cancel</a>
+                            <a th:href="@{/forum}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

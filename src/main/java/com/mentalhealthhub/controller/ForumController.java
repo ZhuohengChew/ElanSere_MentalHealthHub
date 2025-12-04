@@ -29,7 +29,10 @@ public class ForumController {
         model.addAttribute("posts", posts);
         model.addAttribute("user", user);
         
-        return "forum/list";
+        model.addAttribute("page", "forum/list");
+        model.addAttribute("title", "Forum List");
+
+        return "layout";
     }
 
     @GetMapping("/{id}")
@@ -50,8 +53,11 @@ public class ForumController {
 
         model.addAttribute("post", post);
         model.addAttribute("user", user);
+
+        model.addAttribute("page", "forum/view");
+        model.addAttribute("title", "Forum View");
         
-        return "forum/view";
+        return "layout";
     }
 
     @GetMapping("/new")
@@ -62,7 +68,10 @@ public class ForumController {
         }
 
         model.addAttribute("user", user);
-        return "forum/new";
+
+        model.addAttribute("page", "forum/new");
+        model.addAttribute("title", "New Forum Post");
+        return "layout";
     }
 
     @PostMapping("/save")
