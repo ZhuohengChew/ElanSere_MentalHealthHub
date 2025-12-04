@@ -40,11 +40,11 @@
             
             <!--/*===== STAFF Links =====*/-->
             <div th:if="${session.userRole == 'STAFF'}">
-                 <a th:href="@{/resources/manage}" class="nav-link" th:classappend="${activePage == 'resources' ? 'active' : ''}">
-                    <i class="bi bi-journal-album"></i> Manage Resources
+                 <a th:href="@{/concerns/report}" class="nav-link" th:classappend="${activePage == 'report' ? 'active' : ''}">
+                    <i class="bi bi-exclamation-circle"></i> Report Concerns
                 </a>
-                <a th:href="@{/appointments/all}" class="nav-link" th:classappend="${activePage == 'all-appointments' ? 'active' : ''}">
-                    <i class="bi bi-calendar-event"></i> View All Appointments
+                <a th:href="@{/student/progress}" class="nav-link" th:classappend="${activePage == 'student-progress' ? 'active' : ''}">
+                    <i class="bi bi-graph-up-arrow"></i> Track Student Progress
                 </a>
             </div>
 

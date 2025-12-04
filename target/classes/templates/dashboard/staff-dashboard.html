@@ -1,96 +1,238 @@
 <!-- Staff Dashboard -->
 <div class="container-fluid">
-
     <div class="row mb-4">
         <div class="col-md-12">
-            <h1 class="mb-2">Staff Dashboard</h1>
-            <p class="text-muted">Support student mental health and manage resources</p>
+            <div class="card" style="border-left: 4px solid #FF6B6B;">
+                <div class="card-body">
+                    <h1 class="mb-2">
+                        <span style="font-size: 2rem;">👨‍🏫</span> Staff Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">Monitor student wellbeing and access training resources</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center hover-shadow" style="border-left: 4px solid #FF6B6B;">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <div class="bg-gradient-to-br from-[#FF6B6B] to-[#E74C3C] p-3 rounded-lg d-inline-block">
+                            <span style="font-size: 2rem;">👥</span>
+                        </div>
+                    </div>
+                    <h6 class="text-muted mb-1">Students Monitored</h6>
+                    <h3 class="mb-0">24</h3>
+                    <small class="text-muted">In your cohort</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center hover-shadow" style="border-left: 4px solid #F39C12;">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <div class="bg-gradient-to-br from-[#F39C12] to-[#E67E22] p-3 rounded-lg d-inline-block">
+                            <span style="font-size: 2rem;">⚠️</span>
+                        </div>
+                    </div>
+                    <h6 class="text-muted mb-1">Active Concerns</h6>
+                    <h3 class="mb-0">3</h3>
+                    <small class="text-muted">Require attention</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center hover-shadow" style="border-left: 4px solid #20B2AA;">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <div class="bg-gradient-to-br from-[#20B2AA] to-[#17A2B8] p-3 rounded-lg d-inline-block">
+                            <span style="font-size: 2rem;">📚</span>
+                        </div>
+                    </div>
+                    <h6 class="text-muted mb-1">Training Progress</h6>
+                    <h3 class="mb-0">75%</h3>
+                    <small class="text-muted">2 of 3 modules complete</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center hover-shadow" style="border-left: 4px solid #8E44AD;">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <div class="bg-gradient-to-br from-[#8E44AD] to-[#7D3C98] p-3 rounded-lg d-inline-block">
+                            <span style="font-size: 2rem;">❤️</span>
+                        </div>
+                    </div>
+                    <h6 class="text-muted mb-1">Wellness Score</h6>
+                    <h3 class="mb-0">82%</h3>
+                    <small class="text-muted">Average cohort wellness</small>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h6 class="text-muted">Active Tickets</h6>
-                <div class="stat-number">24</div>
-                <small class="text-danger"><i class="bi bi-arrow-up"></i> 3 urgent</small>
+        <!-- Recent Student Activity -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-left: 4px solid #6A8EAE;">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <span style="font-size: 1.5rem;">📊</span> Recent Student Activity
+                    </h5>
+                    <small class="text-muted">Overview of student engagement with mental health resources</small>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">✅</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #1234</p>
+                                    <p class="mb-0 small text-muted">Completed self-assessment</p>
+                                </div>
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">📅</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #5678</p>
+                                    <p class="mb-0 small text-muted">Booked telehealth appointment</p>
+                                </div>
+                                <small class="text-muted">5 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">⚠️</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #9012</p>
+                                    <p class="mb-0 small text-danger">Reported concern (High urgency)</p>
+                                </div>
+                                <small class="text-muted">1 day ago</small>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">💚</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #3456</p>
+                                    <p class="mb-0 small text-muted">Accessed self-care tools</p>
+                                </div>
+                                <small class="text-muted">2 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h6 class="text-muted">Students Supported</h6>
-                <div class="stat-number">156</div>
-                <small class="text-muted">This month</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h6 class="text-muted">Resources Created</h6>
-                <div class="stat-number">42</div>
-                <small class="text-success"><i class="bi bi-arrow-up"></i> 5 new this month</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <h6 class="text-muted">Response Time</h6>
-                <div class="stat-number">2.4h</div>
-                <small class="text-muted">Average</small>
+
+        <!-- Student Analytics Report -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-left: 4px solid #20B2AA;">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <span style="font-size: 1.5rem;">📈</span> Student Analytics Report
+                    </h5>
+                    <small class="text-muted">Key metrics for monitored students</small>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Assessment Completion Rate</span>
+                            <span class="small fw-medium text-primary">89%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 89%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Active Engagement</span>
+                            <span class="small fw-medium text-danger">76%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 76%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Support Resource Usage</span>
+                            <span class="small fw-medium text-purple">92%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="background-color: #8E44AD; width: 92%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Appointment Attendance</span>
+                            <span class="small fw-medium text-warning">85%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-outline-primary w-100">
+                        <span style="font-size: 1.2rem;">📄</span> View Detailed Report
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Quick Actions -->
     <div class="row">
-        <div class="col-md-8">
-            <div class="card mb-3">
-                <div class="card-header border-0 pb-3">
-                    <h6 class="mb-0">Recent Student Referrals</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Student</th>
-                                    <th>Issue</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Ali Zainal</td>
-                                    <td>Exam stress</td>
-                                    <td>Today</td>
-                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Fatima Ahmad</td>
-                                    <td>Sleep issues</td>
-                                    <td>Yesterday</td>
-                                    <td><span class="badge bg-success">Resolved</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-12">
+            <h3 class="mb-4">
+                <span style="font-size: 1.8rem;">⚡</span> Quick Actions
+            </h3>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header border-0 pb-3">
-                    <h6 class="mb-0">Quick Actions</h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-plus-circle"></i> New Referral
-                        </a>
-                        <a href="#" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-folder-plus"></i> Add Resource
-                        </a>
+        <div class="col-md-6 mb-4">
+            <a th:href="@{/student/progress}" class="text-decoration-none">
+                <div class="card hover-shadow h-100" style="border-left: 4px solid #FF6B6B; cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-gradient-to-br from-[#FF6B6B] to-[#E74C3C] p-3 rounded-lg me-3">
+                                <span style="font-size: 2rem;">📈</span>
+                            </div>
+                            <h5 class="mb-0 text-dark">Track Student Progress</h5>
+                        </div>
+                        <p class="text-muted small mb-0">Monitor individual student mental health trends and assessment history</p>
                     </div>
                 </div>
-            </div>
+            </a>
+        </div>
+        <div class="col-md-6 mb-4">
+            <a th:href="@{/concerns/report}" class="text-decoration-none">
+                <div class="card hover-shadow h-100" style="border-left: 4px solid #F39C12; cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-gradient-to-br from-[#F39C12] to-[#E67E22] p-3 rounded-lg me-3">
+                                <span style="font-size: 2rem;">🆘</span>
+                            </div>
+                            <h5 class="mb-0 text-dark">Report Concern</h5>
+                        </div>
+                        <p class="text-muted small mb-0">Report a mental health concern for a student to a professional</p>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    .text-purple {
+        color: #8E44AD;
+    }
+</style>

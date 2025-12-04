@@ -1,0 +1,639 @@
+<!-- Track Student Progress Page -->
+<div class="container-fluid">
+    <!-- Student List View -->
+    <div id="studentListView">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card" style="border-left: 4px solid #FF6B6B;">
+                    <div class="card-body">
+                        <h1 class="mb-2">
+                            <i class="bi bi-graph-up-arrow"></i> Track Student Progress
+                        </h1>
+                        <p class="text-muted mb-0">
+                            Monitor mental health trends and assessment history for your students
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Card -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card" style="border-left: 4px solid #20B2AA;">
+                    <div class="card-body">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="searchInput"
+                                   placeholder="Search by student name or ID..."
+                                   th:value="${searchQuery != null ? searchQuery : ''}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Cards -->
+        <div class="row" id="studentCardsContainer">
+            <div th:each="student : ${students}" 
+                 class="col-md-6 col-lg-4 mb-4 student-card"
+                 th:data-student-id="${student.id}"
+                 th:data-student-name="${student.name}"
+                 style="cursor: pointer;">
+                <div class="card h-100 hover-shadow" 
+                     th:classappend="${student.trend == 'improving' ? 'border-success' : (student.trend == 'stable' ? 'border-primary' : 'border-danger')}"
+                     style="border-left: 4px solid; transition: all 0.3s ease;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="bi bi-person-circle" style="font-size: 2rem; color: #6A8EAE;"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0" th:text="${student.name}">Student Name</h5>
+                                    <small class="text-muted" th:text="'ID: ' + ${student.id}">ID: S1234</small>
+                                </div>
+                            </div>
+                            <span class="badge" 
+                                  th:classappend="${student.trend == 'improving' ? 'bg-success' : (student.trend == 'stable' ? 'bg-primary' : 'bg-danger')}"
+                                  th:text="${student.trend}">Trend</span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="p-3 rounded" style="background: linear-gradient(135deg, rgba(32, 178, 170, 0.1), transparent);">
+                                    <p class="small text-muted mb-1">Assessments</p>
+                                    <p class="h6 mb-0 text-primary" th:text="${student.assessments} + ' completed'">0</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded" style="background: linear-gradient(135deg, rgba(142, 68, 173, 0.1), transparent);">
+                                    <p class="small text-muted mb-1">Last Active</p>
+                                    <p class="h6 mb-0 text-purple" th:text="${student.lastActive}">N/A</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded" style="background: linear-gradient(135deg, rgba(243, 156, 18, 0.1), transparent);">
+                                    <p class="small text-muted mb-1">Wellbeing</p>
+                                    <p class="h6 mb-0 text-warning" th:text="${student.wellbeing} + '%'">0%</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded" style="background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), transparent);">
+                                    <p class="small text-muted mb-1">Engagement</p>
+                                    <p class="h6 mb-0 text-danger" th:text="${student.engagement} + '%'">0%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${students == null || students.isEmpty()}" class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-search" style="font-size: 4rem; color: #ddd;"></i>
+                        <h3 class="mt-3">No students found</h3>
+                        <p class="text-muted">Try adjusting your search query</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail View -->
+    <div id="studentDetailView" style="display: none;">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-outline-secondary mb-3" onclick="showStudentList()">
+                    <i class="bi bi-arrow-left"></i> Back to Student List
+                </button>
+            </div>
+        </div>
+
+        <!-- Student Header -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card" style="border-left: 4px solid #20B2AA;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h1 class="mb-2">
+                                    <i class="bi bi-person-circle"></i> <span id="detailStudentName">Student Name</span>
+                                </h1>
+                                <p class="text-muted mb-0">
+                                    Student ID: <span id="detailStudentId">S1234</span> • Mental health progress tracking and wellness monitoring
+                                </p>
+                            </div>
+                            <span class="badge badge-lg" id="detailTrendBadge">Trend</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card text-center" style="border-left: 4px solid #20B2AA;">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="bi bi-check-circle-fill text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6 class="text-muted">Total Assessments</h6>
+                        <h3 class="mb-0" id="detailAssessments">0</h3>
+                        <small class="text-muted">Last: <span id="detailLastAssessment">N/A</span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center" style="border-left: 4px solid #FF6B6B;">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="bi bi-graph-up-arrow text-danger" id="detailTrendIcon" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6 class="text-muted">Current Trend</h6>
+                        <h3 class="mb-0" id="detailTrend">-</h3>
+                        <small class="text-muted">Over past month</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center" style="border-left: 4px solid #8E44AD;">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="bi bi-heart-fill text-purple" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6 class="text-muted">Wellbeing Score</h6>
+                        <h3 class="mb-0" id="detailWellbeing">0%</h3>
+                        <small class="text-muted">Latest assessment</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-center" style="border-left: 4px solid #F39C12;">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <i class="bi bi-activity text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6 class="text-muted">Engagement Rate</h6>
+                        <h3 class="mb-0" id="detailEngagement">0%</h3>
+                        <small class="text-muted">Active: <span id="detailLastActive">N/A</span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" id="progressTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="indicators-tab" data-bs-toggle="tab" data-bs-target="#indicators" type="button" role="tab">
+                    Mental Health Indicators
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+                    Assessment History
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities" type="button" role="tab">
+                    Recent Activities
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="progressTabContent">
+            <!-- Mental Health Indicators Tab -->
+            <div class="tab-pane fade show active" id="indicators" role="tabpanel">
+                <!-- Current Levels Card -->
+                <div class="card mb-4" style="border-left: 4px solid #FF6B6B;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-bar-chart"></i> Mental Health Indicators - Current Levels
+                        </h5>
+                        <small class="text-muted">Latest assessment results</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Stress Level</span>
+                                <div>
+                                    <span class="badge" id="stressBadge">-</span>
+                                    <span class="ms-2 text-muted" id="stressValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" id="stressProgress" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Anxiety Level</span>
+                                <div>
+                                    <span class="badge" id="anxietyBadge">-</span>
+                                    <span class="ms-2 text-muted" id="anxietyValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-warning" id="anxietyProgress" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Depression Indicators</span>
+                                <div>
+                                    <span class="badge" id="depressionBadge">-</span>
+                                    <span class="ms-2 text-muted" id="depressionValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-danger" id="depressionProgress" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-medium">Overall Wellbeing</span>
+                                <div>
+                                    <span class="badge" id="wellbeingBadge">-</span>
+                                    <span class="ms-2 text-muted" id="wellbeingValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" id="wellbeingProgress" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trends Chart Card -->
+                <div class="card mb-4" style="border-left: 4px solid #6A8EAE;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up"></i> Mental Health Trends Over Time
+                        </h5>
+                        <small class="text-muted">6-week progression of mental health indicators</small>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trendsChart" height="100"></canvas>
+                    </div>
+                </div>
+
+                <!-- Alert Card (if concerning) -->
+                <div class="card border-danger bg-danger bg-opacity-10" id="alertCard" style="display: none; border-left: 4px solid #dc3545;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h5 class="text-danger mb-2">⚠️ Attention Required</h5>
+                                <p class="mb-0">
+                                    This student is showing concerning indicators. Consider scheduling a follow-up check-in or referring to a mental health professional for additional support.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assessment History Tab -->
+            <div class="tab-pane fade" id="history" role="tabpanel">
+                <div class="card" style="border-left: 4px solid #20B2AA;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-check"></i> Assessment History
+                        </h5>
+                        <small class="text-muted">Past 30 days of mental health assessments</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="assessmentHistoryList">
+                            <!-- Assessment items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities Tab -->
+            <div class="tab-pane fade" id="activities" role="tabpanel">
+                <div class="card mb-4" style="border-left: 4px solid #8E44AD;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-activity"></i> Platform Activities
+                        </h5>
+                        <small class="text-muted">Student engagement with platform resources (past 30 days)</small>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="activitiesChart" height="100"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 4px solid #20B2AA;">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul"></i> Activity Summary
+                        </h5>
+                        <small class="text-muted">Overview of student engagement</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="activitySummary">
+                            <!-- Activity items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student Data (hidden, populated by Thymeleaf) -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const studentsData = /*[[${students}]]*/ [];
+    let selectedStudent = null;
+    
+    // Initialize search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterStudents);
+        }
+        
+        // Add click handlers to student cards
+        document.querySelectorAll('.student-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const studentId = this.getAttribute('data-student-id');
+                showStudentDetail(studentId);
+            });
+        });
+    });
+    
+    function filterStudents() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.student-card').forEach(card => {
+            const name = card.getAttribute('data-student-name').toLowerCase();
+            const id = card.getAttribute('data-student-id').toLowerCase();
+            if (name.includes(query) || id.includes(query)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    function showStudentDetail(studentId) {
+        selectedStudent = studentsData.find(s => s.id === studentId);
+        if (!selectedStudent) return;
+        
+        // Hide list, show detail
+        document.getElementById('studentListView').style.display = 'none';
+        document.getElementById('studentDetailView').style.display = 'block';
+        
+        // Populate detail view
+        document.getElementById('detailStudentName').textContent = selectedStudent.name;
+        document.getElementById('detailStudentId').textContent = selectedStudent.id;
+        document.getElementById('detailAssessments').textContent = selectedStudent.assessments;
+        document.getElementById('detailLastAssessment').textContent = selectedStudent.lastAssessment;
+        document.getElementById('detailTrend').textContent = selectedStudent.trend;
+        document.getElementById('detailWellbeing').textContent = selectedStudent.wellbeing + '%';
+        document.getElementById('detailEngagement').textContent = selectedStudent.engagement + '%';
+        document.getElementById('detailLastActive').textContent = selectedStudent.lastActive;
+        
+        // Update trend badge
+        const trendBadge = document.getElementById('detailTrendBadge');
+        trendBadge.textContent = selectedStudent.trend;
+        trendBadge.className = 'badge badge-lg ' + 
+            (selectedStudent.trend === 'improving' ? 'bg-success' : 
+             selectedStudent.trend === 'stable' ? 'bg-primary' : 'bg-danger');
+        
+        // Update trend icon
+        const trendIcon = document.getElementById('detailTrendIcon');
+        trendIcon.className = 'bi ' + 
+            (selectedStudent.trend === 'improving' ? 'bi-graph-up-arrow' : 
+             selectedStudent.trend === 'stable' ? 'bi-activity' : 'bi-graph-down-arrow') + 
+            ' text-danger';
+        
+        // Update progress bars
+        updateProgressBar('stress', selectedStudent.stressLevel);
+        updateProgressBar('anxiety', selectedStudent.anxietyLevel);
+        updateProgressBar('depression', selectedStudent.depressionLevel);
+        updateProgressBar('wellbeing', selectedStudent.wellbeing);
+        
+        // Show/hide alert
+        if (selectedStudent.trend === 'concerning') {
+            document.getElementById('alertCard').style.display = 'block';
+        } else {
+            document.getElementById('alertCard').style.display = 'none';
+        }
+        
+        // Render charts
+        renderTrendsChart();
+        renderActivitiesChart();
+        renderAssessmentHistory();
+        renderActivitySummary();
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+    }
+    
+    function updateProgressBar(type, value) {
+        const progressBar = document.getElementById(type + 'Progress');
+        const valueSpan = document.getElementById(type + 'Value');
+        const badge = document.getElementById(type + 'Badge');
+        
+        if (progressBar) progressBar.style.width = value + '%';
+        if (valueSpan) valueSpan.textContent = value + '%';
+        
+        if (type === 'wellbeing') {
+            if (badge) {
+                if (value > 60) {
+                    badge.textContent = '✅ Good';
+                    badge.className = 'badge bg-success';
+                } else if (value > 30) {
+                    badge.textContent = '⚠️ Fair';
+                    badge.className = 'badge bg-warning';
+                } else {
+                    badge.textContent = '🚨 Needs Attention';
+                    badge.className = 'badge bg-danger';
+                }
+            }
+        } else {
+            if (badge) {
+                if (value < 40) {
+                    badge.textContent = '🟢 Low';
+                    badge.className = 'badge bg-success';
+                } else if (value < 70) {
+                    badge.textContent = '🟡 Moderate';
+                    badge.className = 'badge bg-warning';
+                } else {
+                    badge.textContent = '🔴 High';
+                    badge.className = 'badge bg-danger';
+                }
+            }
+        }
+    }
+    
+    function showStudentList() {
+        document.getElementById('studentListView').style.display = 'block';
+        document.getElementById('studentDetailView').style.display = 'none';
+        selectedStudent = null;
+    }
+    
+    function renderTrendsChart() {
+        if (!selectedStudent || !selectedStudent.mentalHealthHistory) return;
+        
+        const ctx = document.getElementById('trendsChart');
+        if (!ctx) return;
+        
+        const history = selectedStudent.mentalHealthHistory;
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: history.map(h => h.date),
+                datasets: [
+                    {
+                        label: 'Stress Level',
+                        data: history.map(h => h.stress),
+                        borderColor: '#FF6B6B',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Anxiety Level',
+                        data: history.map(h => h.anxiety),
+                        borderColor: '#F39C12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Depression Indicators',
+                        data: history.map(h => h.depression),
+                        borderColor: '#8E44AD',
+                        backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Wellbeing Score',
+                        data: history.map(h => h.wellbeing),
+                        borderColor: '#20B2AA',
+                        backgroundColor: 'rgba(32, 178, 170, 0.1)',
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderActivitiesChart() {
+        if (!selectedStudent || !selectedStudent.platformActivities) return;
+        
+        const ctx = document.getElementById('activitiesChart');
+        if (!ctx) return;
+        
+        const activities = selectedStudent.platformActivities;
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: activities.map(a => a.activity),
+                datasets: [{
+                    label: 'Count',
+                    data: activities.map(a => a.count),
+                    backgroundColor: '#8E44AD'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderAssessmentHistory() {
+        if (!selectedStudent) return;
+        
+        const container = document.getElementById('assessmentHistoryList');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        for (let i = 0; i < selectedStudent.assessments; i++) {
+            const isRecent = i === 0;
+            const item = document.createElement('div');
+            item.className = 'd-flex justify-content-between align-items-center p-3 mb-2 rounded border ' + 
+                (isRecent ? 'bg-light border-primary' : 'bg-white border-secondary');
+            item.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="me-3 ${isRecent ? 'text-primary' : 'text-secondary'}">
+                        <i class="bi bi-check-circle-fill" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                        <p class="mb-0 fw-medium">Self-Assessment #${selectedStudent.assessments - i}</p>
+                        <small class="text-muted">${i === 0 ? selectedStudent.lastAssessment : (i + 1) * 5 + ' days ago'}</small>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-sm btn-outline-primary">View Details →</a>
+            `;
+            container.appendChild(item);
+        }
+    }
+    
+    function renderActivitySummary() {
+        if (!selectedStudent || !selectedStudent.platformActivities) return;
+        
+        const container = document.getElementById('activitySummary');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        selectedStudent.platformActivities.forEach(activity => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 col-sm-6 mb-3';
+            col.innerHTML = `
+                <div class="text-center p-4 rounded border" style="background: linear-gradient(135deg, rgba(142, 68, 173, 0.1), white);">
+                    <div class="h3 text-purple mb-2">${activity.count}</div>
+                    <p class="small text-muted mb-0">${activity.activity}</p>
+                </div>
+            `;
+            container.appendChild(col);
+        });
+    }
+    /*]]>*/
+</script>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    .badge-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    .text-purple {
+        color: #8E44AD;
+    }
+</style>
