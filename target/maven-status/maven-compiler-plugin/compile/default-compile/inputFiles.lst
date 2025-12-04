@@ -1,18 +1,18 @@
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\AppointmentController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\UserRole.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\AppointmentRepository.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\User.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\MentalHealthHubApplication.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\ForumController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\ForumPost.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\UserRepository.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\AuthController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\PageController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\Appointment.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\config\SecurityConfig.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\AssessmentController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\AssessmentRepository.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\ForumPostRepository.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\PatientController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\UserController.java
-C:\Users\ASUS\IP Project\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\Assessment.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\AssessmentController.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\AssessmentRepository.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\MentalHealthHubApplication.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\PatientController.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\ForumPostRepository.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\Assessment.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\UserRole.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\UserController.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\config\SecurityConfig.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\Appointment.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\ForumPost.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\AppointmentRepository.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\PageController.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\ForumController.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\AuthController.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\repository\UserRepository.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\model\User.java
+C:\ElanSere_MentalHealthHub\src\main\java\com\mentalhealthhub\controller\AppointmentController.java
