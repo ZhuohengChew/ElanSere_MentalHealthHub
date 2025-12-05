@@ -26,8 +26,11 @@ public class UserController {
         List<User> users = userRepository.findAll();
         model.addAttribute("users", users);
         model.addAttribute("currentUser", user);
+
+        model.addAttribute("page", "users/manage-users");
+        model.addAttribute("title", "Manage Users");
         
-        return "users/manage-users";
+        return "layout";
     }
 
     @GetMapping("/{id}")
@@ -45,7 +48,10 @@ public class UserController {
         model.addAttribute("user", targetUser);
         model.addAttribute("currentUser", user);
         
-        return "users/user-detail";
+        model.addAttribute("page", "users/user-detail");
+        model.addAttribute("title", "User Details");
+
+        return "layout";
     }
 
     @PostMapping("/{id}/deactivate")
