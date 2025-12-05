@@ -5,6 +5,7 @@ import com.mentalhealthhub.dto.AssessmentResultDTO;
 import com.mentalhealthhub.model.Assessment;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.repository.AssessmentRepository;
+import com.mentalhealthhub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,9 @@ public class AssessmentService {
 
     @Autowired
     private AssessmentRepository assessmentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // Define all 8 questions
     public List<AssessmentQuestionDTO> getAllQuestions() {
@@ -116,7 +120,23 @@ public class AssessmentService {
         }
         assessment.setContent(content.toString());
 
-        return assessmentRepository.save(assessment);
+        // Save the assessment
+        Assessment savedAssessment = assessmentRepository.save(assessment);
+
+        // Update user's mental health scores based on assessment results
+        int stressScore = (answers.get(0) != null ? answers.get(0) : 0) +
+                (answers.get(1) != null ? answers.get(1) : 0); // Q1 + Q2
+        int anxietyScore = (answers.get(2) != null ? answers.get(2) : 0) * 2; // Q3 * 2
+        int wellbeingScore = 100 - totalScore; // Higher total score = lower wellbeing
+
+        user.setStressLevel((stressScore * 100) / 8); // Convert to 0-100
+        user.setAnxietyLevel((anxietyScore * 100) / 8); // Convert to 0-100
+        user.setWellbeingScore(wellbeingScore);
+        user.setLastAssessmentDate(java.time.LocalDateTime.now());
+
+        userRepository.save(user);
+
+        return savedAssessment;
     }
 
     public AssessmentResultDTO getAssessmentResult(Assessment assessment) {

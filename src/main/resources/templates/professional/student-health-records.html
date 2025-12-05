@@ -1,0 +1,278 @@
+<!-- Student Health Records View -->
+<div th:fragment="content" class="container-fluid">
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <a href="#" onclick="history.back(); return false;" class="btn btn-sm btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+                <h1 class="mb-0">Student Mental Health Records</h1>
+            </div>
+            <p class="text-muted">View self-assessment history and mental health scores</p>
+        </div>
+    </div>
+
+    <!-- Mental Health Scores Summary -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-1 pb-3">
+                    <h5 class="mb-0">Current Mental Health Scores</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Stress Level -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-1">Stress Level</h6>
+                                <small class="text-muted">Based on most recent assessment</small>
+                            </div>
+                            <span class="badge badge-lg" th:classappend="${student != null && student.stressLevel >= 70 ? 'bg-danger' : student != null && student.stressLevel >= 40 ? 'bg-warning text-dark' : 'bg-success'}" 
+                                  th:text="${student != null && student.stressLevel != null ? student.stressLevel + '%' : 'No data'}">
+                            </span>
+                        </div>
+                        <div th:if="${student != null && student.stressLevel != null}" class="progress" style="height: 24px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 th:style="'width: ' + ${student.stressLevel} + '%;'"
+                                 th:classappend="${student.stressLevel >= 70 ? 'bg-danger' : student.stressLevel >= 40 ? 'bg-warning' : 'bg-success'}"
+                                 th:attr="aria-valuenow=${student.stressLevel}">
+                            </div>
+                        </div>
+                        <div th:if="${student == null || student.stressLevel == null}" class="alert alert-info py-2 mb-0">
+                            No stress assessment data available
+                        </div>
+                    </div>
+
+                    <!-- Anxiety Level -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-1">Anxiety Level</h6>
+                                <small class="text-muted">Based on most recent assessment</small>
+                            </div>
+                            <span class="badge badge-lg" th:classappend="${student != null && student.anxietyLevel >= 70 ? 'bg-danger' : student != null && student.anxietyLevel >= 40 ? 'bg-warning text-dark' : 'bg-success'}" 
+                                  th:text="${student != null && student.anxietyLevel != null ? student.anxietyLevel + '%' : 'No data'}">
+                            </span>
+                        </div>
+                        <div th:if="${student != null && student.anxietyLevel != null}" class="progress" style="height: 24px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 th:style="'width: ' + ${student.anxietyLevel} + '%;'"
+                                 th:classappend="${student.anxietyLevel >= 70 ? 'bg-danger' : student.anxietyLevel >= 40 ? 'bg-warning' : 'bg-success'}"
+                                 th:attr="aria-valuenow=${student.anxietyLevel}">
+                            </div>
+                        </div>
+                        <div th:if="${student == null || student.anxietyLevel == null}" class="alert alert-info py-2 mb-0">
+                            No anxiety assessment data available
+                        </div>
+                    </div>
+
+                    <!-- Overall Wellbeing -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="mb-1">Overall Wellbeing</h6>
+                                <small class="text-muted">Based on most recent assessment</small>
+                            </div>
+                            <span class="badge badge-lg" th:classappend="${student != null && student.wellbeingScore >= 70 ? 'bg-success' : student != null && student.wellbeingScore >= 40 ? 'bg-info' : 'bg-warning text-dark'}" 
+                                  th:text="${student != null && student.wellbeingScore != null ? student.wellbeingScore + '%' : 'No data'}">
+                            </span>
+                        </div>
+                        <div th:if="${student != null && student.wellbeingScore != null}" class="progress" style="height: 24px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 th:style="'width: ' + ${student.wellbeingScore} + '%;'"
+                                 th:classappend="${student.wellbeingScore >= 70 ? 'bg-success' : student.wellbeingScore >= 40 ? 'bg-info' : 'bg-warning'}"
+                                 th:attr="aria-valuenow=${student.wellbeingScore}">
+                            </div>
+                        </div>
+                        <div th:if="${student == null || student.wellbeingScore == null}" class="alert alert-info py-2 mb-0">
+                            No wellbeing assessment data available
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Assessment Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-1 pb-3">
+                    <h5 class="mb-0">Assessment Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Last Assessment Date</small>
+                        <span th:if="${student != null && student.lastAssessmentDate != null}" th:text="${#temporals.format(student.lastAssessmentDate, 'MMM dd, yyyy')}">Date</span>
+                        <span th:if="${student == null || student.lastAssessmentDate == null}" class="text-muted">Never assessed</span>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Assessment Time</small>
+                        <span th:if="${student != null && student.lastAssessmentDate != null}" th:text="${#temporals.format(student.lastAssessmentDate, 'hh:mm a')}">Time</span>
+                        <span th:if="${student == null || student.lastAssessmentDate == null}" class="text-muted">—</span>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block mb-1">Total Assessments</small>
+                        <span th:text="${assessments != null ? #lists.size(assessments) : 0}">0</span> assessment<span th:if="${assessments != null && #lists.size(assessments) != 1}">s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessment History -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-1 pb-3">
+                    <h5 class="mb-0">Assessment History</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${assessments == null || #lists.isEmpty(assessments)}" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p class="mt-3">No assessment history available</p>
+                    </div>
+                    
+                    <div th:unless="${assessments == null || #lists.isEmpty(assessments)}" class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Total Score</th>
+                                    <th>Category</th>
+                                    <th>Answers</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="assessment : ${assessments}">
+                                    <td>
+                                        <span th:text="${#temporals.format(assessment.completedAt, 'MMM dd, yyyy hh:mm a')}">Date</span>
+                                    </td>
+                                    <td>
+                                        <strong th:text="${assessment.totalScore} + ' / 32'">0/32</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge" th:classappend="${assessment.category == 'SEVERE' ? 'bg-danger' : assessment.category == 'MODERATE' ? 'bg-warning text-dark' : assessment.category == 'MILD' ? 'bg-info' : 'bg-success'}" 
+                                              th:text="${assessment.category}">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted" th:text="${assessment.answers}">Answers</small>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
+                                                th:attr="data-bs-target='#assessmentModal' + ${assessment.id}"
+                                                onclick="loadAssessmentDetails(this)">
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessment Details Modals -->
+    <div th:each="assessment : ${assessments}" class="modal fade" 
+         th:id="'assessmentModal' + ${assessment.id}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title">Assessment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6 class="text-muted small">Assessment Date</h6>
+                        <p th:text="${#temporals.format(assessment.completedAt, 'MMMM dd, yyyy hh:mm a')}">Date</p>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">Total Score</h6>
+                            <p><strong th:text="${assessment.totalScore} + ' / 32'">0/32</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted small">Category</h6>
+                            <p>
+                                <span class="badge" th:classappend="${assessment.category == 'SEVERE' ? 'bg-danger' : assessment.category == 'MODERATE' ? 'bg-warning text-dark' : assessment.category == 'MILD' ? 'bg-info' : 'bg-success'}" 
+                                      th:text="${assessment.category}">
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted small">Question Responses</h6>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td>Q1: Felt overwhelmed</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q1Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q2: Difficulty concentrating</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q2Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q3: Nervous/anxious</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q3Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q4: Felt down/depressed</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q4Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q5: Sleep troubles</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q5Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q6: Felt tired/low energy</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q6Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q7: Bad about yourself</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q7Score}">0</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Q8: Thoughts of self-harm</td>
+                                    <td><span class="badge bg-secondary" th:text="${assessment.q8Score}">0</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted small">Assessment Notes</h6>
+                        <p class="border-start ps-3" th:text="${assessment.result} ?: 'No additional notes'">Notes</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+.badge-lg {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.75rem;
+    min-width: 80px;
+    text-align: center;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
+
+<script>
+function loadAssessmentDetails(button) {
+    // Modal content is pre-rendered, so this is just a placeholder
+    // In a real application, you might fetch details via AJAX
+}
+</script>

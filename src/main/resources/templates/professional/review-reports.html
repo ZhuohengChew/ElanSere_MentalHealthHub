@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Concern Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #fef2f2 100%);
+            min-height: 100vh;
+        }
+
+        .report-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .report-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+        }
+
+        .report-card.urgent {
+            border-left-color: #dc3545;
+            background: rgba(220, 53, 69, 0.05);
+        }
+
+        .report-card.high {
+            border-left-color: #fd7e14;
+        }
+
+        .report-card.medium {
+            border-left-color: #ffc107;
+        }
+
+        .report-card.low {
+            border-left-color: #28a745;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(155, 126, 222, 0.1) 0%, transparent 100%);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .info-box.blue {
+            background: linear-gradient(135deg, rgba(106, 142, 174, 0.1) 0%, transparent 100%);
+        }
+
+        .info-box.green {
+            background: linear-gradient(135deg, rgba(127, 182, 133, 0.1) 0%, transparent 100%);
+        }
+
+        .badge-category {
+            border: 1px solid;
+        }
+
+        .badge-stress {
+            background-color: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .badge-anxiety {
+            background-color: #fff3cd;
+            color: #856404;
+            border-color: #ffc107;
+        }
+
+        .badge-depression {
+            background-color: #cfe2ff;
+            color: #084298;
+            border-color: #6ea8fe;
+        }
+
+        .badge-crisis {
+            background-color: #f8d7da;
+            color: #842029;
+            border-color: #f5c2c7;
+        }
+
+        .badge-other {
+            background-color: #e7d4f8;
+            color: #6f42c1;
+            border-color: #c29ffa;
+        }
+
+        .urgent-alert {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .detail-card {
+            border-left: 4px solid #9B7EDE;
+        }
+
+        .nav-tabs .nav-link {
+            color: #6c757d;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #9B7EDE;
+            border-bottom: 2px solid #9B7EDE;
+        }
+
+        .back-btn:hover {
+            background-color: white !important;
+        }
+
+        .stat-card {
+            border-left: 4px solid;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="bg-white rounded-3 p-4 shadow-sm border-start border-4" style="border-color: #9B7EDE !important;">
+                    <h1 class="d-flex align-items-center gap-2 mb-3">
+                        <span style="font-size: 2rem;">📋</span>
+                        Review Concern Reports
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Review and respond to student mental health concerns and schedule appointments
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Urgent Alert -->
+        <div class="row mb-4 urgent-reports-section" style="display: none;">
+            <div class="col-12">
+                <div class="alert urgent-alert d-flex align-items-center" role="alert">
+                    <div class="bg-danger rounded-circle p-2 me-3" style="animation: pulse 2s infinite;">
+                        <i class="bi bi-exclamation-triangle-fill text-white"></i>
+                    </div>
+                    <div>
+                        <p class="fw-bold text-danger mb-1">
+                            🚨 <span class="urgent-count">0</span> urgent report(s) requiring immediate attention
+                        </p>
+                        <p class="small text-danger mb-0">Please review and respond to these cases as soon as possible</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-tabs mb-4" id="reportTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
+                            All Reports (<span class="all-count">0</span>)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button">
+                            Pending (<span class="pending-count">0</span>)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviewed-tab" data-bs-toggle="tab" data-bs-target="#reviewed" type="button">
+                            Reviewed (<span class="reviewed-count">0</span>)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="scheduled-tab" data-bs-toggle="tab" data-bs-target="#scheduled" type="button">
+                            Scheduled (<span class="scheduled-count">0</span>)
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="reportTabContent">
+                    <!-- All Reports Tab -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel">
+                        <div class="row g-4">
+                            <div th:if="${reports == null or #lists.isEmpty(reports)}" class="col-12">
+                                <div class="card p-4 text-center">No reports found.</div>
+                            </div>
+
+                            <div th:each="report : ${reports}" th:classappend=" ${report.urgency == 'urgent'} ? 'urgent-replace' : ''">
+                                <div class="col-12">
+                                    <div class="card report-card" th:classappend=" ${report.urgency} == 'urgent' ? ' urgent' : ( ${report.urgency} == 'high' ? ' high' : ( ${report.urgency} == 'medium' ? ' medium' : ' low' ) )" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
+                                        ">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        <span style="font-size: 1.5rem;" th:text="${report.type != null ? (report.type.contains('Anxiety') ? '😰' : (report.type.contains('Depression') ? '😔' : '💭')) : '💭'}"></span>
+                                                        <div class="flex-grow-1">
+                                                            <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <span class="badge badge-category" th:text="${report.type}">Type</span>
+                                                                <span class="badge" th:classappend=" ${report.urgency == 'urgent' ? ' bg-danger text-white' : (report.urgency == 'high' ? ' bg-warning text-dark' : (report.urgency == 'medium' ? ' bg-info text-dark' : ' bg-success text-white')) }" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge badge-category" th:text="${report.status}">status</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mt-3">
+                                                        <div class="col-md-4">
+                                                            <div class="info-box">
+                                                                <p class="text-muted small mb-1">Student</p>
+                                                                <p class="fw-medium mb-0" style="color: #9B7EDE;" th:text="${report.student != null ? report.student.name : 'Unknown'}">Student Name</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box blue">
+                                                                <p class="text-muted small mb-1">Submitted</p>
+                                                                <p class="fw-medium mb-0" style="color: #6A8EAE;" th:text="${#temporals.format(report.submittedAt, 'yyyy-MM-dd HH:mm')}">submitted</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box green">
+                                                                <p class="text-muted small mb-1">Scores (S/A/D)</p>
+                                                                <p class="fw-medium mb-0" style="color: #7FB685;" th:text="${(report.stressScore != null ? report.stressScore : '-') + ' / ' + (report.anxietyScore != null ? report.anxietyScore : '-') + ' / ' + (report.depressionScore != null ? report.depressionScore : '-')}">scores</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-link text-decoration-none">
+                                                    <span th:text="|View|">View</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Tab -->
+                    <div class="tab-pane fade" id="pending" role="tabpanel">
+                        <div class="row g-4">
+                            <div th:each="report : ${reports}" th:if="${report.status} == 'pending'">
+                                <div class="col-12">
+                                    <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        <span style="font-size: 1.5rem;" th:text="${report.type != null ? '💭' : '💭'}">💭</span>
+                                                        <div class="flex-grow-1">
+                                                            <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <span class="badge badge-category" th:text="${report.type}">Type</span>
+                                                                <span class="badge" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge badge-category" th:text="${report.status}">status</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mt-3">
+                                                        <div class="col-md-4">
+                                                            <div class="info-box">
+                                                                <p class="text-muted small mb-1">Student</p>
+                                                                <p class="fw-medium mb-0" style="color: #9B7EDE;" th:text="${report.student != null ? report.student.name : 'Unknown'}">Student Name</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box blue">
+                                                                <p class="text-muted small mb-1">Submitted</p>
+                                                                <p class="fw-medium mb-0" style="color: #6A8EAE;" th:text="${#temporals.format(report.submittedAt, 'yyyy-MM-dd HH:mm')}">submitted</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box green">
+                                                                <p class="text-muted small mb-1">Scores (S/A/D)</p>
+                                                                <p class="fw-medium mb-0" style="color: #7FB685;" th:text="${(report.stressScore != null ? report.stressScore : '-') + ' / ' + (report.anxietyScore != null ? report.anxietyScore : '-') + ' / ' + (report.depressionScore != null ? report.depressionScore : '-')}">scores</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-link text-decoration-none">
+                                                    <span th:text="|View|">View</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviewed Tab -->
+                    <div class="tab-pane fade" id="reviewed" role="tabpanel">
+                        <div class="row g-4">
+                            <div th:each="report : ${reports}" th:if="${report.status} == 'reviewed'">
+                                <div class="col-12">
+                                    <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        <span style="font-size: 1.5rem;">💬</span>
+                                                        <div class="flex-grow-1">
+                                                            <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <span class="badge badge-category" th:text="${report.type}">Type</span>
+                                                                <span class="badge" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge badge-category" th:text="${report.status}">status</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mt-3">
+                                                        <div class="col-md-4">
+                                                            <div class="info-box">
+                                                                <p class="text-muted small mb-1">Student</p>
+                                                                <p class="fw-medium mb-0" style="color: #9B7EDE;" th:text="${report.student != null ? report.student.name : 'Unknown'}">Student Name</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box blue">
+                                                                <p class="text-muted small mb-1">Submitted</p>
+                                                                <p class="fw-medium mb-0" style="color: #6A8EAE;" th:text="${#temporals.format(report.submittedAt, 'yyyy-MM-dd HH:mm')}">submitted</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box green">
+                                                                <p class="text-muted small mb-1">Scores (S/A/D)</p>
+                                                                <p class="fw-medium mb-0" style="color: #7FB685;" th:text="${(report.stressScore != null ? report.stressScore : '-') + ' / ' + (report.anxietyScore != null ? report.anxietyScore : '-') + ' / ' + (report.depressionScore != null ? report.depressionScore : '-')}">scores</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-link text-decoration-none">
+                                                    <span th:text="|View|">View</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scheduled Tab -->
+                    <div class="tab-pane fade" id="scheduled" role="tabpanel">
+                        <div class="row g-4">
+                            <div th:each="report : ${reports}" th:if="${report.status} == 'scheduled'">
+                                <div class="col-12">
+                                    <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        <span style="font-size: 1.5rem;">📅</span>
+                                                        <div class="flex-grow-1">
+                                                            <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <span class="badge badge-category" th:text="${report.type}">Type</span>
+                                                                <span class="badge" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge badge-category" th:text="${report.status}">status</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mt-3">
+                                                        <div class="col-md-4">
+                                                            <div class="info-box">
+                                                                <p class="text-muted small mb-1">Student</p>
+                                                                <p class="fw-medium mb-0" style="color: #9B7EDE;" th:text="${report.student != null ? report.student.name : 'Unknown'}">Student Name</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box blue">
+                                                                <p class="text-muted small mb-1">Submitted</p>
+                                                                <p class="fw-medium mb-0" style="color: #6A8EAE;" th:text="${#temporals.format(report.submittedAt, 'yyyy-MM-dd HH:mm')}">submitted</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box green">
+                                                                <p class="text-muted small mb-1">Scores (S/A/D)</p>
+                                                                <p class="fw-medium mb-0" style="color: #7FB685;" th:text="${(report.stressScore != null ? report.stressScore : '-') + ' / ' + (report.anxietyScore != null ? report.anxietyScore : '-') + ' / ' + (report.depressionScore != null ? report.depressionScore : '-')}">scores</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-link text-decoration-none">
+                                                    <span th:text="|View|">View</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Appointment Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Schedule Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-4">Choose a date and time for the telehealth appointment</p>
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" id="appointmentDate">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Time</label>
+                        <input type="time" class="form-control" id="appointmentTime">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="appointmentNotes" rows="3" placeholder="Add any notes for the appointment..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn text-white" style="background: linear-gradient(135deg, #9B7EDE 0%, #8B6ECE 100%);" id="confirmAppointment">
+                        Confirm Appointment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-center py-5">
+                    <div class="mb-4 d-flex justify-content-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">Appointment Scheduled Successfully! ✅</h4>
+                    <p class="text-muted mb-4">The appointment has been confirmed and the report status has been updated to "scheduled"</p>
+                    
+                    <div class="p-4 rounded-3 mb-4" style="background: linear-gradient(135deg, rgba(155, 126, 222, 0.1) 0%, rgba(106, 142, 174, 0.1) 100%); border: 1px solid rgba(155, 126, 222, 0.2);">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Student:</span>
+                            <span class="fw-medium" id="confirmedStudent"></span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted small">Date:</span>
+                            <span class="fw-medium" id="confirmedDate"></span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Time:</span>
+                            <span class="fw-medium" id="confirmedTime"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn text-white flex-fill" style="background: linear-gradient(135deg, #9B7EDE 0%, #8B6ECE 100%);" onclick="window.location.href='/professional/appointments'">
+                            <i class="bi bi-calendar me-2"></i>View Appointments
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        /* Set counts and urgent alert from server-side model attributes */
+        /*<![CDATA[*/
+        (function() {
+            var allCount = /*[[${allCount}]]*/ 0;
+            var pendingCount = /*[[${pendingCount}]]*/ 0;
+            var reviewedCount = /*[[${reviewedCount}]]*/ 0;
+            var scheduledCount = /*[[${scheduledCount}]]*/ 0;
+            var urgentCount = /*[[${urgentCount}]]*/ 0;
+
+            var allElem = document.querySelector('.all-count');
+            var pendingElem = document.querySelector('.pending-count');
+            var reviewedElem = document.querySelector('.reviewed-count');
+            var scheduledElem = document.querySelector('.scheduled-count');
+            var urgentSection = document.querySelector('.urgent-reports-section');
+            var urgentCountElem = document.querySelector('.urgent-count');
+
+            if (allElem) allElem.textContent = allCount;
+            if (pendingElem) pendingElem.textContent = pendingCount;
+            if (reviewedElem) reviewedElem.textContent = reviewedCount;
+            if (scheduledElem) scheduledElem.textContent = scheduledCount;
+            if (urgentCount > 0 && urgentSection && urgentCountElem) {
+                urgentSection.style.display = 'block';
+                urgentCountElem.textContent = urgentCount;
+            }
+        })();
+        /*]]>*/
+    </script>
+</body>
+</html>
+
+</body>
+</html>
