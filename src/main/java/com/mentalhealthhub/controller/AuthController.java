@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,7 @@ import com.mentalhealthhub.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-public class AuthController {
+public class    AuthController {
 
     @Autowired
     private UserRepository userRepository;
@@ -140,4 +141,25 @@ public class AuthController {
         model.addAttribute("title", "Dashboard");
         return "layout";
     }
+    @GetMapping("/manage-users")
+    public String manageUsers(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // Only admins can manage users
+        if (user.getRole() != UserRole.ADMIN) {
+            return "redirect:/dashboard";
+        }
+
+        List<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+        model.addAttribute("user", user);
+        model.addAttribute("page", "users/manage-users");
+        model.addAttribute("activePage", "users");
+        model.addAttribute("title", "Manage Users");
+        return "layout";
+    }
+    
 }

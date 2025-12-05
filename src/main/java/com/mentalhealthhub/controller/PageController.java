@@ -69,7 +69,7 @@ public class PageController {
         if (user.getRole().name().equals("STAFF")) {
             model.addAttribute("page", "notifications/staff-notifications");
         } else {
-            model.addAttribute("page", "notifications");
+            model.addAttribute("page", "notifications/notifications");
         }
         
         model.addAttribute("title", "Notifications");

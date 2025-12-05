@@ -69,4 +69,31 @@ public class UserController {
 
         return "redirect:/users";
     }
+
+    @PostMapping("/add")
+    public String addUser(@RequestParam String name,
+                          @RequestParam String email,
+                          @RequestParam String password,
+                          @RequestParam String role,
+                          HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null || !currentUser.getRole().toString().equals("ADMIN")) {
+            return "redirect:/login";
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            return "redirect:/users?error=User with this email already exists";
+        }
+
+        User newUser = User.builder()
+                .name(name)
+                .email(email)
+                .password(password)
+                .role(com.mentalhealthhub.model.UserRole.valueOf(role.toUpperCase()))
+                .active(true)
+                .build();
+
+        userRepository.save(newUser);
+        return "redirect:/users";
+    }
 }
