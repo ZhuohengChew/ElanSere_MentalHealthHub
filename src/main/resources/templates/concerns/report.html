@@ -272,7 +272,7 @@
                 </div>
             </div>
 
-            <form id="concernForm" th:action="@{/concerns/submit}" method="post">
+            <form id="concernForm" th:action="@{/concerns/submit}" method="post" onsubmit="handleSubmit(event)">
                 <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="row justify-content-center mb-4">
                     <div class="col-lg-8">
@@ -621,5 +621,103 @@
         function handleSubmit(event) {
             event.preventDefault();
             
-            // Hide form and show success page
-            document.getElementById('reportForm').style
+            // Gather form data for confirmation
+            const urgency = document.querySelector('input[name="urgency"]:checked').value;
+            const concerns = Array.from(document.querySelectorAll('input[name="concerns"]:checked'))
+                .map(cb => cb.value)
+                .join(', ');
+            const description = document.querySelector('textarea[name="description"]').value;
+            
+            // Show confirmation modal
+            showConfirmationModal(urgency, concerns, description);
+        }
+
+        function showConfirmationModal(urgency, concerns, description) {
+            const modal = document.getElementById('confirmationModal');
+            if (!modal) {
+                createConfirmationModal();
+            }
+            
+            // Update modal content
+            document.getElementById('confirmUrgency').textContent = urgency;
+            document.getElementById('confirmConcerns').textContent = concerns;
+            document.getElementById('confirmDescription').textContent = description.substring(0, 150) + (description.length > 150 ? '...' : '');
+            
+            // Show modal
+            const bootstrapModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            bootstrapModal.show();
+        }
+
+        function createConfirmationModal() {
+            const modalHTML = `
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-gradient" style="background: linear-gradient(135deg, #ef4444, #f97316); color: white;">
+                                <h5 class="modal-title" id="confirmationLabel">
+                                    <i class="bi bi-check-circle me-2"></i>Confirm Your Concern Submission
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info d-flex align-items-start" role="alert">
+                                    <i class="bi bi-info-circle me-2 flex-shrink-0" style="margin-top: 2px;"></i>
+                                    <div>
+                                        Please review the information below before submission. Once submitted, a school administrator will review your concern.
+                                    </div>
+                                </div>
+                                
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted">Urgency Level</label>
+                                        <div class="p-3 rounded" style="background-color: #f8f9fa; border-left: 4px solid #ef4444;">
+                                            <span id="confirmUrgency" class="badge bg-danger">Low</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted">Concern Categories</label>
+                                        <div class="p-3 rounded" style="background-color: #f8f9fa; border-left: 4px solid #9B7EDE;">
+                                            <small id="confirmConcerns" class="text-dark">Categories will appear here</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted">Your Description (Preview)</label>
+                                        <div class="p-3 rounded" style="background-color: #f8f9fa; border-left: 4px solid #6A8EAE;">
+                                            <small id="confirmDescription" class="text-dark d-block">Description will appear here</small>
+                                            <small class="text-muted d-block mt-2"><i class="bi bi-info-circle me-1"></i>Full description will be submitted</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-arrow-left me-1"></i>Back to Edit
+                                </button>
+                                <button type="button" class="btn btn-gradient-red" onclick="submitConcernForm()">
+                                    <i class="bi bi-check-lg me-1"></i>Confirm & Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function submitConcernForm() {
+            // Close modal first
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+            if (modal) modal.hide();
+            
+            // Remove the onsubmit handler to prevent recursion
+            document.getElementById('concernForm').removeAttribute('onsubmit');
+            
+            // Submit the actual form
+            document.getElementById('concernForm').submit();
+        }
+
+        // Hide form and show success page
+        document.getElementById('reportForm').style

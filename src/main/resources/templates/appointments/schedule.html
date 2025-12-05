@@ -185,21 +185,42 @@
         let currentDate = new Date();
         let selectedDate = new Date();
         
-        // Load appointments data from server (Thymeleaf)
-        const appointmentsData = /*[[${appointments}]]*/ [];
+        // Load appointments data from API instead of Thymeleaf inline (better compatibility)
+        let appointmentsData = [];
         
-        console.log('Appointments loaded:', appointmentsData);
+        // Fetch appointments from API
+        console.log('Fetching appointments from API endpoint...');
+        fetch('/mentalhealthhub/appointments/api/my-schedule')
+            .then(response => response.json())
+            .then(data => {
+                appointmentsData = data;
+                console.log('✓ Successfully loaded', appointmentsData.length, 'appointments from API');
+                console.log('Appointments data:', appointmentsData);
+                
+                // Convert date strings to Date objects
+                appointmentsData.forEach((apt, index) => {
+                    console.log(`Processing appointment ${index}:`, apt);
+                    
+                    // Convert ISO string to Date
+                    if (typeof apt.appointmentDate === 'string') {
+                        apt.appointmentDate = new Date(apt.appointmentDate);
+                        console.log(`  ✓ Converted date string to Date:`, apt.appointmentDate);
+                    }
+                });
+                
+                // Initialize the calendar after data is loaded
+                renderCalendar();
+                displayAppointmentsForDate(selectedDate);
+            })
+            .catch(error => {
+                console.error('✗ Error loading appointments from API:', error);
+                // Initialize calendar even if data load fails
+                renderCalendar();
+                displayAppointmentsForDate(selectedDate);
+            });
         
-        // Convert date strings to Date objects if needed
-        appointmentsData.forEach(apt => {
-            if (typeof apt.appointmentDate === 'string') {
-                apt.appointmentDate = new Date(apt.appointmentDate);
-            }
-            // Handle LocalDateTime objects
-            if (apt.appointmentDate instanceof Object && apt.appointmentDate.year) {
-                apt.appointmentDate = new Date(apt.appointmentDate.year, apt.appointmentDate.month - 1, apt.appointmentDate.day, apt.appointmentDate.hour || 0, apt.appointmentDate.minute || 0);
-            }
-        });
+        console.log('Initial appointments array setup (will be populated by API)');
+
 
         function renderCalendar() {
             const year = currentDate.getFullYear();
@@ -289,12 +310,37 @@
 
         function displayAppointmentsForDate(date) {
             const dateStr = formatDateForComparison(date);
+            console.log('=== Displaying appointments for date:', dateStr, '(', date.toDateString(), ')');
             document.getElementById('selectedDate').textContent = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             
+            console.log('Total appointments to check:', appointmentsData.length);
+            
             const appointmentsForDate = appointmentsData.filter(apt => {
-                const aptDateStr = formatDateForComparison(apt.appointmentDate);
-                return aptDateStr === dateStr;
+                const aptDate = apt.appointmentDate;
+                
+                if (!aptDate) {
+                    console.warn('Appointment has no date:', apt);
+                    return false;
+                }
+                
+                if (!(aptDate instanceof Date) || isNaN(aptDate.getTime())) {
+                    console.warn('Invalid appointment date object:', aptDate, 'for appointment:', apt);
+                    return false;
+                }
+                
+                const aptDateStr = formatDateForComparison(aptDate);
+                const match = aptDateStr === dateStr;
+                
+                if (match) {
+                    console.log('✓ MATCH - Appointment date:', aptDateStr, '===', dateStr);
+                } else {
+                    console.log('✗ NO MATCH - Appointment date:', aptDateStr, '!==', dateStr);
+                }
+                
+                return match;
             });
+            
+            console.log('=== Found', appointmentsForDate.length, 'appointments for date:', dateStr);
             
             const container = document.getElementById('appointmentsContainer');
             const count = appointmentsForDate.length;
@@ -365,9 +411,7 @@
             renderCalendar();
         });
 
-        // Initialize calendar
-        renderCalendar();
-        displayAppointmentsForDate(selectedDate);
+        // Calendar will be initialized after appointments are loaded from API
     </script>
 </body>
 </html>

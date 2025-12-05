@@ -1,9 +1,8 @@
 package com.mentalhealthhub.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.mentalhealthhub.model.Appointment;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
-import com.mentalhealthhub.repository.UserRepository;
 import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
 
