@@ -1,52 +1,625 @@
-<!-- Report Concern Page -->
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="mb-2">Report a Concern</h1>
-            <p class="text-muted">
-                Share any concerns about your mental health or someone else’s so our team can follow up.
-            </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report a Concern</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 50%, #fef9c3 100%);
+            min-height: 100vh;
+        }
+
+        .success-page {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 50%, #faf5ff 100%);
+        }
+
+        .header-card {
+            border-left: 4px solid #ef4444;
+        }
+
+        .success-header-card {
+            border-left: 4px solid #7FB685;
+        }
+
+        .urgency-option {
+            border: 2px solid;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .urgency-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .urgency-option.selected {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .urgency-low {
+            border-color: #d1fae5;
+        }
+
+        .urgency-low.selected {
+            border-color: #10b981;
+            background: linear-gradient(to right, #f0fdf4, transparent);
+        }
+
+        .urgency-low:hover {
+            background-color: #f0fdf4;
+        }
+
+        .urgency-moderate {
+            border-color: #fef3c7;
+        }
+
+        .urgency-moderate.selected {
+            border-color: #f59e0b;
+            background: linear-gradient(to right, #fef9c3, transparent);
+        }
+
+        .urgency-moderate:hover {
+            background-color: #fef9c3;
+        }
+
+        .urgency-high {
+            border-color: #fecaca;
+        }
+
+        .urgency-high.selected {
+            border-color: #ef4444;
+            background: linear-gradient(to right, #fef2f2, transparent);
+        }
+
+        .urgency-high:hover {
+            background-color: #fef2f2;
+        }
+
+        .concern-checkbox {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .concern-checkbox:hover {
+            border-color: #9B7EDE;
+            background-color: #f9fafb;
+        }
+
+        .concern-checkbox.selected {
+            border-color: #9B7EDE;
+            background: linear-gradient(to right, rgba(155, 126, 222, 0.1), transparent);
+        }
+
+        .emergency-alert {
+            background: linear-gradient(to right, #fef2f2, transparent);
+            border-left: 4px solid #ef4444;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-left-width: 4px; }
+            50% { border-left-width: 6px; }
+        }
+
+        .card-border-orange {
+            border-left: 4px solid #FF9F1C;
+        }
+
+        .card-border-purple {
+            border-left: 4px solid #9B7EDE;
+        }
+
+        .card-border-blue {
+            border-left: 4px solid #6A8EAE;
+        }
+
+        .privacy-card {
+            background: linear-gradient(135deg, #dbeafe, transparent);
+            border-left: 4px solid #6A8EAE;
+        }
+
+        .crisis-resource-card {
+            background: linear-gradient(135deg, rgba(155, 126, 222, 0.1), transparent);
+            border-left: 4px solid #9B7EDE;
+        }
+
+        .btn-gradient-red {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: white;
+            border: none;
+        }
+
+        .btn-gradient-red:hover {
+            opacity: 0.9;
+            color: white;
+        }
+
+        .btn-gradient-red:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-gradient-blue {
+            background: linear-gradient(135deg, #6A8EAE, #5A7E9E);
+            color: white;
+            border: none;
+        }
+
+        .btn-gradient-blue:hover {
+            opacity: 0.9;
+            color: white;
+        }
+
+        .success-icon {
+            animation: success-pulse 2s infinite;
+        }
+
+        @keyframes success-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .permission-box {
+            background: linear-gradient(135deg, #f0fdf4, transparent);
+            border: 2px solid #bbf7d0;
+        }
+
+        .staff-permission-box {
+            background: linear-gradient(135deg, #faf5ff, transparent);
+            border: 2px solid #e9d5ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <!-- Success Page (Hidden by default) -->
+        <div id="successPage" class="success-page" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg success-header-card">
+                        <div class="card-header bg-white border-0 pb-0 pt-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="bg-gradient p-3 rounded-circle success-icon" style="background: linear-gradient(135deg, #7FB685, #6FA675);">
+                                    <i class="bi bi-check-circle-fill text-white" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h2 class="mb-1">✅ Concern Submitted Successfully</h2>
+                                    <p class="text-muted mb-0">Your report has been received and will be reviewed promptly</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="p-4 rounded-3 border-2" style="background: linear-gradient(135deg, #dbeafe, transparent); border: 2px solid #bfdbfe;">
+                                <h5 class="mb-4 d-flex align-items-center gap-2">
+                                    <span style="font-size: 1.3rem;">📋</span>
+                                    What happens next?
+                                </h5>
+                                <ul class="list-unstyled">
+                                    <li class="d-flex align-items-start gap-3 bg-white p-3 rounded mb-3">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <span>A mental health professional will review your concern within 24 hours</span>
+                                    </li>
+                                    <li class="d-flex align-items-start gap-3 bg-white p-3 rounded mb-3">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <span>If marked as urgent, someone will reach out within 2 hours</span>
+                                    </li>
+                                    <li class="d-flex align-items-start gap-3 bg-white p-3 rounded mb-3">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <span>You'll receive an email with next steps and available resources</span>
+                                    </li>
+                                    <li class="d-flex align-items-start gap-3 bg-white p-3 rounded">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <span>All information is kept confidential in accordance with privacy policies</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="alert emergency-alert mt-4">
+                                <div class="d-flex align-items-start gap-3">
+                                    <i class="bi bi-telephone-fill text-danger" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <p class="fw-bold text-danger mb-1">🚨 In Immediate Crisis?</p>
+                                        <p class="mb-0 text-danger">If you're in immediate danger, please call 911 or the National Crisis Hotline at 988.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3 mt-4">
+                                <button onclick="window.location.href='/dashboard'" class="btn btn-outline-secondary flex-fill">
+                                    Return to Dashboard
+                                </button>
+                                <button onclick="window.location.href='/self-care'" class="btn btn-gradient-blue flex-fill">
+                                    <i class="bi bi-heart-fill me-2"></i>
+                                    Explore Self-Care Tools
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Type of concern</label>
-                            <select class="form-select">
-                                <option value="">Select...</option>
-                                <option>My own wellbeing</option>
-                                <option>Concern about a friend/peer</option>
-                                <option>Academic-related stress</option>
-                                <option>Other</option>
-                            </select>
+        <!-- Report Form (Visible by default) -->
+        <div id="reportForm">
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-8">
+                    <div class="bg-white rounded-3 p-4 shadow-sm header-card">
+                        <h1 class="d-flex align-items-center gap-2 mb-3">
+                            <span style="font-size: 2rem;">🆘</span>
+                            Report a Concern
+                        </h1>
+                        <p class="text-muted mb-0">
+                            Share your mental health concern confidentially so we can provide appropriate support and resources
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-8">
+                    <div class="alert emergency-alert shadow">
+                        <div class="d-flex align-items-start gap-3">
+                            <i class="bi bi-exclamation-triangle-fill text-danger success-icon" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <p class="fw-bold text-danger mb-1">🚨 In an Emergency:</p>
+                                <p class="mb-0 text-danger">If you or someone else is in immediate danger, please call <strong>911</strong> or the National Crisis Hotline at <strong>988</strong> immediately. This form is not monitored 24/7.</p>
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Describe your concern</label>
-                            <textarea class="form-control" rows="5"
-                                      placeholder="Share as much detail as you feel comfortable with."></textarea>
+            <form id="concernForm" th:action="@{/concerns/submit}" method="post">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow card-border-orange">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-circle" style="color: #FF9F1C;"></i>
+                                    Level of Urgency
+                                </h5>
+                                <p class="text-muted small mb-0">How urgent is this concern? This helps us prioritize responses.</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-3">
+                                    <div class="urgency-option urgency-low rounded-3 p-3" onclick="selectUrgency('low', this)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="radio" name="urgency" value="low" class="form-check-input" required>
+                                            <div class="flex-fill">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <span style="font-size: 1.5rem;">🟢</span>
+                                                    <div>
+                                                        <p class="fw-medium mb-1">Low - I'd like to discuss this at my convenience</p>
+                                                        <p class="text-muted small mb-0">Response within 48 hours</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="urgency-option urgency-moderate rounded-3 p-3" onclick="selectUrgency('moderate', this)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="radio" name="urgency" value="moderate" class="form-check-input" required>
+                                            <div class="flex-fill">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <span style="font-size: 1.5rem;">🟡</span>
+                                                    <div>
+                                                        <p class="fw-medium mb-1">Moderate - I need support soon</p>
+                                                        <p class="text-muted small mb-0">Response within 24 hours</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="urgency-option urgency-high rounded-3 p-3" onclick="selectUrgency('high', this)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="radio" name="urgency" value="high" class="form-check-input" required>
+                                            <div class="flex-fill">
+                                                <div class="d-flex align-items-start gap-2">
+                                                    <span style="font-size: 1.5rem;">🔴</span>
+                                                    <div>
+                                                        <p class="fw-medium mb-1">High - I need urgent support</p>
+                                                        <p class="text-muted small mb-0">Response within 2 hours</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Preferred follow-up</label>
-                            <select class="form-select">
-                                <option value="">Select...</option>
-                                <option>Email me</option>
-                                <option>Schedule an appointment</option>
-                                <option>No follow-up needed</option>
-                            </select>
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow card-border-purple">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-heart-fill" style="color: #9B7EDE;"></i>
+                                    Type of Concern
+                                </h5>
+                                <p class="text-muted small mb-0">Select all that apply to help us understand your situation better</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Anxiety or Panic" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">😰</span>
+                                                    Anxiety or Panic
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Depression or Low Mood" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">😔</span>
+                                                    Depression or Low Mood
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Stress or Overwhelm" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">😣</span>
+                                                    Stress or Overwhelm
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Suicidal Thoughts" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">🆘</span>
+                                                    Suicidal Thoughts
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Self-Harm" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">⚠️</span>
+                                                    Self-Harm
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Relationship Issues" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">💔</span>
+                                                    Relationship Issues
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Academic Pressure" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">📚</span>
+                                                    Academic Pressure
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Substance Use" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">🚫</span>
+                                                    Substance Use
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Eating or Body Image" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">🍽️</span>
+                                                    Eating or Body Image
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Trauma or PTSD" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">💭</span>
+                                                    Trauma or PTSD
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="concern-checkbox rounded p-3" onclick="toggleConcern(this)">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="checkbox" name="concerns" value="Other" class="form-check-input">
+                                                <label class="flex-fill d-flex align-items-center gap-2 mb-0 fw-medium small">
+                                                    <span style="font-size: 1.2rem;">💬</span>
+                                                    Other
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
 
-                        <button type="submit" class="btn btn-primary">Submit Concern</button>
-                    </form>
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow card-border-blue">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-info-circle-fill" style="color: #6A8EAE;"></i>
+                                    Describe Your Concern
+                                </h5>
+                                <p class="text-muted small mb-0">Share as much detail as you feel comfortable with. This information helps us provide better support.</p>
+                            </div>
+                            <div class="card-body">
+                                <textarea class="form-control mb-3" rows="6" name="description" required
+                                    placeholder="Tell us what's been happening and how you've been feeling. Include any specific situations, symptoms, or challenges you're experiencing..."
+                                    style="resize: none;"></textarea>
+
+                                <div class="permission-box rounded p-3">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <input type="checkbox" class="form-check-input mt-1" id="contactPermission">
+                                        <label for="contactPermission" class="flex-fill small">
+                                            <p class="fw-medium mb-1">✅ Contact Permission</p>
+                                            I give permission to be contacted by a mental health professional to discuss this concern and receive support
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card privacy-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start gap-3">
+                                    <i class="bi bi-shield-fill-check" style="color: #6A8EAE; font-size: 1.5rem;"></i>
+                                    <div class="small">
+                                        <p class="fw-bold mb-2 d-flex align-items-center gap-2">
+                                            <span style="font-size: 1.2rem;">🔒</span>
+                                            Your Privacy is Protected
+                                        </p>
+                                        <p class="text-muted mb-0">
+                                            All information shared is confidential and will only be accessed by qualified mental health 
+                                            professionals. Your report will be handled with care and in accordance with HIPAA privacy regulations 
+                                            and UTM's privacy policies.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="d-flex gap-3">
+                            <button type="button" onclick="window.location.href='/dashboard'" class="btn btn-outline-secondary flex-fill">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-gradient-red flex-fill" id="submitBtn">
+                                <i class="bi bi-send-fill me-2"></i>
+                                Submit Concern
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card crisis-resource-card">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-telephone-fill" style="color: #9B7EDE;"></i>
+                                📞 Crisis Resources - Available 24/7
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="bg-white p-3 rounded border" style="border-color: rgba(155, 126, 222, 0.3) !important;">
+                                        <p class="fw-bold mb-1">🆘 National Crisis Hotline</p>
+                                        <p class="text-muted small mb-0">Call or text <strong style="color: #9B7EDE;">988</strong> - Available 24/7</p>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="bg-white p-3 rounded border" style="border-color: rgba(155, 126, 222, 0.3) !important;">
+                                        <p class="fw-bold mb-1">💬 Crisis Text Line</p>
+                                        <p class="text-muted small mb-0">Text <strong style="color: #9B7EDE;">HOME</strong> to <strong style="color: #9B7EDE;">741741</strong> - Available 24/7</p>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="bg-white p-3 rounded border" style="border-color: rgba(155, 126, 222, 0.3) !important;">
+                                        <p class="fw-bold mb-1">🚨 Campus Security</p>
+                                        <p class="text-muted small mb-0">Call <strong style="color: #9B7EDE;">(123) 456-7890</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function selectUrgency(value, element) {
+            // Remove selected class from all urgency options
+            document.querySelectorAll('.urgency-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Check the radio button
+            element.querySelector('input[type="radio"]').checked = true;
+            
+            validateForm();
+        }
 
+        function toggleConcern(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+            
+            validateForm();
+        }
+
+        function validateForm() {
+            const urgencyChecked = document.querySelector('input[name="urgency"]:checked');
+            const concernsChecked = document.querySelectorAll('input[name="concerns"]:checked').length > 0;
+            const descriptionFilled = document.querySelector('textarea[name="description"]').value.trim() !== '';
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = !(urgencyChecked && concernsChecked && descriptionFilled);
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Hide form and show success page
+            document.getElementById('reportForm').style

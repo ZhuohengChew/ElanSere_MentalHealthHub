@@ -1,6 +1,7 @@
 package com.mentalhealthhub.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -28,11 +29,17 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String profilePicture;
 
+    // Mental health assessment scores (from self-assessment)
+    private Integer stressLevel;      // 0-100
+    private Integer anxietyLevel;     // 0-100
+    private Integer wellbeingScore;   // 0-100
+    private LocalDateTime lastAssessmentDate;
+
+    // Constructors
     public User() {
     }
 
-    public User(Long id, String email, String password, String name, UserRole role, Boolean active,
-            String profilePicture) {
+    public User(Long id, String email, String password, String name, UserRole role, Boolean active, String profilePicture) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -40,6 +47,38 @@ public class User {
         this.role = role;
         this.active = active;
         this.profilePicture = profilePicture;
+    }
+
+    public Integer getStressLevel() {
+        return stressLevel;
+    }
+
+    public void setStressLevel(Integer stressLevel) {
+        this.stressLevel = stressLevel;
+    }
+
+    public Integer getAnxietyLevel() {
+        return anxietyLevel;
+    }
+
+    public void setAnxietyLevel(Integer anxietyLevel) {
+        this.anxietyLevel = anxietyLevel;
+    }
+
+    public Integer getWellbeingScore() {
+        return wellbeingScore;
+    }
+
+    public void setWellbeingScore(Integer wellbeingScore) {
+        this.wellbeingScore = wellbeingScore;
+    }
+
+    public LocalDateTime getLastAssessmentDate() {
+        return lastAssessmentDate;
+    }
+
+    public void setLastAssessmentDate(LocalDateTime lastAssessmentDate) {
+        this.lastAssessmentDate = lastAssessmentDate;
     }
 
     public static Builder builder() {
