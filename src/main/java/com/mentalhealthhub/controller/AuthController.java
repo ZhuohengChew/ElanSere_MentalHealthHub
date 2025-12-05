@@ -1,6 +1,9 @@
 package com.mentalhealthhub.controller;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import com.mentalhealthhub.model.Appointment;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.UserRepository;
+import com.mentalhealthhub.repository.AppointmentRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -22,6 +26,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @GetMapping("/")
     public String index() {
