@@ -1,0 +1,399 @@
+<!-- Staff Notifications Page -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card" style="border-left: 4px solid #FF6B6B;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="mb-2">
+                                <span style="font-size: 2rem;">🔔</span> Staff Notifications
+                            </h1>
+                            <p class="text-muted mb-0">Stay informed about your monitored students</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary" id="markAllReadBtn" onclick="markAllAsRead()">
+                                <span style="font-size: 1.2rem;">✅</span> Mark All Read
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" id="clearAllBtn" onclick="clearAll()">
+                                <span style="font-size: 1.2rem;">🗑️</span> Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Urgent Alert Banner -->
+    <div class="row mb-4" id="urgentAlert" style="display: none;">
+        <div class="col-md-12">
+            <div class="card border-danger bg-danger bg-opacity-10" style="border-left: 4px solid #FF6B6B;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger p-2 rounded-circle me-3">
+                            <span style="font-size: 1.5rem;">⚠️</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="fw-medium text-danger mb-1" id="urgentCountText">⚠️ 0 urgent notifications require attention</p>
+                            <p class="small text-muted mb-0">Please review student activity alerts and follow up as needed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unread Alert Banner -->
+    <div class="row mb-4" id="unreadAlert" style="display: none;">
+        <div class="col-md-12">
+            <div class="card border-primary bg-primary bg-opacity-10" style="border-left: 4px solid #20B2AA;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary p-2 rounded-circle me-3">
+                            <span style="font-size: 1.5rem;">🔔</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="fw-medium text-primary mb-1" id="unreadCountText">You have 0 unread notifications</p>
+                            <p class="small text-muted mb-0">Stay informed about your students' wellbeing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="row" id="emptyState" style="display: none;">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <span style="font-size: 4rem;">🔔</span>
+                    <h3 class="mt-3 mb-2">No notifications</h3>
+                    <p class="text-muted">You're all caught up! Check back later for updates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Tabs -->
+    <div class="row" id="notificationsContent" style="display: none;">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs mb-4" id="notificationTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                        All (<span id="allCount">0</span>)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="unread-tab" data-bs-toggle="tab" data-bs-target="#unread" type="button" role="tab">
+                        Unread (<span id="unreadCount">0</span>)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="urgent-tab" data-bs-toggle="tab" data-bs-target="#urgent" type="button" role="tab">
+                        Urgent (<span id="urgentCount">0</span>)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="read-tab" data-bs-toggle="tab" data-bs-target="#read" type="button" role="tab">
+                        Read (<span id="readCount">0</span>)
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="notificationTabContent">
+                <!-- All Notifications Tab -->
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div id="allNotificationsList">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Unread Notifications Tab -->
+                <div class="tab-pane fade" id="unread" role="tabpanel">
+                    <div id="unreadNotificationsList">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Urgent Notifications Tab -->
+                <div class="tab-pane fade" id="urgent" role="tabpanel">
+                    <div id="urgentNotificationsList">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Read Notifications Tab -->
+                <div class="tab-pane fade" id="read" role="tabpanel">
+                    <div id="readNotificationsList">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Data (hidden, populated by Thymeleaf or JavaScript) -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Sample notification data - replace with actual data from backend
+    const notificationsData = [
+        {
+            id: 1,
+            type: 'urgent',
+            title: 'Student Assessment Score Alert',
+            message: 'Student #5678 scored high on depression indicators in recent assessment',
+            time: '30 minutes ago',
+            isRead: false,
+            icon: '⚠️',
+            color: 'bg-danger bg-opacity-10 text-danger',
+            student: 'Student #5678'
+        },
+        {
+            id: 2,
+            type: 'activity',
+            title: 'Multiple Students Showing Decreased Engagement',
+            message: '4 students in your cohort have not accessed resources in the past week',
+            time: '2 hours ago',
+            isRead: false,
+            icon: '📊',
+            color: 'bg-warning bg-opacity-10 text-warning',
+            student: null
+        },
+        {
+            id: 3,
+            type: 'urgent',
+            title: 'Student Inactivity Alert',
+            message: 'Student #9012 has not logged in for 7 days - follow-up may be needed',
+            time: '5 hours ago',
+            isRead: false,
+            icon: '⚠️',
+            color: 'bg-danger bg-opacity-10 text-danger',
+            student: 'Student #9012'
+        },
+        {
+            id: 4,
+            type: 'activity',
+            title: 'Student Completed Telehealth Appointment',
+            message: 'Student #1234 successfully attended their telehealth session',
+            time: '1 day ago',
+            isRead: true,
+            icon: '✅',
+            color: 'bg-success bg-opacity-10 text-success',
+            student: 'Student #1234'
+        },
+        {
+            id: 5,
+            type: 'system',
+            title: 'Weekly Cohort Report Available',
+            message: 'Your weekly student wellbeing analytics report is ready for review',
+            time: '2 days ago',
+            isRead: true,
+            icon: '📄',
+            color: 'bg-info bg-opacity-10 text-info',
+            student: null
+        },
+        {
+            id: 6,
+            type: 'activity',
+            title: 'Student Showing Positive Progress',
+            message: 'Student #3456 has completed 5 self-care sessions this week - significant improvement',
+            time: '2 days ago',
+            isRead: true,
+            icon: '📈',
+            color: 'bg-success bg-opacity-10 text-success',
+            student: 'Student #3456'
+        },
+        {
+            id: 7,
+            type: 'activity',
+            title: 'Student Accessed Self-Care Tools',
+            message: 'Student #2468 completed meditation session and mood tracking',
+            time: '3 days ago',
+            isRead: true,
+            icon: '💚',
+            color: 'bg-success bg-opacity-10 text-success',
+            student: 'Student #2468'
+        }
+    ];
+
+    let notifications = notificationsData;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        renderNotifications();
+        updateCounts();
+    });
+
+    function updateCounts() {
+        const unreadCount = notifications.filter(n => !n.isRead).length;
+        const urgentCount = notifications.filter(n => n.type === 'urgent' && !n.isRead).length;
+        const readCount = notifications.filter(n => n.isRead).length;
+
+        document.getElementById('allCount').textContent = notifications.length;
+        document.getElementById('unreadCount').textContent = unreadCount;
+        document.getElementById('urgentCount').textContent = urgentCount;
+        document.getElementById('readCount').textContent = readCount;
+
+        // Update alert banners
+        if (urgentCount > 0) {
+            document.getElementById('urgentAlert').style.display = 'block';
+            document.getElementById('urgentCountText').textContent = `⚠️ ${urgentCount} urgent notification${urgentCount > 1 ? 's' : ''} require attention`;
+        } else {
+            document.getElementById('urgentAlert').style.display = 'none';
+        }
+
+        if (unreadCount > 0 && urgentCount === 0) {
+            document.getElementById('unreadAlert').style.display = 'block';
+            document.getElementById('unreadCountText').textContent = `You have ${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}`;
+        } else {
+            document.getElementById('unreadAlert').style.display = 'none';
+        }
+
+        // Show/hide empty state
+        if (notifications.length === 0) {
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('notificationsContent').style.display = 'none';
+        } else {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('notificationsContent').style.display = 'block';
+        }
+
+        // Show/hide buttons
+        document.getElementById('markAllReadBtn').style.display = unreadCount > 0 ? 'block' : 'none';
+        document.getElementById('clearAllBtn').style.display = notifications.length > 0 ? 'block' : 'none';
+    }
+
+    function renderNotifications() {
+        const unreadNotifications = notifications.filter(n => !n.isRead);
+        const readNotifications = notifications.filter(n => n.isRead);
+        const urgentNotifications = notifications.filter(n => n.type === 'urgent');
+
+        renderNotificationList('allNotificationsList', notifications);
+        renderNotificationList('unreadNotificationsList', unreadNotifications, true);
+        renderNotificationList('urgentNotificationsList', urgentNotifications, true);
+        renderNotificationList('readNotificationsList', readNotifications);
+    }
+
+    function renderNotificationList(containerId, notificationList, showEmpty = false) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (notificationList.length === 0 && showEmpty) {
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <span style="font-size: 3rem;">✅</span>
+                        <p class="text-muted mt-3">No notifications in this category</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        notificationList.forEach(notification => {
+            const card = createNotificationCard(notification);
+            container.appendChild(card);
+        });
+    }
+
+    function createNotificationCard(notification) {
+        const card = document.createElement('div');
+        card.className = `card mb-3 ${!notification.isRead ? 'border-danger border-2' : 'border border-secondary opacity-75'}`;
+        if (notification.type === 'urgent' && !notification.isRead) {
+            card.classList.add('bg-danger', 'bg-opacity-10');
+        } else if (!notification.isRead) {
+            card.classList.add('bg-warning', 'bg-opacity-10');
+        }
+
+        const badgeHtml = `
+            ${!notification.isRead ? '<span class="badge bg-danger me-1">New</span>' : ''}
+            ${notification.type === 'urgent' ? '<span class="badge bg-danger me-1">Urgent</span>' : ''}
+            ${notification.student ? `<span class="badge bg-secondary">${notification.student}</span>` : ''}
+        `;
+
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="d-flex align-items-start">
+                    <div class="${notification.color} p-3 rounded-circle me-3">
+                        <span style="font-size: 1.5rem;">${notification.icon}</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="mb-1">${notification.title}</h5>
+                                <div class="mb-2">${badgeHtml}</div>
+                            </div>
+                            <small class="text-muted">
+                                <span style="font-size: 0.9rem;">🕐</span> ${notification.time}
+                            </small>
+                        </div>
+                        <p class="text-muted mb-3">${notification.message}</p>
+                        <div class="d-flex gap-2">
+                            ${!notification.isRead ? `
+                                <button class="btn btn-sm btn-outline-primary" onclick="markAsRead(${notification.id})">
+                                    Mark as read
+                                </button>
+                            ` : ''}
+                            ${notification.type === 'urgent' ? `
+                                <a href="/student/progress" class="btn btn-sm btn-danger">
+                                    ${notification.student ? 'View Student' : 'Take Action'}
+                                </a>
+                            ` : ''}
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(${notification.id})">
+                                <span style="font-size: 0.9rem;">🗑️</span> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return card;
+    }
+
+    function markAsRead(id) {
+        notifications = notifications.map(n => 
+            n.id === id ? { ...n, isRead: true } : n
+        );
+        renderNotifications();
+        updateCounts();
+    }
+
+    function markAllAsRead() {
+        notifications = notifications.map(n => ({ ...n, isRead: true }));
+        renderNotifications();
+        updateCounts();
+    }
+
+    function deleteNotification(id) {
+        if (confirm('Are you sure you want to delete this notification?')) {
+            notifications = notifications.filter(n => n.id !== id);
+            renderNotifications();
+            updateCounts();
+        }
+    }
+
+    function clearAll() {
+        if (confirm('Are you sure you want to clear all notifications?')) {
+            notifications = [];
+            renderNotifications();
+            updateCounts();
+        }
+    }
+    /*]]>*/
+</script>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+    }
+    .nav-tabs .nav-link.active {
+        color: #495057;
+        font-weight: 600;
+    }
+</style>

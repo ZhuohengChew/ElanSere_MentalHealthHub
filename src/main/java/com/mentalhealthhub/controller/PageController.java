@@ -33,8 +33,15 @@ public class PageController {
 
         model.addAttribute("user", user);
 
-        model.addAttribute("page", "notifications");
+        // Show staff-specific notifications page for staff users
+        if (user.getRole().name().equals("STAFF")) {
+            model.addAttribute("page", "notifications/staff-notifications");
+        } else {
+            model.addAttribute("page", "notifications");
+        }
+        
         model.addAttribute("title", "Notifications");
+        model.addAttribute("activePage", "notifications");
         return "layout";
     }
 
@@ -74,6 +81,21 @@ public class PageController {
         model.addAttribute("user", user);
         model.addAttribute("page", "concerns/report");
         model.addAttribute("title", "Report Concern");
+        model.addAttribute("activePage", "report");
+        return "layout";
+    }
+
+    @GetMapping("/student/progress")
+    public String studentProgress(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("page", "progress/student-progress");
+        model.addAttribute("title", "Track Student Progress");
+        model.addAttribute("activePage", "student-progress");
         return "layout";
     }
 
