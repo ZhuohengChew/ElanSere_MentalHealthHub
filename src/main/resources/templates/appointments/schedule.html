@@ -181,45 +181,46 @@
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
         let currentDate = new Date();
         let selectedDate = new Date();
         
-        // Sample appointments data
-        const appointmentsData = [
-            {
-                id: 1,
-                studentName: 'John Doe',
-                studentId: '12345',
-                appointmentDate: new Date('2025-12-04T09:00:00'),
-                notes: 'Initial consultation',
-                status: 'SCHEDULED'
-            },
-            {
-                id: 2,
-                studentName: 'Jane Smith',
-                studentId: '12346',
-                appointmentDate: new Date('2025-12-04T14:30:00'),
-                notes: 'Follow-up session',
-                status: 'CONFIRMED'
-            },
-            {
-                id: 3,
-                studentName: 'Mike Johnson',
-                studentId: '12347',
-                appointmentDate: new Date('2025-12-15T10:00:00'),
-                notes: 'Therapy session',
-                status: 'SCHEDULED'
-            },
-            {
-                id: 4,
-                studentName: 'Sarah Williams',
-                studentId: '12348',
-                appointmentDate: new Date('2025-12-20T15:00:00'),
-                notes: 'Assessment',
-                status: 'PENDING'
-            }
-        ];
+        // Load appointments data from API instead of Thymeleaf inline (better compatibility)
+        let appointmentsData = [];
+        
+        // Fetch appointments from API
+        console.log('Fetching appointments from API endpoint...');
+        fetch('/mentalhealthhub/appointments/api/my-schedule')
+            .then(response => response.json())
+            .then(data => {
+                appointmentsData = data;
+                console.log('✓ Successfully loaded', appointmentsData.length, 'appointments from API');
+                console.log('Appointments data:', appointmentsData);
+                
+                // Convert date strings to Date objects
+                appointmentsData.forEach((apt, index) => {
+                    console.log(`Processing appointment ${index}:`, apt);
+                    
+                    // Convert ISO string to Date
+                    if (typeof apt.appointmentDate === 'string') {
+                        apt.appointmentDate = new Date(apt.appointmentDate);
+                        console.log(`  ✓ Converted date string to Date:`, apt.appointmentDate);
+                    }
+                });
+                
+                // Initialize the calendar after data is loaded
+                renderCalendar();
+                displayAppointmentsForDate(selectedDate);
+            })
+            .catch(error => {
+                console.error('✗ Error loading appointments from API:', error);
+                // Initialize calendar even if data load fails
+                renderCalendar();
+                displayAppointmentsForDate(selectedDate);
+            });
+        
+        console.log('Initial appointments array setup (will be populated by API)');
+
 
         function renderCalendar() {
             const year = currentDate.getFullYear();
@@ -309,12 +310,37 @@
 
         function displayAppointmentsForDate(date) {
             const dateStr = formatDateForComparison(date);
+            console.log('=== Displaying appointments for date:', dateStr, '(', date.toDateString(), ')');
             document.getElementById('selectedDate').textContent = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             
+            console.log('Total appointments to check:', appointmentsData.length);
+            
             const appointmentsForDate = appointmentsData.filter(apt => {
-                const aptDateStr = formatDateForComparison(apt.appointmentDate);
-                return aptDateStr === dateStr;
+                const aptDate = apt.appointmentDate;
+                
+                if (!aptDate) {
+                    console.warn('Appointment has no date:', apt);
+                    return false;
+                }
+                
+                if (!(aptDate instanceof Date) || isNaN(aptDate.getTime())) {
+                    console.warn('Invalid appointment date object:', aptDate, 'for appointment:', apt);
+                    return false;
+                }
+                
+                const aptDateStr = formatDateForComparison(aptDate);
+                const match = aptDateStr === dateStr;
+                
+                if (match) {
+                    console.log('✓ MATCH - Appointment date:', aptDateStr, '===', dateStr);
+                } else {
+                    console.log('✗ NO MATCH - Appointment date:', aptDateStr, '!==', dateStr);
+                }
+                
+                return match;
             });
+            
+            console.log('=== Found', appointmentsForDate.length, 'appointments for date:', dateStr);
             
             const container = document.getElementById('appointmentsContainer');
             const count = appointmentsForDate.length;
@@ -330,14 +356,13 @@
                 return;
             }
             
-            // Sort appointments by time
-            appointmentsForDate.sort((a, b) => a.appointmentDate - b.appointmentDate);
-            
             let html = '';
             appointmentsForDate.forEach(apt => {
                 const time = apt.appointmentDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                 const cardClass = apt.status === 'CANCELLED' ? 'urgent' : apt.status === 'COMPLETED' ? 'confirmed' : '';
                 const badgeClass = apt.status === 'CANCELLED' ? 'danger' : apt.status === 'COMPLETED' ? 'success' : (apt.status === 'PENDING' ? 'warning' : 'info');
+                const studentName = apt.student ? apt.student.name : 'Unknown Student';
+                const studentId = apt.student ? apt.student.id : 'N/A';
                 
                 html += `
                     <div class="appointment-card ${cardClass}">
@@ -345,10 +370,10 @@
                         <div class="appointment-type">Initial Consultation</div>
                         <div class="appointment-patient">
                             <div class="patient-info">
-                                Patient <span class="patient-number">#${apt.studentId}</span>
+                                Patient <span class="patient-number">#${studentId}</span>
                                 <span class="badge bg-${badgeClass} ms-2">${apt.status}</span>
                             </div>
-                            <div class="patient-info mt-2">${apt.studentName}</div>
+                            <div class="patient-info mt-2">${studentName}</div>
                         </div>
                         <div class="mt-3">
                             <button class="btn btn-primary btn-small me-2">
@@ -386,9 +411,7 @@
             renderCalendar();
         });
 
-        // Initialize calendar
-        renderCalendar();
-        displayAppointmentsForDate(selectedDate);
+        // Calendar will be initialized after appointments are loaded from API
     </script>
 </body>
 </html>

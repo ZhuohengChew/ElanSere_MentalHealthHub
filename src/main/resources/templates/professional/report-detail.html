@@ -247,6 +247,33 @@
                         </div>
                     </div>
 
+                    <!-- Overall Score Summary (S/A/D) -->
+                    <div style="background: linear-gradient(135deg, rgba(155, 126, 222, 0.1) 0%, rgba(155, 126, 222, 0.05) 100%); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 2px solid #9B7EDE;">
+                        <h6 class="mb-3" style="color: #9B7EDE; font-weight: 600;">
+                            <i class="bi bi-speedometer2"></i> Overall Score (S/A/D)
+                        </h6>
+                        <div style="display: flex; gap: 1rem; justify-content: center; align-items: center;">
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #ffc107;">
+                                    <span th:text="${student != null && student.stressLevel != null ? student.stressLevel : '-'}">-</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem;">Stress (S)</div>
+                            </div>
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #dc3545;">
+                                    <span th:text="${student != null && student.anxietyLevel != null ? student.anxietyLevel : '-'}">-</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem;">Anxiety (A)</div>
+                            </div>
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #6f42c1;">
+                                    <span th:text="${student != null && student.wellbeingScore != null ? student.wellbeingScore : '-'}">-</span>
+                                </div>
+                                <div style="font-size: 0.85rem; color: #6c757d; margin-top: 0.5rem;">Depression (D)</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Last Assessment -->
                     <div class="alert alert-info mt-4" style="font-size: 0.9rem;">
                         <i class="bi bi-info-circle"></i>
@@ -284,7 +311,7 @@
                     <h5 class="modal-title">Schedule Appointment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" th:action="@{/mentalhealthhub/professional/appointments/book}">
+                <form method="POST" th:action="@{/professional/appointments/book}">
                     <div class="modal-body">
                         <p class="text-muted mb-4">Choose a date and time for the appointment with <strong th:text="${student != null ? student.name : 'Student'}">Student</strong></p>
                         

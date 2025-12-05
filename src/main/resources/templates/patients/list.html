@@ -2,58 +2,104 @@
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="mb-2">My Patients</h1>
-            <p class="text-muted">View and manage your patient list</p>
+            <h1 class="mb-2">
+                <i class="bi bi-people-fill" style="color: #9B7EDE;"></i> All Students
+            </h1>
+            <p class="text-muted">View and manage all students in the system</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-primary" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                Total Students: <span th:text="${patients.size()}">0</span>
+            </span>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Search by Student ID or Name..." style="border-left: 0;">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header border-0 pb-3">
-                    <h6 class="mb-0">Patients with Active Appointments</h6>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom pb-3">
+                    <h6 class="mb-0">
+                        <i class="bi bi-list-ul"></i> Student Directory
+                    </h6>
                 </div>
                 <div class="card-body">
                     <div th:if="${patients.isEmpty()}" class="text-center py-5">
                         <i class="bi bi-person-x" style="font-size: 3rem; color: #ddd;"></i>
-                        <p class="text-muted mt-3">No patients yet</p>
+                        <p class="text-muted mt-3">No students found in the system</p>
                     </div>
                     <div th:unless="${patients.isEmpty()}" class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="patientsTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Patient Name</th>
+                                    <th>Student Name</th>
                                     <th>Email</th>
-                                    <th>Total Appointments</th>
-                                    <th>Last Appointment</th>
+                                    <th>Wellbeing Score</th>
+                                    <th>Status</th>
+                                    <th>Appointments</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="patient : ${patients}">
+                                <tr th:each="patient : ${patients}" class="patient-row" th:attr="data-patient-id=${patient.id},data-patient-name=${patient.name},data-patient-email=${patient.email}">
                                     <td>
-                                        <h6 class="mb-0" th:text="${patient.name}">Name</h6>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; font-weight: bold;">
+                                                <span th:text="${#strings.substring(patient.name, 0, 1).toUpperCase()}">S</span>
+                                            </div>
+                                            <div class="ms-3">
+                                                <h6 class="mb-0" th:text="${patient.name}">Name</h6>
+                                                <small class="text-muted" th:text="${patient.id}">ID</small>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td th:text="${patient.email}">Email</td>
+                                    <td>
+                                        <small th:text="${patient.email}">email@example.com</small>
+                                    </td>
+                                    <td>
+                                        <div th:if="${patient.wellbeingScore != null}" class="d-flex align-items-center">
+                                            <span th:text="${patient.wellbeingScore}" style="font-weight: bold; margin-right: 0.5rem;">0</span>
+                                            <div class="progress" style="width: 80px; height: 6px;">
+                                                <div class="progress-bar" 
+                                                     th:classappend="${patient.wellbeingScore >= 70 ? 'bg-success' : patient.wellbeingScore >= 40 ? 'bg-info' : 'bg-warning'}"
+                                                     th:style="'width: ' + ${patient.wellbeingScore} + '%'"></div>
+                                            </div>
+                                        </div>
+                                        <div th:unless="${patient.wellbeingScore != null}">
+                                            <small class="text-muted">N/A</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success" th:if="${patient.active}">Active</span>
+                                        <span class="badge bg-secondary" th:unless="${patient.active}">Inactive</span>
+                                    </td>
                                     <td>
                                         <span class="badge bg-primary" 
-                                              th:text="${#arrays.length(appointments.?[student.id == patient.id])}">
+                                              th:text="${appointmentCounts.get(patient.id) != null ? appointmentCounts.get(patient.id) : 0}">
                                             0
                                         </span>
                                     </td>
                                     <td>
-                                        <span th:if="${appointments.?[student.id == patient.id]?.empty}">
-                                            <small class="text-muted">N/A</small>
-                                        </span>
-                                        <span th:unless="${appointments.?[student.id == patient.id]?.empty}">
-                                            <small th:text="${#temporals.format(appointments.?[student.id == patient.id].get(0).appointmentDate, 'dd MMM yyyy HH:mm')}">
-                                                Date
-                                            </small>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-sm btn-outline-primary">View Profile</a>
-                                        <a href="#" class="btn btn-sm btn-outline-secondary">History</a>
+                                        <a th:href="@{/professional/students/{id}(id=${patient.id})}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-person-circle"></i> View
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-calendar"></i> History
+                                        </a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -66,7 +112,35 @@
 
     <style>
         .table-hover tbody tr:hover {
-            background-color: #f8f9fa;
+            background-color: rgba(155, 126, 222, 0.05);
+        }
+        
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.35rem 0.75rem;
+        }
+        
+        .patient-row.hidden {
+            display: none;
         }
     </style>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#patientsTable tbody tr');
+            
+            rows.forEach(row => {
+                const patientId = row.getAttribute('data-patient-id');
+                const patientName = row.getAttribute('data-patient-name').toLowerCase();
+                const patientEmail = row.getAttribute('data-patient-email').toLowerCase();
+                
+                if (patientId.includes(searchValue) || patientName.includes(searchValue) || patientEmail.includes(searchValue)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </div>

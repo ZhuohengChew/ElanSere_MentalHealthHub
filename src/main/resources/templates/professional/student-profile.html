@@ -1,0 +1,298 @@
+<!-- Student Profile Page -->
+<div class="container-fluid">
+    <!-- Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="/mentalhealthhub/patients" class="btn btn-sm btn-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Student List
+            </a>
+        </div>
+    </div>
+
+    <!-- Student Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-white rounded-3 p-4 shadow-sm border-start border-4" style="border-color: #9B7EDE !important;">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                        <span th:text="${#strings.substring(student.name, 0, 1).toUpperCase()}">S</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h2 class="mb-2" th:text="${student.name}">Student Name</h2>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-card-text"></i> Student ID: <span th:text="${student.id}">ID</span>
+                        </p>
+                        <p class="text-muted mb-1">
+                            <i class="bi bi-envelope"></i> <span th:text="${student.email}">email@example.com</span>
+                        </p>
+                        <p class="text-muted">
+                            <i class="bi bi-circle-fill"></i> 
+                            <span class="badge bg-success" th:if="${student.active}">Active</span>
+                            <span class="badge bg-secondary" th:unless="${student.active}">Inactive</span>
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <div style="background: linear-gradient(135deg, rgba(155, 126, 222, 0.1) 0%, rgba(155, 126, 222, 0.05) 100%); border-radius: 0.5rem; padding: 1.5rem; border: 2px solid #9B7EDE;">
+                            <div class="text-muted small mb-2">Current Status</div>
+                            <div style="font-size: 2.5rem; font-weight: bold; color: #9B7EDE;" th:text="${student.wellbeingScore != null ? student.wellbeingScore + '%' : 'N/A'}">75%</div>
+                            <div class="text-muted small">Wellbeing Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-check" style="font-size: 2rem; color: #007bff;"></i>
+                    <h6 class="mt-2 text-muted">Total Assessments</h6>
+                    <h3 class="mb-0" th:text="${totalAssessments}">5</h3>
+                    <small class="text-muted">Completed</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up" style="font-size: 2rem; color: #28a745;"></i>
+                    <h6 class="mt-2 text-muted">Current Trend</h6>
+                    <h3 class="mb-0" style="color: #28a745;">Improving</h3>
+                    <small class="text-muted">Over last month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-percent" style="font-size: 2rem; color: #9B7EDE;"></i>
+                    <h6 class="mt-2 text-muted">Wellbeing Score</h6>
+                    <h3 class="mb-0" th:text="${student.wellbeingScore != null ? student.wellbeingScore + '%' : 'N/A'}">75%</h3>
+                    <small class="text-muted">Latest assessment</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-activity" style="font-size: 2rem; color: #ffc107;"></i>
+                    <h6 class="mt-2 text-muted">Engagement Rate</h6>
+                    <h3 class="mb-0">85%</h3>
+                    <small class="text-muted">Active 2 hours ago</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mental Health Scores Section -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom pb-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up"></i> Mental Health Indicators - Current Levels
+                    </h5>
+                    <small class="text-muted">Latest assessment results</small>
+                </div>
+                <div class="card-body">
+                    <!-- Stress Level -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <label class="fw-bold">Stress Level</label>
+                            <span class="badge bg-warning text-dark" th:text="${student.stressLevel != null ? student.stressLevel + ' / 100' : 'N/A'}">45 / 100</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" 
+                                 th:style="${student.stressLevel != null ? 'width: ' + student.stressLevel + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Anxiety Level -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <label class="fw-bold">Anxiety Level</label>
+                            <span class="badge bg-info text-dark" th:text="${student.anxietyLevel != null ? student.anxietyLevel + ' / 100' : 'N/A'}">30 / 100</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" 
+                                 th:style="${student.anxietyLevel != null ? 'width: ' + student.anxietyLevel + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Depression Indicators -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <label class="fw-bold">Depression Indicators</label>
+                            <span class="badge bg-danger" th:text="${student.wellbeingScore != null ? (100 - student.wellbeingScore) + ' / 100' : 'N/A'}">25 / 100</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" 
+                                 th:style="${student.wellbeingScore != null ? 'width: ' + (100 - student.wellbeingScore) + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Wellbeing -->
+                    <div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <label class="fw-bold">Overall Wellbeing</label>
+                            <span class="badge bg-success" th:text="${student.wellbeingScore != null ? student.wellbeingScore + ' / 100' : 'N/A'}">75 / 100</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" 
+                                 th:style="${student.wellbeingScore != null ? 'width: ' + student.wellbeingScore + '%' : 'width: 0%'}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assessment Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom pb-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-text"></i> Assessment History
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${assessments.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-file-x" style="font-size: 2rem; color: #ddd;"></i>
+                        <p class="text-muted mt-3">No assessments completed yet</p>
+                    </div>
+                    <div th:unless="${assessments.isEmpty()}" class="assessment-list">
+                        <div th:each="assessment : ${assessments.subList(0, #lists.size(assessments) > 5 ? 5 : #lists.size(assessments))}" class="mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">Assessment</h6>
+                                    <small class="text-muted" th:text="${#temporals.format(assessment.completedAt, 'dd MMM yyyy')}">Date</small>
+                                </div>
+                                <span class="badge" 
+                                      th:classappend="${assessment.totalScore >= 24 ? 'bg-success' : assessment.totalScore >= 16 ? 'bg-info' : 'bg-warning'}"
+                                      th:text="${assessment.totalScore} + ' / 32'">Score</span>
+                            </div>
+                            <small class="text-muted d-block" th:text="${assessment.result}">Result category</small>
+                        </div>
+                        <div th:if="${#lists.size(assessments) > 5}" class="text-center mt-3">
+                            <small class="text-muted" th:text="'and ' + (${#lists.size(assessments)} - 5) + ' more assessments'">and more</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom pb-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up-arrow"></i> Mental Health Trends Over Time
+                    </h5>
+                    <small class="text-muted">6-week progression of mental health indicators</small>
+                </div>
+                <div class="card-body">
+                    <div style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Placeholder trend data - can be populated from server if needed
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        const trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Oct 1', 'Oct 8', 'Oct 15', 'Oct 22', 'Oct 29', 'Nov 5'],
+                datasets: [
+                    {
+                        label: 'Stress Level',
+                        data: [65, 62, 60, 55, 50, 45],
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Anxiety Level',
+                        data: [40, 38, 35, 32, 30, 30],
+                        borderColor: '#17a2b8',
+                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Depression Indicators',
+                        data: [35, 32, 28, 25, 25, 25],
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Overall Wellbeing',
+                        data: [65, 68, 70, 73, 75, 75],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .border-start {
+            border-left: 4px solid !important;
+        }
+
+        .assessment-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</div>

@@ -1,17 +1,26 @@
 package com.mentalhealthhub.controller;
 
-import com.mentalhealthhub.model.Appointment;
-import com.mentalhealthhub.model.User;
-import com.mentalhealthhub.repository.AppointmentRepository;
-import com.mentalhealthhub.repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.AppointmentStatus;
+import com.mentalhealthhub.model.User;
+import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/appointments")
@@ -67,12 +76,14 @@ public class AppointmentController {
             return "redirect:/login";
         }
 
-        List<Appointment> appointments = appointmentRepository.findByProfessional(user);
-        model.addAttribute("appointments", appointments);
-        model.addAttribute("user", user);
+// Get all appointments where user is either student or professional
+// Pass the same user object for BOTH parameters
+List<Appointment> allAppointments = appointmentRepository.findByStudentOrProfessional(user, user);
         
+        model.addAttribute("appointments", allAppointments);
+        model.addAttribute("user", user);
         model.addAttribute("page", "appointments/schedule");
-        model.addAttribute("title", "My Schedule");
+        model.addAttribute("title", "My Complete Schedule");
 
         return "layout";
     }
@@ -100,10 +111,66 @@ public class AppointmentController {
             .professional(professional)
             .appointmentDate(dateTime)
             .notes(notes)
+            .status(AppointmentStatus.SCHEDULED)
             .createdAt(LocalDateTime.now())
             .build();
 
         appointmentRepository.save(appointment);
-        return "redirect:/appointments";
+        return "redirect:/appointments/my-schedule";
+    }
+
+    @GetMapping("/api/my-schedule")
+    @ResponseBody
+    public List<Map<String, Object>> myScheduleApi(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return List.of();
+        }
+
+// Get all appointments where user is either student or professional
+// Pass the same user object for BOTH parameters
+List<Appointment> allAppointments = appointmentRepository.findByStudentOrProfessional(user, user);
+        
+        return allAppointments.stream().map(apt -> Map.ofEntries(
+            Map.entry("id", apt.getId()),
+            Map.entry("appointmentDate", apt.getAppointmentDate().toString()),
+            Map.entry("status", apt.getStatus().toString()),
+            Map.entry("notes", apt.getNotes() != null ? apt.getNotes() : ""),
+            Map.entry("student", Map.ofEntries(
+                Map.entry("id", apt.getStudent().getId()),
+                Map.entry("name", apt.getStudent().getName()),
+                Map.entry("email", apt.getStudent().getEmail())
+            )),
+            Map.entry("professional", Map.ofEntries(
+                Map.entry("id", apt.getProfessional().getId()),
+                Map.entry("name", apt.getProfessional().getName())
+            ))
+        )).toList();
+    }
+
+    @GetMapping("/api/my-appointments")
+    @ResponseBody
+    public List<Map<String, Object>> myAppointmentsApi(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return List.of();
+        }
+
+        List<Appointment> appointments = appointmentRepository.findByStudent(user);
+        return appointments.stream().map(apt -> Map.ofEntries(
+            Map.entry("id", apt.getId()),
+            Map.entry("appointmentDate", apt.getAppointmentDate().toString()),
+            Map.entry("status", apt.getStatus().toString()),
+            Map.entry("notes", apt.getNotes() != null ? apt.getNotes() : ""),
+            Map.entry("student", Map.ofEntries(
+                Map.entry("id", apt.getStudent().getId()),
+                Map.entry("name", apt.getStudent().getName()),
+                Map.entry("email", apt.getStudent().getEmail())
+            )),
+            Map.entry("professional", Map.ofEntries(
+                Map.entry("id", apt.getProfessional().getId()),
+                Map.entry("name", apt.getProfessional().getName())
+            ))
+        )).toList();
     }
 }

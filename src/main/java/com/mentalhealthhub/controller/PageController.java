@@ -1,15 +1,28 @@
 package com.mentalhealthhub.controller;
 
-import com.mentalhealthhub.model.*;
-import com.mentalhealthhub.repository.ReportRepository;
-import com.mentalhealthhub.repository.AppointmentRepository;
-import com.mentalhealthhub.service.AssessmentService;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.AppointmentStatus;
+import com.mentalhealthhub.model.Assessment;
+import com.mentalhealthhub.model.Report;
+import com.mentalhealthhub.model.User;
+import com.mentalhealthhub.model.UserRole;
+import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.AssessmentRepository;
+import com.mentalhealthhub.repository.ReportRepository;
+import com.mentalhealthhub.repository.UserRepository;
+import com.mentalhealthhub.service.AssessmentService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class PageController {
@@ -17,11 +30,15 @@ public class PageController {
     private final ReportRepository reportRepository;
     private final AppointmentRepository appointmentRepository;
     private final AssessmentService assessmentService;
+    private final UserRepository userRepository;
+    private final AssessmentRepository assessmentRepository;
 
-    public PageController(ReportRepository reportRepository, AppointmentRepository appointmentRepository, AssessmentService assessmentService) {
+    public PageController(ReportRepository reportRepository, AppointmentRepository appointmentRepository, AssessmentService assessmentService, UserRepository userRepository, AssessmentRepository assessmentRepository) {
         this.reportRepository = reportRepository;
         this.appointmentRepository = appointmentRepository;
         this.assessmentService = assessmentService;
+        this.userRepository = userRepository;
+        this.assessmentRepository = assessmentRepository;
     }
 
     @GetMapping("/settings")
@@ -119,6 +136,12 @@ public class PageController {
         Report report = reportRepository.findById(id).orElse(null);
         if (report == null) {
             return "redirect:/404";
+        }
+
+        // Update report status to "reviewed" when professional views it
+        if (report.getStatus() == null || report.getStatus().isEmpty() || report.getStatus().equals("pending")) {
+            report.setStatus("reviewed");
+            reportRepository.save(report);
         }
 
         model.addAttribute("user", user);
@@ -219,15 +242,33 @@ public class PageController {
 
     @GetMapping("/student/progress")
     public String studentProgress(HttpSession session, Model model) {
+        // Redirect to /patients which now serves both professionals and staff
+        return "redirect:/patients";
+    }
+
+    @GetMapping("/professional/students/{id}")
+    public String viewStudentProfile(@PathVariable Long id, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null) {
+        if (user == null || (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF)) {
             return "redirect:/login";
         }
 
+        User student = userRepository.findById(id).orElse(null);
+        if (student == null || student.getRole() != UserRole.STUDENT) {
+            return "redirect:/patients";
+        }
+
+        List<Assessment> assessments = assessmentRepository.findAll().stream()
+            .filter(a -> a.getUser() != null && a.getUser().getId().equals(id))
+            .toList();
+
+        model.addAttribute("student", student);
+        model.addAttribute("assessments", assessments);
+        model.addAttribute("totalAssessments", assessments.size());
         model.addAttribute("user", user);
-        model.addAttribute("page", "progress/student-progress");
-        model.addAttribute("title", "Track Student Progress");
-        model.addAttribute("activePage", "student-progress");
+        model.addAttribute("page", "professional/student-profile");
+        model.addAttribute("title", "Student Profile");
+
         return "layout";
     }
 

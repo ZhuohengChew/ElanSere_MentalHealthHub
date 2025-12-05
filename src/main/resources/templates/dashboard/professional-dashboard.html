@@ -55,7 +55,7 @@
                                     <h6 class="mb-1" th:text="${apt.student.name} + ' - ' + ${#temporals.format(apt.appointmentDate,'hh:mm a')}">Student - 00:00</h6>
                                     <small class="text-muted" th:text="${apt.notes} ?: 'Session'">Session details</small>
                                 </div>
-                                <span class="badge" th:classappend="${apt.status.name() == 'SCHEDULED' ? ' bg-info' : (apt.status.name() == 'COMPLETED' ? ' bg-success' : ' bg-danger')}" th:text="${apt.status}">Status</span>
+                                <span class="badge" th:classappend="${apt.status != null ? (apt.status.name() == 'SCHEDULED' ? ' bg-info' : (apt.status.name() == 'COMPLETED' ? ' bg-success' : ' bg-danger')) : ' bg-secondary'}" th:text="${apt.status} ?: 'Pending'">Status</span>
                             </div>
                         </div>
                     </div>
@@ -84,8 +84,8 @@
                                     </div>
                                 </div>
                                 <div class="btn-group-vertical btn-group-sm">
-                                    <a th:href="@{/professional/students/{id}/health-records(id=${p.id})}" class="btn btn-outline-primary">Records</a>
-                                    <a th:href="@{/appointments}?patientId=${p.id}" class="btn btn-outline-secondary">History</a>
+                                    <a th:href="@{/professional/students/{id}(id=${p.id})}" class="btn btn-outline-primary">View Detail</a>
+                                    <a th:href="@{/appointments(patientId=${p.id})}" class="btn btn-outline-secondary">History</a>
                                 </div>
                             </div>
                         </li>
