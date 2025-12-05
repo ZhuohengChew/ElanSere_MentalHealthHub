@@ -20,6 +20,9 @@ public class ForumPost {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Column
+    private String category; // Academic Stress, Anxiety, Depression, Self-Care, Motivation, General
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -35,13 +38,14 @@ public class ForumPost {
     public ForumPost() {
     }
 
-    public ForumPost(Long id, User user, String title, String content,
+    public ForumPost(Long id, User user, String title, String content, String category,
             LocalDateTime createdAt, LocalDateTime updatedAt,
             Integer views, Integer replies) {
         this.id = id;
         this.user = user;
         this.title = title;
         this.content = content;
+        this.category = category;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.views = views;
@@ -116,11 +120,20 @@ public class ForumPost {
         this.replies = replies;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public static class Builder {
         private Long id;
         private User user;
         private String title;
         private String content;
+        private String category;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private Integer views = 0;
@@ -146,6 +159,11 @@ public class ForumPost {
             return this;
         }
 
+        public Builder category(String category) {
+            this.category = category;
+            return this;
+        }
+
         public Builder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -167,7 +185,7 @@ public class ForumPost {
         }
 
         public ForumPost build() {
-            return new ForumPost(id, user, title, content, createdAt, updatedAt, views, replies);
+            return new ForumPost(id, user, title, content, category, createdAt, updatedAt, views, replies);
         }
     }
 }

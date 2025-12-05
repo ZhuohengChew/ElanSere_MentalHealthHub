@@ -1,0 +1,111 @@
+<!-- Educational Modules Page -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card" style="border-left: 4px solid #6A8EAE;">
+                <div class="card-body">
+                    <h1 class="mb-2">
+                        <span style="font-size: 2rem;">📚</span> Educational Modules
+                    </h1>
+                    <p class="text-muted mb-0">Learn about mental health topics and develop coping strategies</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Your Progress</h5>
+            <small class="text-muted">You've completed <span th:text="${completedCount}">0</span> of <span th:text="${totalModules}">0</span> modules</small>
+        </div>
+        <div class="card-body">
+            <div class="progress mb-2" style="height: 8px;">
+                <div class="progress-bar" role="progressbar" 
+                     th:style="'width: ' + ${progressPercentage} + '%'"
+                     th:aria-valuenow="${progressPercentage}" 
+                     aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <p class="text-sm text-muted mb-0">
+                <span th:text="${#numbers.formatDecimal(progressPercentage, 0, 0)}">0</span>% complete
+            </p>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="get" th:action="@{/modules}">
+                <div class="input-group">
+                    <span class="input-group-text">🔍</span>
+                    <input type="text" class="form-control" name="search" 
+                           placeholder="Search modules..." 
+                           th:value="${search}">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/modules}" class="btn btn-sm btn-outline-secondary">All Topics</a>
+                <a th:href="@{/modules(category='Foundation')}" class="btn btn-sm btn-outline-primary">Foundation</a>
+                <a th:href="@{/modules(category='Coping Skills')}" class="btn btn-sm btn-outline-primary">Coping Skills</a>
+                <a th:href="@{/modules(category='Personal Growth')}" class="btn btn-sm btn-outline-primary">Personal Growth</a>
+                <a th:href="@{/modules(category='Wellness')}" class="btn btn-sm btn-outline-primary">Wellness</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules Grid -->
+    <div class="row g-4" th:if="${modules != null && !modules.isEmpty()}">
+        <div class="col-md-4" th:each="module : ${modules}">
+            <a th:href="@{'/modules/' + ${module.id}}" class="text-decoration-none">
+            <div class="card h-100 hover-shadow" style="cursor: pointer; transition: all 0.3s;">
+                <div class="position-relative" style="height: 200px; overflow: hidden;">
+                    <img th:src="${module.imageUrl != null ? module.imageUrl : 'https://images.unsplash.com/photo-1620147512372-9e00421556bb?w=400'}" 
+                         class="card-img-top" 
+                         style="height: 100%; object-fit: cover; width: 100%;"
+                         th:alt="${module.title}">
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge bg-white text-dark" th:text="${module.category}">Category</span>
+                    </div>
+                    <div class="position-absolute top-0 start-0 m-2" 
+                         th:if="${progressMap != null && progressMap[module.id] != null && progressMap[module.id].completed}">
+                        <div class="bg-success rounded-circle p-1">
+                            <span style="font-size: 1.2rem; color: white;">✅</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${module.title}">Module Title</h5>
+                    <p class="card-text text-muted small mb-3" 
+                       style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                       th:text="${module.description}">Description</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <span style="font-size: 0.9rem;">🕐</span>
+                            <span th:text="${module.durationMinutes} + ' min'">Duration</span>
+                        </small>
+                        <span class="badge bg-primary">
+                            <span th:text="${progressMap != null && progressMap[module.id] != null && progressMap[module.id].completed} ? 'Review' : 'Start'">Start</span> →
+                        </span>
+                    </div>
+                </div>
+            </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center py-5" th:if="${modules == null || modules.isEmpty()}">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📖</div>
+        <p class="text-muted">No modules found matching your search</p>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-2px);
+    }
+</style>

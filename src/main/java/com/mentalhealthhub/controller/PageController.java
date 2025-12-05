@@ -77,18 +77,6 @@ public class PageController {
         return "layout";
     }
 
-    @GetMapping("/self-care")
-    public String selfCare(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        model.addAttribute("user", user);
-        model.addAttribute("page", "self-care");
-        model.addAttribute("title", "Self-Care Tools");
-        return "layout";
-    }
 
     @GetMapping("/professional/reports")
     public String professionalReports(HttpSession session, Model model) {
@@ -211,18 +199,6 @@ public class PageController {
         model.addAttribute("page", "professional/student-health-records");
         model.addAttribute("title", "Student Health Records");
 
-        return "layout";
-    }
-    @GetMapping("/modules")
-    public String modules(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        model.addAttribute("user", user);
-        model.addAttribute("page", "modules");
-        model.addAttribute("title", "Educational Modules");
         return "layout";
     }
 

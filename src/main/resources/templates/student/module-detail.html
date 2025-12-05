@@ -1,0 +1,136 @@
+<!-- Module Detail Page -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a th:href="@{/modules}" class="btn btn-sm btn-outline-secondary mb-3">
+                <span style="font-size: 1rem;">←</span> Back to Modules
+            </a>
+        </div>
+    </div>
+
+    <!-- Module Header Image -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="position-relative" style="height: 320px; border-radius: 0.5rem; overflow: hidden;">
+                <img th:src="${module.imageUrl != null ? module.imageUrl : 'https://images.unsplash.com/photo-1620147512372-9e00421556bb?w=1200'}" 
+                     class="w-100 h-100" 
+                     style="object-fit: cover;"
+                     th:alt="${module.title}">
+                <div class="position-absolute bottom-0 start-0 end-0 p-4" 
+                     style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);">
+                    <div class="text-white">
+                        <span class="badge bg-white text-dark mb-2" th:text="${module.category}">Category</span>
+                        <h1 class="text-white mb-2" th:text="${module.title}">Module Title</h1>
+                        <div class="d-flex align-items-center gap-3">
+                            <small class="text-white-50">
+                                <span style="font-size: 0.9rem;">🕐</span>
+                                <span th:text="${module.durationMinutes} + ' min'">Duration</span>
+                            </small>
+                            <span th:if="${progress != null && progress.completed}" 
+                                  class="badge bg-success">
+                                <span style="font-size: 0.9rem;">✅</span> Completed
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Content -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Module Overview</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4" th:text="${module.description}">Description</p>
+
+                    <div class="border-top pt-4">
+                        <h6 class="mb-3">What You'll Learn</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2 d-flex align-items-start">
+                                <span class="text-success me-2" style="font-size: 1.2rem;">✅</span>
+                                <span class="text-muted small">
+                                    Key concepts and terminology related to <span th:text="${module.title.toLowerCase()}">this topic</span>
+                                </span>
+                            </li>
+                            <li class="mb-2 d-flex align-items-start">
+                                <span class="text-success me-2" style="font-size: 1.2rem;">✅</span>
+                                <span class="text-muted small">Practical strategies you can apply immediately</span>
+                            </li>
+                            <li class="mb-2 d-flex align-items-start">
+                                <span class="text-success me-2" style="font-size: 1.2rem;">✅</span>
+                                <span class="text-muted small">Resources for further learning and support</span>
+                            </li>
+                            <li class="mb-2 d-flex align-items-start">
+                                <span class="text-success me-2" style="font-size: 1.2rem;">✅</span>
+                                <span class="text-muted small">Self-reflection exercises and activities</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="border-top pt-4 mt-4">
+                        <div th:if="${module.content != null && !module.content.isEmpty()}" 
+                             th:utext="${module.content}">
+                            <!-- Module content will be displayed here -->
+                        </div>
+                        <div th:if="${module.content == null || module.content.isEmpty()}" 
+                             class="text-muted">
+                            <p>Module content is being prepared. Please check back soon!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <form th:if="${progress == null || !progress.completed}" 
+                              th:action="@{'/modules/' + ${module.id} + '/start'}" 
+                              method="post">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <span style="font-size: 1rem;">▶️</span>
+                                <span th:text="${progress != null && progress.startedAt != null} ? 'Continue Module' : 'Start Module'">Start Module</span>
+                            </button>
+                        </form>
+                        <form th:if="${progress != null && progress.completed}" 
+                              th:action="@{'/modules/' + ${module.id} + '/start'}" 
+                              method="post">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <span style="font-size: 1rem;">🔄</span> Review Module
+                            </button>
+                        </form>
+                        <button class="btn btn-outline-secondary w-100" onclick="alert('PDF download feature coming soon!')">
+                            <span style="font-size: 1rem;">📥</span> Download PDF
+                        </button>
+                    </div>
+
+                    <div th:if="${progress != null && progress.startedAt != null}" class="mt-4">
+                        <div class="mb-3">
+                            <small class="text-muted d-block mb-1">Progress</small>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" 
+                                     th:style="'width: ' + ${progress.progressPercentage} + '%'"
+                                     th:aria-valuenow="${progress.progressPercentage}" 
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted" th:text="${progress.progressPercentage} + '%'">0%</small>
+                        </div>
+                        <form th:if="${!progress.completed}" 
+                              th:action="@{'/modules/' + ${module.id} + '/complete'}" 
+                              method="post">
+                            <button type="submit" class="btn btn-success w-100 btn-sm">
+                                <span style="font-size: 0.9rem;">✅</span> Mark as Complete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

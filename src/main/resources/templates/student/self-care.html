@@ -1,0 +1,697 @@
+<!-- Self-Care Tools Page -->
+<div class="container-fluid">
+    <!-- Success Message -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card" style="border-left: 4px solid #7FB685;">
+                <div class="card-body">
+                    <h1 class="mb-2">
+                        <span style="font-size: 2rem;">🧘</span> Self-Care Tools
+                    </h1>
+                    <p class="text-muted mb-0">Take time for yourself with these mental health resources</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="selfCareTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="meditation-tab" data-bs-toggle="tab" data-bs-target="#meditation" type="button" role="tab">
+                Meditation
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="mood-tab" data-bs-toggle="tab" data-bs-target="#mood" type="button" role="tab">
+                Mood Tracker
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="breathing-tab" data-bs-toggle="tab" data-bs-target="#breathing" type="button" role="tab">
+                Breathing
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="exercises-tab" data-bs-toggle="tab" data-bs-target="#exercises" type="button" role="tab">
+                Exercises
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="music-tab" data-bs-toggle="tab" data-bs-target="#music" type="button" role="tab">
+                Music
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="selfCareTabContent">
+        <!-- Meditation Tab -->
+        <div class="tab-pane fade show active" id="meditation" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Guided Meditations</h5>
+                    <small class="text-muted">Choose a meditation session that fits your needs</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <img src="https://images.unsplash.com/photo-1606733572375-35620adc4a18?w=400" 
+                                     class="card-img-top" alt="Morning Mindfulness" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title">Morning Mindfulness</h5>
+                                        <span class="badge bg-secondary">
+                                            <span style="font-size: 0.9rem;">🕐</span> 10 min
+                                        </span>
+                                    </div>
+                                    <p class="card-text text-muted small">Start your day with clarity and calm</p>
+                                    <form th:action="@{/self-care/meditation}" method="post" class="mt-3">
+                                        <input type="hidden" name="title" value="Morning Mindfulness">
+                                        <input type="hidden" name="duration" value="10">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Start Session
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <img src="https://images.unsplash.com/photo-1758599879728-d7079db6505b?w=400" 
+                                     class="card-img-top" alt="Stress Relief" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title">Stress Relief</h5>
+                                        <span class="badge bg-secondary">
+                                            <span style="font-size: 0.9rem;">🕐</span> 15 min
+                                        </span>
+                                    </div>
+                                    <p class="card-text text-muted small">Release tension and find peace</p>
+                                    <form th:action="@{/self-care/meditation}" method="post" class="mt-3">
+                                        <input type="hidden" name="title" value="Stress Relief">
+                                        <input type="hidden" name="duration" value="15">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Start Session
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <img src="https://images.unsplash.com/photo-1713428856080-43fc975d2496?w=400" 
+                                     class="card-img-top" alt="Sleep Preparation" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title">Sleep Preparation</h5>
+                                        <span class="badge bg-secondary">
+                                            <span style="font-size: 0.9rem;">🕐</span> 20 min
+                                        </span>
+                                    </div>
+                                    <p class="card-text text-muted small">Wind down for restful sleep</p>
+                                    <form th:action="@{/self-care/meditation}" method="post" class="mt-3">
+                                        <input type="hidden" name="title" value="Sleep Preparation">
+                                        <input type="hidden" name="duration" value="20">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Start Session
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mood Tracker Tab -->
+        <div class="tab-pane fade" id="mood" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">How are you feeling today?</h5>
+                    <small class="text-muted">Track your mood to identify patterns and triggers</small>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/self-care/mood}" method="post">
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <input type="radio" class="btn-check" name="mood" id="mood-great" value="great" 
+                                       th:checked="${todayMood != null && todayMood.mood == 'great'}">
+                                <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-great">
+                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                         style="width: 48px; height: 48px;">
+                                        <span style="font-size: 1.5rem;">😊</span>
+                                    </div>
+                                    <div class="small">Great</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <input type="radio" class="btn-check" name="mood" id="mood-good" value="good"
+                                       th:checked="${todayMood != null && todayMood.mood == 'good'}">
+                                <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-good">
+                                    <div class="bg-success bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                         style="width: 48px; height: 48px;">
+                                        <span style="font-size: 1.5rem;">🙂</span>
+                                    </div>
+                                    <div class="small">Good</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <input type="radio" class="btn-check" name="mood" id="mood-okay" value="okay"
+                                       th:checked="${todayMood != null && todayMood.mood == 'okay'}">
+                                <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-okay">
+                                    <div class="bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                         style="width: 48px; height: 48px;">
+                                        <span style="font-size: 1.5rem;">😐</span>
+                                    </div>
+                                    <div class="small">Okay</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <input type="radio" class="btn-check" name="mood" id="mood-low" value="low"
+                                       th:checked="${todayMood != null && todayMood.mood == 'low'}">
+                                <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-low">
+                                    <div class="bg-warning bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                         style="width: 48px; height: 48px;">
+                                        <span style="font-size: 1.5rem;">😔</span>
+                                    </div>
+                                    <div class="small">Low</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-4 col-lg-2">
+                                <input type="radio" class="btn-check" name="mood" id="mood-struggling" value="struggling"
+                                       th:checked="${todayMood != null && todayMood.mood == 'struggling'}">
+                                <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-struggling">
+                                    <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
+                                         style="width: 48px; height: 48px;">
+                                        <span style="font-size: 1.5rem;">😢</span>
+                                    </div>
+                                    <div class="small">Struggling</div>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <span style="font-size: 1rem;">💾</span> Save Mood
+                        </button>
+                    </form>
+
+                    <div th:if="${todayMood != null}" class="alert alert-success mt-3">
+                        <span style="font-size: 1rem;">✅</span> Mood logged for <span th:text="${#temporals.format(todayMood.activityDate, 'MMMM dd, yyyy')}"></span>. Keep tracking daily to see your patterns!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood History -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Mood History</h5>
+                    <small class="text-muted">Your mood trends over the past week</small>
+                </div>
+                <div class="card-body">
+                    <div th:if="${moodHistory == null || moodHistory.isEmpty()}" class="text-center py-4">
+                        <p class="text-muted">No mood history yet. Start tracking your mood daily!</p>
+                    </div>
+                    <div th:unless="${moodHistory == null || moodHistory.isEmpty()}">
+                        <div th:each="mood : ${moodHistory}" class="d-flex align-items-center mb-3">
+                            <div class="w-100 me-3">
+                                <div class="progress" style="height: 30px;">
+                                    <div class="progress-bar" 
+                                         th:classappend="${mood.mood == 'great'} ? 'bg-success' : 
+                                                          (mood.mood == 'good') ? 'bg-success bg-opacity-75' : 
+                                                          (mood.mood == 'okay') ? 'bg-warning' : 
+                                                          (mood.mood == 'low') ? 'bg-warning bg-opacity-75' : 'bg-danger'"
+                                         th:style="${mood.mood == 'great'} ? 'width: 100%' : 
+                                                          (mood.mood == 'good') ? 'width: 80%' : 
+                                                          (mood.mood == 'okay') ? 'width: 60%' : 
+                                                          (mood.mood == 'low') ? 'width: 40%' : 'width: 20%'">
+                                        <span th:text="${#strings.capitalize(mood.mood)}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted" th:text="${#temporals.format(mood.activityDate, 'MMM dd')}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breathing Tab -->
+        <div class="tab-pane fade" id="breathing" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Breathing Exercises</h5>
+                    <small class="text-muted">Calm your mind and reduce stress with controlled breathing</small>
+                </div>
+                <div class="card-body">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="bg-gradient-to-br from-primary to-success rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" 
+                                 style="width: 256px; height: 256px; background: linear-gradient(135deg, #6A8EAE, #7FB685);">
+                                <span style="font-size: 5rem; color: white;">💨</span>
+                            </div>
+
+                            <form th:action="@{/self-care/breathing}" method="post">
+                                <div class="mb-4">
+                                    <label class="form-label">Breath Duration: <span id="breathDurationValue">4</span> seconds</label>
+                                    <input type="range" class="form-range" name="breathDuration" id="breathDuration" 
+                                           min="3" max="8" value="4" step="1" 
+                                           oninput="document.getElementById('breathDurationValue').textContent = this.value">
+                                </div>
+
+                                <div class="bg-light rounded p-4 mb-4">
+                                    <h6 class="text-center mb-3">Box Breathing Technique</h6>
+                                    <div class="row text-center">
+                                        <div class="col-6 mb-3">
+                                            <p class="mb-0 small">Breathe In</p>
+                                            <p class="h4 text-primary mb-0" id="breatheIn">4s</p>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <p class="mb-0 small">Hold</p>
+                                            <p class="h4 text-success mb-0" id="hold1">4s</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-0 small">Breathe Out</p>
+                                            <p class="h4 text-info mb-0" id="breatheOut">4s</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-0 small">Hold</p>
+                                            <p class="h4 text-warning mb-0" id="hold2">4s</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="technique" value="Box Breathing">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <span style="font-size: 1rem;">▶️</span> Start Exercise
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">4-7-8 Breathing</h6>
+                            <small class="text-muted">Perfect for reducing anxiety</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">
+                                Breathe in for 4 seconds, hold for 7 seconds, exhale for 8 seconds. Repeat 4 times.
+                            </p>
+                            <form th:action="@{/self-care/breathing}" method="post">
+                                <input type="hidden" name="technique" value="4-7-8 Breathing">
+                                <input type="hidden" name="breathDuration" value="4">
+                                <input type="hidden" name="duration" value="5">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <span style="font-size: 1rem;">▶️</span> Start
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Belly Breathing</h6>
+                            <small class="text-muted">Deep relaxation technique</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">
+                                Place one hand on your belly, breathe deeply so your belly rises. Exhale slowly.
+                            </p>
+                            <form th:action="@{/self-care/breathing}" method="post">
+                                <input type="hidden" name="technique" value="Belly Breathing">
+                                <input type="hidden" name="breathDuration" value="5">
+                                <input type="hidden" name="duration" value="10">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <span style="font-size: 1rem;">▶️</span> Start
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercises Tab -->
+        <div class="tab-pane fade" id="exercises" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Stress Relief Exercises</h5>
+                    <small class="text-muted">Physical exercises to release tension and reduce stress</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-left: 4px solid #7FB685;">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <span style="font-size: 1.5rem;">🧘</span> Progressive Muscle Relaxation
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small text-muted mb-3">
+                                        Systematically tense and relax different muscle groups to release physical tension.
+                                    </p>
+                                    <div class="bg-light rounded p-3 mb-3 small">
+                                        <p class="mb-1"><strong>1.</strong> Start with your toes - tense for 5 seconds, then release</p>
+                                        <p class="mb-1"><strong>2.</strong> Move up to calves, thighs, abdomen, chest</p>
+                                        <p class="mb-1"><strong>3.</strong> Continue with hands, arms, shoulders, neck, face</p>
+                                        <p class="mb-0"><strong>4.</strong> Notice the difference between tension and relaxation</p>
+                                    </div>
+                                    <form th:action="@{/self-care/exercise}" method="post">
+                                        <input type="hidden" name="title" value="Progressive Muscle Relaxation">
+                                        <input type="hidden" name="duration" value="15">
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Start Guided Exercise (15 min)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-left: 4px solid #9B7EDE;">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <span style="font-size: 1.5rem;">🚶</span> Mindful Walking
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small text-muted mb-3">
+                                        A gentle walking exercise that combines movement with mindfulness.
+                                    </p>
+                                    <div class="bg-light rounded p-3 mb-3 small">
+                                        <p class="mb-1"><strong>1.</strong> Walk slowly, focusing on each step</p>
+                                        <p class="mb-1"><strong>2.</strong> Notice the sensation of your feet touching the ground</p>
+                                        <p class="mb-1"><strong>3.</strong> Pay attention to your breathing rhythm</p>
+                                        <p class="mb-0"><strong>4.</strong> Observe your surroundings without judgment</p>
+                                    </div>
+                                    <form th:action="@{/self-care/exercise}" method="post">
+                                        <input type="hidden" name="title" value="Mindful Walking">
+                                        <input type="hidden" name="duration" value="10">
+                                        <button type="submit" class="btn btn-primary w-100" style="background-color: #9B7EDE; border-color: #9B7EDE;">
+                                            <span style="font-size: 1rem;">▶️</span> Start Guided Walk (10 min)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-left: 4px solid #6A8EAE;">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <span style="font-size: 1.5rem;">✋</span> 5-4-3-2-1 Grounding
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small text-muted mb-3">
+                                        A sensory awareness technique to bring you back to the present moment.
+                                    </p>
+                                    <div class="bg-light rounded p-3 mb-3 small">
+                                        <p class="mb-1"><strong>5</strong> things you can see</p>
+                                        <p class="mb-1"><strong>4</strong> things you can touch</p>
+                                        <p class="mb-1"><strong>3</strong> things you can hear</p>
+                                        <p class="mb-1"><strong>2</strong> things you can smell</p>
+                                        <p class="mb-0"><strong>1</strong> thing you can taste</p>
+                                    </div>
+                                    <form th:action="@{/self-care/exercise}" method="post">
+                                        <input type="hidden" name="title" value="5-4-3-2-1 Grounding">
+                                        <input type="hidden" name="duration" value="5">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Start Exercise (5 min)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-left: 4px solid #FF9F1C;">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <span style="font-size: 1.5rem;">🤸</span> Gentle Stretching
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="small text-muted mb-3">
+                                        Simple stretches to release physical tension and improve circulation.
+                                    </p>
+                                    <div class="bg-light rounded p-3 mb-3 small">
+                                        <p class="mb-1"><strong>1.</strong> Neck rolls - slowly rotate your head</p>
+                                        <p class="mb-1"><strong>2.</strong> Shoulder shrugs - lift and drop shoulders</p>
+                                        <p class="mb-1"><strong>3.</strong> Arm stretches - reach up and across</p>
+                                        <p class="mb-0"><strong>4.</strong> Seated twists - gentle spine rotation</p>
+                                    </div>
+                                    <form th:action="@{/self-care/exercise}" method="post">
+                                        <input type="hidden" name="title" value="Gentle Stretching">
+                                        <input type="hidden" name="duration" value="8">
+                                        <button type="submit" class="btn btn-warning w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Start Routine (8 min)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Tab -->
+        <div class="tab-pane fade" id="music" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Relaxing Music</h5>
+                    <small class="text-muted">Calming music and nature sounds to help you relax and focus</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">🌊 Ocean Waves</h6>
+                                    <small class="text-muted">Gentle ocean sounds for deep relaxation</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                        <span><span style="font-size: 0.9rem;">🕐</span> 30 min</span>
+                                    </div>
+                                    <form th:action="@{/self-care/music}" method="post">
+                                        <input type="hidden" name="title" value="🌊 Ocean Waves">
+                                        <input type="hidden" name="duration" value="30">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Play
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">🌧️ Rainfall</h6>
+                                    <small class="text-muted">Soothing rain sounds to calm your mind</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                        <span><span style="font-size: 0.9rem;">🕐</span> 45 min</span>
+                                    </div>
+                                    <form th:action="@{/self-care/music}" method="post">
+                                        <input type="hidden" name="title" value="🌧️ Rainfall">
+                                        <input type="hidden" name="duration" value="45">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Play
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">🎵 Piano Meditation</h6>
+                                    <small class="text-muted">Peaceful piano melodies for mindfulness</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                        <span><span style="font-size: 0.9rem;">🕐</span> 25 min</span>
+                                    </div>
+                                    <form th:action="@{/self-care/music}" method="post">
+                                        <input type="hidden" name="title" value="🎵 Piano Meditation">
+                                        <input type="hidden" name="duration" value="25">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Play
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">🌲 Forest Ambience</h6>
+                                    <small class="text-muted">Natural forest sounds with birds chirping</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                        <span><span style="font-size: 0.9rem;">🕐</span> 60 min</span>
+                                    </div>
+                                    <form th:action="@{/self-care/music}" method="post">
+                                        <input type="hidden" name="title" value="🌲 Forest Ambience">
+                                        <input type="hidden" name="duration" value="60">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Play
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">🔥 Crackling Fire</h6>
+                                    <small class="text-muted">Warm fireplace sounds for cozy relaxation</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                        <span><span style="font-size: 0.9rem;">🕐</span> 40 min</span>
+                                    </div>
+                                    <form th:action="@{/self-care/music}" method="post">
+                                        <input type="hidden" name="title" value="🔥 Crackling Fire">
+                                        <input type="hidden" name="duration" value="40">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Play
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h6 class="mb-0">🎼 Ambient Soundscape</h6>
+                                    <small class="text-muted">Ethereal ambient music for deep focus</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                        <span><span style="font-size: 0.9rem;">🕐</span> 50 min</span>
+                                    </div>
+                                    <form th:action="@{/self-care/music}" method="post">
+                                        <input type="hidden" name="title" value="🎼 Ambient Soundscape">
+                                        <input type="hidden" name="duration" value="50">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <span style="font-size: 1rem;">▶️</span> Play
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Benefits of Music for Mental Health</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center">
+                            <div class="bg-light rounded p-4">
+                                <div style="font-size: 3rem;">😌</div>
+                                <h6 class="mt-2 mb-2">Reduces Stress</h6>
+                                <p class="small text-muted mb-0">
+                                    Calming music lowers cortisol levels and promotes relaxation
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="bg-light rounded p-4">
+                                <div style="font-size: 3rem;">🧠</div>
+                                <h6 class="mt-2 mb-2">Improves Focus</h6>
+                                <p class="small text-muted mb-0">
+                                    Background sounds can enhance concentration and productivity
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="bg-light rounded p-4">
+                                <div style="font-size: 3rem;">😴</div>
+                                <h6 class="mt-2 mb-2">Better Sleep</h6>
+                                <p class="small text-muted mb-0">
+                                    Gentle sounds help you unwind and fall asleep faster
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update breathing display when slider changes
+    document.getElementById('breathDuration')?.addEventListener('input', function() {
+        const value = this.value;
+        document.getElementById('breatheIn').textContent = value + 's';
+        document.getElementById('hold1').textContent = value + 's';
+        document.getElementById('breatheOut').textContent = value + 's';
+        document.getElementById('hold2').textContent = value + 's';
+    });
+
+    // Fixed tab switching - simple and reliable approach
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for flash attribute indicating which tab to show
+        const successMessage = document.querySelector('.alert-success');
+        const shouldShowMoodTab = successMessage && successMessage.textContent.includes('Mood logged');
+        
+        // Initialize tab switching - simple event delegation
+        const tabList = document.querySelector('#selfCareTabs');
+        if (tabList) {
+            tabList.addEventListener('click', function(e) {
+                const button = e.target.closest('[data-bs-toggle="tab"]');
+                if (button) {
+                    const targetId = button.getAttribute('data-bs-target');
+                    if (targetId) {
+                        // Allow all tabs to switch freely
+                        const tab = new bootstrap.Tab(button);
+                        tab.show();
+                    }
+                }
+            });
+        }
+
+        // Show mood tab if we just submitted mood, otherwise show default
+        if (shouldShowMoodTab) {
+            setTimeout(function() {
+                const moodTab = document.querySelector('[data-bs-target="#mood"]');
+                if (moodTab) {
+                    const tab = new bootstrap.Tab(moodTab);
+                    tab.show();
+                }
+            }, 100);
+        }
+    });
+</script>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+    }
+    .nav-tabs .nav-link.active {
+        color: #495057;
+        font-weight: 600;
+    }
+    .btn-check:checked + .btn {
+        border-color: #6A8EAE;
+        background-color: rgba(106, 142, 174, 0.1);
+    }
+</style>

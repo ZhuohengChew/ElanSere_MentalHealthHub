@@ -3,10 +3,12 @@
     <div class="row mb-4">
         <div class="col-md-12">
             <a th:href="@{/forum}" class="btn btn-sm btn-outline-secondary mb-3">
-                <i class="bi bi-arrow-left"></i> Back to Forum
+                <span style="font-size: 1rem;">←</span> Back to Forum
             </a>
-            <h1 class="mb-2">Create New Post</h1>
-            <p class="text-muted">Share your thoughts and experiences with our community</p>
+            <h1 class="mb-2">
+                <span style="font-size: 2rem;">✍️</span> Create a New Post
+            </h1>
+            <p class="text-muted">Share your thoughts or ask for support. All posts are anonymous and confidential.</p>
         </div>
     </div>
 
@@ -16,25 +18,39 @@
                 <div class="card-body">
                     <form method="post" th:action="@{/forum/save}">
                         <div class="mb-3">
-                            <label for="title" class="form-label">Post Title</label>
+                            <label for="title" class="form-label fw-medium">Title</label>
                             <input type="text" class="form-control" id="title" name="title" 
-                                   placeholder="What's on your mind?" required>
+                                   placeholder="Give your post a title..." required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="content" class="form-label">Post Content</label>
+                            <label for="category" class="form-label fw-medium">Category</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">Select a category (optional)</option>
+                                <option value="Academic Stress">📚 Academic Stress</option>
+                                <option value="Anxiety">😟 Anxiety</option>
+                                <option value="Depression">😔 Depression</option>
+                                <option value="Self-Care">💚 Self-Care</option>
+                                <option value="Motivation">🎯 Motivation</option>
+                                <option value="General">💭 General</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content" class="form-label fw-medium">Content</label>
                             <textarea class="form-control" id="content" name="content" 
-                                      rows="10" placeholder="Share your thoughts..." required></textarea>
+                                      rows="8" placeholder="Share your thoughts, experiences, or ask for advice..." required></textarea>
                         </div>
 
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> 
+                            <span style="font-size: 1rem;">ℹ️</span>
                             Please be respectful and supportive to other community members.
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check"></i> Publish Post
+                            <button type="submit" class="btn btn-primary" 
+                                    style="background: linear-gradient(135deg, #FF9F1C, #E68F0C); border: none;">
+                                <span style="font-size: 1rem;">📝</span> Post Anonymously
                             </button>
                             <a th:href="@{/forum}" class="btn btn-outline-secondary">Cancel</a>
                         </div>

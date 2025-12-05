@@ -53,10 +53,11 @@
 
             <!--/*===== ADMIN Links =====*/-->
             <div th:if="${session.userRole == 'ADMIN'}">
-                <hr style="margin: 15px 0; opacity: 0.2;">
-                <h6 class="nav-link" style="font-size: 0.8rem; color: #000;">Admin</h6>
                 <a th:href="@{/users}" class="nav-link" th:classappend="${activePage == 'users' ? 'active' : ''}">
                     <i class="bi bi-people"></i> Manage Users
+                </a>
+                <a th:href="@{/admin/content}" class="nav-link" th:classappend="${activePage == 'content-management' ? 'active' : ''}">
+                    <i class="bi bi-file-earmark-text"></i> Content Management
                 </a>
                 <a th:href="@{/analytics}" class="nav-link" th:classappend="${activePage == 'analytics' ? 'active' : ''}">
                     <i class="bi bi-graph-up"></i> Analytics Report
