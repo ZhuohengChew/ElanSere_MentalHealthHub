@@ -1,13 +1,21 @@
 package com.mentalhealthhub.controller;
 
-import com.mentalhealthhub.model.User;
-import com.mentalhealthhub.model.UserRole;
-import com.mentalhealthhub.repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.User;
+import com.mentalhealthhub.model.UserRole;
+import com.mentalhealthhub.repository.UserRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class AuthController {
@@ -85,6 +93,35 @@ public class AuthController {
                 break;
             case PROFESSIONAL:
                 dashboardPage = "dashboard/professional-dashboard";
+                List<Appointment> profAppointments = appointmentRepository.findByProfessional(user);
+                LocalDate today = LocalDate.now();
+                List<Appointment> todayAppointments = profAppointments.stream()
+                    .filter(a -> a.getAppointmentDate() != null && a.getAppointmentDate().toLocalDate().isEqual(today))
+                    .sorted(Comparator.comparing(Appointment::getAppointmentDate))
+                    .collect(Collectors.toList());
+
+                long todayCount = todayAppointments.size();
+                long activeClients = profAppointments.stream()
+                    .filter(a -> a.getStudent() != null && a.getStudent().getId() != null)
+                    .map(a -> a.getStudent().getId())
+                    .distinct()
+                    .count();
+
+                long sessionsCompleted = profAppointments.stream()
+                    .filter(a -> a.getStatus() != null && a.getStatus().name().equals("COMPLETED"))
+                    .count();
+
+                List<?> patientsList = profAppointments.stream()
+                    .map(Appointment::getStudent)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+                model.addAttribute("todayAppointmentsCount", todayCount);
+                model.addAttribute("activeClientsCount", activeClients);
+                model.addAttribute("sessionsCompleted", sessionsCompleted);
+                model.addAttribute("todayAppointments", todayAppointments);
+                model.addAttribute("patientsList", patientsList);
                 break;
             case ADMIN:
                 dashboardPage = "dashboard/admin-dashboard";
