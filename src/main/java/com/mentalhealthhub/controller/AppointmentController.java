@@ -1,6 +1,7 @@
 package com.mentalhealthhub.controller;
 
 import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.AppointmentStatus;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.repository.AppointmentRepository;
 import com.mentalhealthhub.repository.UserRepository;
@@ -100,6 +101,7 @@ public class AppointmentController {
             .professional(professional)
             .appointmentDate(dateTime)
             .notes(notes)
+            .status(AppointmentStatus.SCHEDULED)
             .createdAt(LocalDateTime.now())
             .build();
 

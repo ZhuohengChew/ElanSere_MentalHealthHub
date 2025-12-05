@@ -181,45 +181,25 @@
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
         let currentDate = new Date();
         let selectedDate = new Date();
         
-        // Sample appointments data
-        const appointmentsData = [
-            {
-                id: 1,
-                studentName: 'John Doe',
-                studentId: '12345',
-                appointmentDate: new Date('2025-12-04T09:00:00'),
-                notes: 'Initial consultation',
-                status: 'SCHEDULED'
-            },
-            {
-                id: 2,
-                studentName: 'Jane Smith',
-                studentId: '12346',
-                appointmentDate: new Date('2025-12-04T14:30:00'),
-                notes: 'Follow-up session',
-                status: 'CONFIRMED'
-            },
-            {
-                id: 3,
-                studentName: 'Mike Johnson',
-                studentId: '12347',
-                appointmentDate: new Date('2025-12-15T10:00:00'),
-                notes: 'Therapy session',
-                status: 'SCHEDULED'
-            },
-            {
-                id: 4,
-                studentName: 'Sarah Williams',
-                studentId: '12348',
-                appointmentDate: new Date('2025-12-20T15:00:00'),
-                notes: 'Assessment',
-                status: 'PENDING'
+        // Load appointments data from server (Thymeleaf)
+        const appointmentsData = /*[[${appointments}]]*/ [];
+        
+        console.log('Appointments loaded:', appointmentsData);
+        
+        // Convert date strings to Date objects if needed
+        appointmentsData.forEach(apt => {
+            if (typeof apt.appointmentDate === 'string') {
+                apt.appointmentDate = new Date(apt.appointmentDate);
             }
-        ];
+            // Handle LocalDateTime objects
+            if (apt.appointmentDate instanceof Object && apt.appointmentDate.year) {
+                apt.appointmentDate = new Date(apt.appointmentDate.year, apt.appointmentDate.month - 1, apt.appointmentDate.day, apt.appointmentDate.hour || 0, apt.appointmentDate.minute || 0);
+            }
+        });
 
         function renderCalendar() {
             const year = currentDate.getFullYear();
@@ -330,14 +310,13 @@
                 return;
             }
             
-            // Sort appointments by time
-            appointmentsForDate.sort((a, b) => a.appointmentDate - b.appointmentDate);
-            
             let html = '';
             appointmentsForDate.forEach(apt => {
                 const time = apt.appointmentDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                 const cardClass = apt.status === 'CANCELLED' ? 'urgent' : apt.status === 'COMPLETED' ? 'confirmed' : '';
                 const badgeClass = apt.status === 'CANCELLED' ? 'danger' : apt.status === 'COMPLETED' ? 'success' : (apt.status === 'PENDING' ? 'warning' : 'info');
+                const studentName = apt.student ? apt.student.name : 'Unknown Student';
+                const studentId = apt.student ? apt.student.id : 'N/A';
                 
                 html += `
                     <div class="appointment-card ${cardClass}">
@@ -345,10 +324,10 @@
                         <div class="appointment-type">Initial Consultation</div>
                         <div class="appointment-patient">
                             <div class="patient-info">
-                                Patient <span class="patient-number">#${apt.studentId}</span>
+                                Patient <span class="patient-number">#${studentId}</span>
                                 <span class="badge bg-${badgeClass} ms-2">${apt.status}</span>
                             </div>
-                            <div class="patient-info mt-2">${apt.studentName}</div>
+                            <div class="patient-info mt-2">${studentName}</div>
                         </div>
                         <div class="mt-3">
                             <button class="btn btn-primary btn-small me-2">

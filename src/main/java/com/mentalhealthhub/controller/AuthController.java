@@ -118,10 +118,9 @@ public class AuthController {
                     .filter(a -> a.getStatus() != null && a.getStatus().name().equals("COMPLETED"))
                     .count();
 
-                List<?> patientsList = profAppointments.stream()
-                    .map(Appointment::getStudent)
-                    .filter(Objects::nonNull)
-                    .distinct()
+                // Show ALL students as active patients (not just those with appointments)
+                List<?> patientsList = userRepository.findAll().stream()
+                    .filter(u -> u.getRole() == UserRole.STUDENT)
                     .collect(Collectors.toList());
 
                 model.addAttribute("todayAppointmentsCount", todayCount);
