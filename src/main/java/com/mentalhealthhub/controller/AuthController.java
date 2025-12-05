@@ -22,7 +22,7 @@ import com.mentalhealthhub.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-public class    AuthController {
+public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
@@ -159,6 +159,25 @@ public class    AuthController {
         model.addAttribute("page", "users/manage-users");
         model.addAttribute("activePage", "users");
         model.addAttribute("title", "Manage Users");
+        return "layout";
+    }
+
+    @GetMapping("/analytics")
+    public String analyticsReport(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // Only admins can view analytics
+        if (user.getRole() != UserRole.ADMIN) {
+            return "redirect:/dashboard";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("page", "admin/analytics-report");
+        model.addAttribute("activePage", "analytics");
+        model.addAttribute("title", "Analytics Report");
         return "layout";
     }
     

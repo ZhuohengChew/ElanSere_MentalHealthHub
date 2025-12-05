@@ -249,7 +249,7 @@ public class PageController {
     @GetMapping("/professional/students/{id}")
     public String viewStudentProfile(@PathVariable Long id, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null || (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF)) {
+        if (user == null || (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF && user.getRole() != UserRole.ADMIN)) {
             return "redirect:/login";
         }
 

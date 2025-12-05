@@ -37,7 +37,7 @@ public class PatientController {
         }
 
         // Only allow PROFESSIONAL and STAFF roles to access patients
-        if (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF) {
+        if (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF && user.getRole() != UserRole.ADMIN) {
             return "redirect:/dashboard";
         }
 

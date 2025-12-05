@@ -59,51 +59,6 @@
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header border-0">
-                    <h6 class="mb-0">User Distribution by Role</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="userDistributionChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header border-0">
-                    <h6 class="mb-0">Feature Usage (Last 30 Days)</h6>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Self-Assessment</span>
-                            <span class="badge bg-primary">892 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Self-Care Tools</span>
-                            <span class="badge bg-success">756 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Educational Modules</span>
-                            <span class="badge bg-info">643 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Peer Support Forum</span>
-                            <span class="badge bg-warning text-dark">521 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Telehealth Appointments</span>
-                            <span class="badge bg-secondary">287 uses</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- System Activity -->
     <div class="row mb-4">
         <div class="col-md-12">
@@ -164,7 +119,7 @@
             </a>
         </div>
         <div class="col-md-3 mb-3">
-            <a href="#" class="card text-decoration-none text-reset h-100 hover-shadow">
+            <a th:href="@{/analytics}" class="card text-decoration-none text-reset h-100 hover-shadow">
                 <div class="card-body text-center">
                     <i class="bi bi-graph-up" style="font-size: 2rem; color: #9B7EDE;"></i>
                     <h6 class="mt-3 mb-1">Analytics Report</h6>
@@ -183,25 +138,3 @@
         </div>
     </div>
 </div>
-
-<script th:inline="javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    // User Distribution Chart
-    if (document.getElementById('userDistributionChart')) {
-        new Chart(document.getElementById('userDistributionChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Students', 'Staff', 'Professionals', 'Admins'],
-                datasets: [{
-                    data: [1189, 42, 15, 2],
-                    backgroundColor: ['#6A8EAE', '#7FB685', '#9B7EDE', '#FF9F1C']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true
-            }
-        });
-    }
-});
-</script>

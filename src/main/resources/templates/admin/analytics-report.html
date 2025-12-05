@@ -1,0 +1,134 @@
+<!-- Analytics Report Page -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-2">Analytics Report</h1>
+            <p class="text-muted">Comprehensive system analytics and performance metrics</p>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card border-left-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Users</h6>
+                        <div class="stat-number">1,248</div>
+                        <small class="text-success"><i class="bi bi-arrow-up"></i> +52 this month</small>
+                    </div>
+                    <i class="bi bi-people text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #7FB685;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Active Sessions</h6>
+                        <div class="stat-number">347</div>
+                        <small class="text-muted">Real-time users</small>
+                    </div>
+                    <i class="bi bi-activity text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #9B7EDE;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">System Health</h6>
+                        <div class="stat-number">98.5%</div>
+                        <small class="text-muted">Uptime this month</small>
+                    </div>
+                    <i class="bi bi-heart-pulse text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #FF9F1C;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Engagement Rate</h6>
+                        <div class="stat-number">76%</div>
+                        <small class="text-success"><i class="bi bi-arrow-up"></i> +4% from last month</small>
+                    </div>
+                    <i class="bi bi-graph-up text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">User Distribution by Role</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="userDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Feature Usage (Last 30 Days)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Self-Assessment</span>
+                            <span class="badge bg-primary">892 uses</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Self-Care Tools</span>
+                            <span class="badge bg-success">756 uses</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Educational Modules</span>
+                            <span class="badge bg-info">643 uses</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Peer Support Forum</span>
+                            <span class="badge bg-warning text-dark">521 uses</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Telehealth Appointments</span>
+                            <span class="badge bg-secondary">287 uses</span>
+                        </div>
+                    </div>
+                    <!-- Individual Student Button -->
+                    <div class="mt-4 pt-3 border-top">
+                        <a th:href="@{/patients}" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-person"></i> Individual Student Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    // User Distribution Chart
+    if (document.getElementById('userDistributionChart')) {
+        new Chart(document.getElementById('userDistributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Students', 'Staff', 'Professionals', 'Admins'],
+                datasets: [{
+                    data: [1189, 42, 15, 2],
+                    backgroundColor: ['#6A8EAE', '#7FB685', '#9B7EDE', '#FF9F1C']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+    }
+});
+</script>
