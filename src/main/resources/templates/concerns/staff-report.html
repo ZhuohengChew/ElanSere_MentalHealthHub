@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Student Concern Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 50%, #fef9c3 100%);
+            min-height: 100vh;
+        }
+
+        .success-page {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 50%, #faf5ff 100%);
+        }
+
+        .header-card {
+            border-left: 4px solid #ef4444;
+        }
+
+        .success-header-card {
+            border-left: 4px solid #7FB685;
+        }
+
+        .staff-selection-card {
+            border-left: 4px solid #6A8EAE;
+            background: linear-gradient(135deg, #dbeafe, transparent);
+        }
+
+        .urgency-option {
+            border: 2px solid;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .urgency-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .urgency-option.selected {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .urgency-low {
+            border-color: #d1fae5;
+        }
+
+        .urgency-low.selected {
+            border-color: #10b981;
+            background: linear-gradient(to right, #f0fdf4, transparent);
+        }
+
+        .urgency-low:hover {
+            background-color: #f0fdf4;
+        }
+
+        .urgency-moderate {
+            border-color: #fef3c7;
+        }
+
+        .urgency-moderate.selected {
+            border-color: #f59e0b;
+            background: linear-gradient(to right, #fef9c3, transparent);
+        }
+
+        .urgency-moderate:hover {
+            background-color: #fef9c3;
+        }
+
+        .urgency-high {
+            border-color: #fecaca;
+        }
+
+        .urgency-high.selected {
+            border-color: #ef4444;
+            background: linear-gradient(to right, #fef2f2, transparent);
+        }
+
+        .urgency-high:hover {
+            background-color: #fef2f2;
+        }
+
+        .concern-checkbox {
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .concern-checkbox:hover {
+            border-color: #9B7EDE;
+            background-color: #f9fafb;
+        }
+
+        .concern-checkbox.selected {
+            border-color: #9B7EDE;
+            background: linear-gradient(to right, rgba(155, 126, 222, 0.1), transparent);
+        }
+
+        .emergency-alert {
+            background: linear-gradient(to right, #fef2f2, transparent);
+            border-left: 4px solid #ef4444;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-left-width: 4px; }
+            50% { border-left-width: 6px; }
+        }
+
+        .card-border-orange {
+            border-left: 4px solid #FF9F1C;
+        }
+
+        .card-border-purple {
+            border-left: 4px solid #9B7EDE;
+        }
+
+        .card-border-blue {
+            border-left: 4px solid #6A8EAE;
+        }
+
+        .btn-gradient-red {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: white;
+            border: none;
+        }
+
+        .btn-gradient-red:hover {
+            opacity: 0.9;
+            color: white;
+        }
+
+        .btn-gradient-red:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-gradient-blue {
+            background: linear-gradient(135deg, #6A8EAE, #5A7E9E);
+            color: white;
+            border: none;
+        }
+
+        .btn-gradient-blue:hover {
+            opacity: 0.9;
+            color: white;
+        }
+
+        .success-icon {
+            animation: success-pulse 2s infinite;
+        }
+
+        @keyframes success-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .student-item {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .student-item:hover {
+            border-color: #6A8EAE;
+            background-color: #f0f9ff;
+        }
+
+        .student-item.selected {
+            border-color: #6A8EAE;
+            background: linear-gradient(to right, #dbeafe, transparent);
+        }
+
+        .selected-student-badge {
+            background: linear-gradient(135deg, #6A8EAE, #5A7E9E);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <!-- Success Page (Hidden by default) -->
+        <div id="successPage" class="success-page" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg success-header-card">
+                        <div class="card-header bg-white border-0 pb-0 pt-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="bg-gradient p-3 rounded-circle success-icon" style="background: linear-gradient(135deg, #7FB685, #6FA675);">
+                                    <i class="bi bi-check-circle-fill text-white" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div>
+                                    <h2 class="mb-1">✅ Concern Report Submitted Successfully</h2>
+                                    <p class="text-muted mb-0">The student's report has been recorded and will be reviewed promptly</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="successStudentInfo" class="p-4 rounded-3 border-2 mb-3" style="background: linear-gradient(135deg, #dbeafe, transparent); border: 2px solid #bfdbfe;">
+                                <!-- Student info will be inserted here -->
+                            </div>
+
+                            <div class="d-flex gap-3">
+                                <button onclick="window.location.href='/dashboard'" class="btn btn-outline-secondary flex-fill">
+                                    Return to Dashboard
+                                </button>
+                                <button onclick="location.reload()" class="btn btn-gradient-blue flex-fill">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Create Another Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Form (Visible by default) -->
+        <div id="reportForm">
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-8">
+                    <div class="bg-white rounded-3 p-4 shadow-sm header-card">
+                        <h1 class="d-flex align-items-center gap-2 mb-3">
+                            <span style="font-size: 2rem;">👥</span>
+                            Create Student Concern Report
+                        </h1>
+                        <p class="text-muted mb-0">
+                            Help a student report their mental health concern. Select the student first, then provide the concern details.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="concernForm" th:action="@{/concerns/staff-submit}" method="post" onsubmit="handleSubmit(event)">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" id="selectedStudentId" name="studentId" value="">
+
+                <!-- Student Selection Card -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow staff-selection-card">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-search" style="color: #6A8EAE;"></i>
+                                    Select Student
+                                </h5>
+                                <p class="text-muted small mb-0">Search for and select the student you want to create a report for</p>
+                            </div>
+                            <div class="card-body">
+                                <!-- Search Input -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-medium">Search by Student ID or Name</label>
+                                    <input type="text" id="studentSearch" class="form-control" placeholder="Enter student ID or name..." />
+                                </div>
+
+                                <!-- Student List -->
+                                <div id="studentList" class="border rounded-3 p-3" style="max-height: 400px; overflow-y: auto; background-color: #f9fafb;">
+                                    <div class="text-muted text-center py-4">
+                                        <i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i>
+                                        <p class="mt-2">Start typing to search for students</p>
+                                    </div>
+                                </div>
+
+                                <!-- Selected Student Display -->
+                                <div id="selectedStudentDisplay" style="display: none; margin-top: 15px;">
+                                    <p class="small text-muted mb-2">Selected Student:</p>
+                                    <div id="selectedStudentBadge" class="selected-student-badge">
+                                        <!-- Selected student info will appear here -->
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="clearSelection()">
+                                        <i class="bi bi-x"></i> Change
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Urgency Card -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow card-border-orange">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-circle" style="color: #FF9F1C;"></i>
+                                    Level of Urgency
+                                </h5>
+                                <p class="text-muted small mb-0">How urgent is this concern?</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-3">
+                                    <div class="urgency-option urgency-low rounded-3 p-3" onclick="selectUrgency('low', this)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="radio" name="urgency" value="low" class="form-check-input" required>
+                                            <div class="flex-fill">
+                                                <p class="fw-medium mb-1">🟢 Low - Can be addressed within a week</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="urgency-option urgency-moderate rounded-3 p-3" onclick="selectUrgency('moderate', this)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="radio" name="urgency" value="moderate" class="form-check-input">
+                                            <div class="flex-fill">
+                                                <p class="fw-medium mb-1">🟡 Moderate - Should be addressed within 2-3 days</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="urgency-option urgency-high rounded-3 p-3" onclick="selectUrgency('high', this)">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="radio" name="urgency" value="high" class="form-check-input">
+                                            <div class="flex-fill">
+                                                <p class="fw-medium mb-1">🔴 High - Needs immediate attention (within 24 hours)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Concerns Card -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow card-border-purple">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-chat-dots" style="color: #9B7EDE;"></i>
+                                    Types of Concerns
+                                </h5>
+                                <p class="text-muted small mb-0">Select all that apply to this student's situation</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Anxiety" class="form-check-input">
+                                        <span class="ms-2">😰 Anxiety - Excessive worry or panic attacks</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Depression" class="form-check-input">
+                                        <span class="ms-2">😔 Depression - Persistent low mood or loss of interest</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Stress" class="form-check-input">
+                                        <span class="ms-2">😓 Stress - Feeling overwhelmed or under pressure</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Sleep Issues" class="form-check-input">
+                                        <span class="ms-2">😴 Sleep Issues - Insomnia or irregular sleep patterns</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Suicidal Thoughts" class="form-check-input">
+                                        <span class="ms-2">⚠️ Suicidal Thoughts - Thoughts of harming oneself</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Substance Abuse" class="form-check-input">
+                                        <span class="ms-2">🚫 Substance Abuse - Use of drugs or alcohol</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Self-Harm" class="form-check-input">
+                                        <span class="ms-2">🔪 Self-Harm - Deliberate self-injury</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Eating Disorders" class="form-check-input">
+                                        <span class="ms-2">🍽️ Eating Disorders - Unhealthy eating patterns</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Relationship Issues" class="form-check-input">
+                                        <span class="ms-2">💔 Relationship Issues - Conflicts or breakups</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Academic Pressure" class="form-check-input">
+                                        <span class="ms-2">📚 Academic Pressure - Struggles with schoolwork</span>
+                                    </label>
+                                    <label class="concern-checkbox rounded-3 p-3">
+                                        <input type="checkbox" name="concerns" value="Other" class="form-check-input">
+                                        <span class="ms-2">❓ Other - Something else not listed</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Card -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <div class="card shadow card-border-blue">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-1 d-flex align-items-center gap-2">
+                                    <i class="bi bi-pencil-square" style="color: #6A8EAE;"></i>
+                                    Detailed Description
+                                </h5>
+                                <p class="text-muted small mb-0">Please provide more context about the student's concern</p>
+                            </div>
+                            <div class="card-body">
+                                <textarea id="description" name="description" class="form-control" rows="6" 
+                                    placeholder="Describe the concern in detail. Include any relevant background information, observed behaviors, or specific incidents that prompted this report..."
+                                    required></textarea>
+                                <small class="text-muted mt-2 d-block">Minimum 10 characters required</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-lg-8">
+                        <button type="submit" id="submitBtn" class="btn btn-gradient-red w-100 py-3 fw-bold" disabled>
+                            <i class="bi bi-send me-2"></i>
+                            Submit Report
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mock student data - in a real app, this would come from the backend
+        const allStudents = [];
+
+        // Fetch students on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStudents();
+            setupEventListeners();
+        });
+
+        function fetchStudents() {
+            // Fetch students from backend API
+            fetch('/api/students')
+                .then(response => response.json())
+                .then(data => {
+                    allStudents.length = 0;
+                    allStudents.push(...data);
+                })
+                .catch(error => {
+                    console.error('Error fetching students:', error);
+                    showEmptyState();
+                });
+        }
+
+        function setupEventListeners() {
+            // Student search
+            document.getElementById('studentSearch').addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                if (query.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+                filterStudents(query);
+            });
+
+            // Form validation
+            document.getElementById('description').addEventListener('input', function() {
+                validateForm();
+            });
+
+            // Checkbox selection
+            document.querySelectorAll('.concern-checkbox input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    this.closest('.concern-checkbox').classList.toggle('selected', this.checked);
+                });
+            });
+        }
+
+        function filterStudents(query) {
+            const filtered = allStudents.filter(student => 
+                student.id.toString().includes(query) || 
+                student.name.toLowerCase().includes(query) ||
+                (student.email && student.email.toLowerCase().includes(query))
+            );
+
+            const listDiv = document.getElementById('studentList');
+            
+            if (filtered.length === 0) {
+                listDiv.innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">No students found</p></div>';
+                return;
+            }
+
+            listDiv.innerHTML = filtered.map(student => `
+                <div class="student-item" onclick="selectStudent(${student.id}, '${student.name}', '${student.email}')">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="flex-fill">
+                            <p class="fw-medium mb-1">${student.name}</p>
+                            <p class="text-muted small mb-0">ID: ${student.id} | ${student.email}</p>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectStudent(studentId, studentName, studentEmail) {
+            document.getElementById('selectedStudentId').value = studentId;
+            document.getElementById('selectedStudentDisplay').style.display = 'block';
+            document.getElementById('selectedStudentBadge').innerHTML = `
+                <i class="bi bi-person-fill me-2"></i>
+                ${studentName} <small class="ms-2">(ID: ${studentId})</small>
+            `;
+            
+            // Clear search and hide list
+            document.getElementById('studentSearch').value = '';
+            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">Start typing to search for students</p></div>';
+            
+            validateForm();
+        }
+
+        function clearSelection() {
+            document.getElementById('selectedStudentId').value = '';
+            document.getElementById('selectedStudentDisplay').style.display = 'none';
+            document.getElementById('studentSearch').value = '';
+            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">Start typing to search for students</p></div>';
+            validateForm();
+        }
+
+        function showEmptyState() {
+            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">Start typing to search for students</p></div>';
+        }
+
+        function selectUrgency(level, element) {
+            document.querySelectorAll('.urgency-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+            validateForm();
+        }
+
+        function validateForm() {
+            const hasStudent = document.getElementById('selectedStudentId').value !== '';
+            const hasUrgency = document.querySelector('input[name="urgency"]:checked') !== null;
+            const hasDescription = document.getElementById('description').value.trim().length >= 10;
+            
+            document.getElementById('submitBtn').disabled = !(hasStudent && hasUrgency && hasDescription);
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            const studentId = document.getElementById('selectedStudentId').value;
+            if (!studentId) {
+                alert('Please select a student');
+                return;
+            }
+
+            // Submit form
+            document.getElementById('concernForm').submit();
+        }
+
+        // Show success page after submission (handled by server redirect)
+    </script>
+</body>
+</html>

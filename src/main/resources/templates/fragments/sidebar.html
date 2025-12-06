@@ -43,8 +43,8 @@
             
             <!--/*===== STAFF Links =====*/-->
             <div th:if="${session.userRole == 'STAFF'}">
-                 <a th:href="@{/concerns/report}" class="nav-link" th:classappend="${activePage == 'report' ? 'active' : ''}">
-                    <i class="bi bi-exclamation-circle"></i> Report Concerns
+                 <a th:href="@{/concerns/staff-report}" class="nav-link" th:classappend="${activePage == 'reports' ? 'active' : ''}">
+                    <i class="bi bi-exclamation-circle"></i> Create Student Report
                 </a>
                 <a th:href="@{/patients}" class="nav-link" th:classappend="${activePage == 'patients' ? 'active' : ''}">
                     <i class="bi bi-graph-up-arrow"></i> Track Student Progress
