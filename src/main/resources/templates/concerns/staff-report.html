@@ -265,8 +265,8 @@
                                 <!-- Student List -->
                                 <div id="studentList" class="border rounded-3 p-3" style="max-height: 400px; overflow-y: auto; background-color: #f9fafb;">
                                     <div class="text-muted text-center py-4">
-                                        <i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i>
-                                        <p class="mt-2">Start typing to search for students</p>
+                                        <i class="bi bi-hourglass" style="font-size: 2rem; color: #d1d5db;"></i>
+                                        <p class="mt-2">Loading students...</p>
                                     </div>
                                 </div>
 
@@ -428,7 +428,7 @@
     </div>
 
     <script>
-        // Mock student data - in a real app, this would come from the backend
+        // Store all students in memory
         const allStudents = [];
 
         // Fetch students on page load
@@ -439,11 +439,13 @@
 
         function fetchStudents() {
             // Fetch students from backend API
-            fetch('/api/students')
+            fetch('/mentalhealthhub/api/students')
                 .then(response => response.json())
                 .then(data => {
                     allStudents.length = 0;
                     allStudents.push(...data);
+                    // Display all students initially
+                    displayAllStudents();
                 })
                 .catch(error => {
                     console.error('Error fetching students:', error);
@@ -456,7 +458,7 @@
             document.getElementById('studentSearch').addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
                 if (query.length === 0) {
-                    showEmptyState();
+                    displayAllStudents();
                     return;
                 }
                 filterStudents(query);
@@ -473,6 +475,27 @@
                     this.closest('.concern-checkbox').classList.toggle('selected', this.checked);
                 });
             });
+        }
+
+        function displayAllStudents() {
+            const listDiv = document.getElementById('studentList');
+            
+            if (allStudents.length === 0) {
+                listDiv.innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">No students available</p></div>';
+                return;
+            }
+
+            listDiv.innerHTML = allStudents.map(student => `
+                <div class="student-item" onclick="selectStudent(${student.id}, '${student.name}', '${student.email}')">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="flex-fill">
+                            <p class="fw-medium mb-1">${student.name}</p>
+                            <p class="text-muted small mb-0">ID: ${student.id} | ${student.email}</p>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function filterStudents(query) {
@@ -512,7 +535,7 @@
             
             // Clear search and hide list
             document.getElementById('studentSearch').value = '';
-            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">Start typing to search for students</p></div>';
+            displayAllStudents();
             
             validateForm();
         }
@@ -521,12 +544,12 @@
             document.getElementById('selectedStudentId').value = '';
             document.getElementById('selectedStudentDisplay').style.display = 'none';
             document.getElementById('studentSearch').value = '';
-            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">Start typing to search for students</p></div>';
+            displayAllStudents();
             validateForm();
         }
 
         function showEmptyState() {
-            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-search" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">Start typing to search for students</p></div>';
+            document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">No students available</p></div>';
         }
 
         function selectUrgency(level, element) {

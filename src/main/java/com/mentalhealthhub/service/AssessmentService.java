@@ -89,6 +89,7 @@ public class AssessmentService {
         assessment.setAnswers(String.join(",", answers.stream().map(String::valueOf).toArray(String[]::new)));
 
         // Categorize based on total score (0-32 possible)
+        // Higher score = More symptoms = Higher severity
         String category;
         String resultMessage;
         if (totalScore <= 8) {
@@ -127,7 +128,9 @@ public class AssessmentService {
         int stressScore = (answers.get(0) != null ? answers.get(0) : 0) +
                 (answers.get(1) != null ? answers.get(1) : 0); // Q1 + Q2
         int anxietyScore = (answers.get(2) != null ? answers.get(2) : 0) * 2; // Q3 * 2
-        int wellbeingScore = 100 - totalScore; // Higher total score = lower wellbeing
+        // Wellbeing score is inverted: higher total symptoms = lower wellbeing
+        // Range: 0-32 symptoms → 32-0 wellbeing (0=worst, 32=best)
+        int wellbeingScore = 32 - totalScore;
 
         user.setStressLevel((stressScore * 100) / 8); // Convert to 0-100
         user.setAnxietyLevel((anxietyScore * 100) / 8); // Convert to 0-100
