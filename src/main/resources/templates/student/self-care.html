@@ -19,6 +19,9 @@
         </div>
     </div>
 
+    <!-- Hidden input for activeTab flash attribute -->
+    <input type="hidden" id="activeTabValue" th:value="${activeTab}" />
+
     <!-- Tabs -->
     <ul class="nav nav-tabs mb-4" id="selfCareTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -137,11 +140,11 @@
                     <small class="text-muted">Track your mood to identify patterns and triggers</small>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/self-care/mood}" method="post">
+                    <form th:action="@{/self-care/mood}" method="post" id="moodForm">
                         <div class="row g-3 mb-4">
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-great" value="great" 
-                                       th:checked="${todayMood != null && todayMood.mood == 'great'}">
+                                       th:checked="${todayMood != null && todayMood.mood == 'great'}" required>
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-great">
                                     <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                                          style="width: 48px; height: 48px;">
@@ -152,7 +155,7 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-good" value="good"
-                                       th:checked="${todayMood != null && todayMood.mood == 'good'}">
+                                       th:checked="${todayMood != null && todayMood.mood == 'good'}" required>
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-good">
                                     <div class="bg-success bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                                          style="width: 48px; height: 48px;">
@@ -163,7 +166,7 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-okay" value="okay"
-                                       th:checked="${todayMood != null && todayMood.mood == 'okay'}">
+                                       th:checked="${todayMood != null && todayMood.mood == 'okay'}" required>
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-okay">
                                     <div class="bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                                          style="width: 48px; height: 48px;">
@@ -174,7 +177,7 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-low" value="low"
-                                       th:checked="${todayMood != null && todayMood.mood == 'low'}">
+                                       th:checked="${todayMood != null && todayMood.mood == 'low'}" required>
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-low">
                                     <div class="bg-warning bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                                          style="width: 48px; height: 48px;">
@@ -185,7 +188,7 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-struggling" value="struggling"
-                                       th:checked="${todayMood != null && todayMood.mood == 'struggling'}">
+                                       th:checked="${todayMood != null && todayMood.mood == 'struggling'}" required>
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-struggling">
                                     <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
                                          style="width: 48px; height: 48px;">
@@ -194,6 +197,9 @@
                                     <div class="small">Struggling</div>
                                 </label>
                             </div>
+                        </div>
+                        <div id="moodError" class="alert alert-danger" style="display: none;">
+                            Please select a mood before saving.
                         </div>
                         <button type="submit" class="btn btn-success">
                             <span style="font-size: 1rem;">💾</span> Save Mood
@@ -639,46 +645,130 @@
 
 <script>
     // Update breathing display when slider changes
-    document.getElementById('breathDuration')?.addEventListener('input', function() {
-        const value = this.value;
-        document.getElementById('breatheIn').textContent = value + 's';
-        document.getElementById('hold1').textContent = value + 's';
-        document.getElementById('breatheOut').textContent = value + 's';
-        document.getElementById('hold2').textContent = value + 's';
+    const breathDurationSlider = document.getElementById('breathDuration');
+    if (breathDurationSlider) {
+        breathDurationSlider.addEventListener('input', function() {
+            const value = this.value;
+            const breatheIn = document.getElementById('breatheIn');
+            const hold1 = document.getElementById('hold1');
+            const breatheOut = document.getElementById('breatheOut');
+            const hold2 = document.getElementById('hold2');
+            if (breatheIn) breatheIn.textContent = value + 's';
+            if (hold1) hold1.textContent = value + 's';
+            if (breatheOut) breatheOut.textContent = value + 's';
+            if (hold2) hold2.textContent = value + 's';
+        });
+    }
+
+    // Mood form validation
+    document.getElementById('moodForm')?.addEventListener('submit', function(e) {
+        const selectedMood = document.querySelector('input[name="mood"]:checked');
+        const errorDiv = document.getElementById('moodError');
+        
+        if (!selectedMood) {
+            e.preventDefault();
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            return false;
+        } else {
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        }
     });
 
-    // Fixed tab switching - simple and reliable approach
+    // Tab switching - let Bootstrap handle it natively, only customize initial tab selection
     document.addEventListener('DOMContentLoaded', function() {
-        // Check for flash attribute indicating which tab to show
-        const successMessage = document.querySelector('.alert-success');
-        const shouldShowMoodTab = successMessage && successMessage.textContent.includes('Mood logged');
+        // Get activeTab from hidden input (flash attribute from server)
+        const activeTabInput = document.getElementById('activeTabValue');
+        let activeTabFromServer = activeTabInput ? activeTabInput.value : null;
         
-        // Initialize tab switching - simple event delegation
-        const tabList = document.querySelector('#selfCareTabs');
-        if (tabList) {
-            tabList.addEventListener('click', function(e) {
-                const button = e.target.closest('[data-bs-toggle="tab"]');
-                if (button) {
-                    const targetId = button.getAttribute('data-bs-target');
-                    if (targetId) {
-                        // Allow all tabs to switch freely
-                        const tab = new bootstrap.Tab(button);
-                        tab.show();
-                    }
-                }
+        // Fallback: Check success message for mood-related text
+        if (!activeTabFromServer || activeTabFromServer.trim() === '') {
+            const successMessage = document.querySelector('.alert-success');
+            if (successMessage && successMessage.textContent.includes('Mood logged')) {
+                activeTabFromServer = 'mood';
+            }
+        }
+        
+        // Ensure default tab state is correct (meditation tab should be active by default)
+        const defaultTab = document.querySelector('[data-bs-target="#meditation"]');
+        const defaultPane = document.querySelector('#meditation');
+        
+        // Function to switch tabs manually (fallback)
+        function switchTabManually(tabButton, paneId) {
+            // Remove active from all tabs
+            document.querySelectorAll('#selfCareTabs .nav-link').forEach(link => {
+                link.classList.remove('active');
             });
+            // Remove active from all panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            // Activate target tab and pane
+            if (tabButton) {
+                tabButton.classList.add('active');
+            }
+            const targetPane = document.querySelector(paneId);
+            if (targetPane) {
+                targetPane.classList.add('show', 'active');
+            }
         }
 
-        // Show mood tab if we just submitted mood, otherwise show default
-        if (shouldShowMoodTab) {
+        // Show specific tab if activeTab is set from server (e.g., after mood save)
+        if (activeTabFromServer && activeTabFromServer.trim() !== '') {
             setTimeout(function() {
-                const moodTab = document.querySelector('[data-bs-target="#mood"]');
-                if (moodTab) {
-                    const tab = new bootstrap.Tab(moodTab);
-                    tab.show();
+                const targetTab = document.querySelector('[data-bs-target="#' + activeTabFromServer + '"]');
+                if (targetTab) {
+                    try {
+                        // Use Bootstrap's Tab API for proper activation
+                        const tab = new bootstrap.Tab(targetTab);
+                        tab.show();
+                    } catch (error) {
+                        // Fallback manual switching
+                        switchTabManually(targetTab, '#' + activeTabFromServer);
+                    }
                 }
-            }, 100);
+            }, 300);
+        } else {
+            // Ensure default tab is active if no specific tab is requested
+            // This fixes issues after session completions
+            setTimeout(function() {
+                if (defaultTab && defaultPane) {
+                    // Check if no tab is currently active
+                    const activeTab = document.querySelector('#selfCareTabs .nav-link.active');
+                    const activePane = document.querySelector('.tab-pane.show.active');
+                    
+                    // If no tab is active, activate default meditation tab
+                    if (!activeTab || !activePane) {
+                        try {
+                            const tab = new bootstrap.Tab(defaultTab);
+                            tab.show();
+                        } catch (error) {
+                            // Fallback: manually set active states
+                            switchTabManually(defaultTab, '#meditation');
+                        }
+                    }
+                }
+            }, 200);
         }
+        
+        // Ensure all tab buttons are properly initialized for Bootstrap
+        // Bootstrap will handle the click events natively via data-bs-toggle="tab"
+        // We just need to make sure Bootstrap knows about them
+        const allTabButtons = document.querySelectorAll('#selfCareTabs [data-bs-toggle="tab"]');
+        allTabButtons.forEach(function(button) {
+            try {
+                // Initialize Bootstrap Tab instance for each button
+                // This ensures Bootstrap's event system knows about all tabs
+                new bootstrap.Tab(button);
+            } catch (e) {
+                // Tab might already be initialized, that's fine
+                // Bootstrap will handle it natively
+            }
+        });
     });
 </script>
 

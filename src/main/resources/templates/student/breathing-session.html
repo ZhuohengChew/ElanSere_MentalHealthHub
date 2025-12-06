@@ -1,0 +1,515 @@
+<!-- Breathing Exercise Session Page -->
+<div class="breathing-session-container">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <!-- Back Button -->
+                <div class="mb-3">
+                    <a th:href="@{/self-care}" class="btn btn-link text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Back to Self-Care
+                    </a>
+                </div>
+
+                <!-- Breathing Card -->
+                <div class="card breathing-card" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    <div class="card-body text-center p-5">
+                        <!-- Title -->
+                        <h2 class="mb-4" style="color: #6A8EAE; font-weight: 300;">
+                            <span style="font-size: 2rem;">💨</span>
+                            <span th:text="${breathingTechnique}"></span>
+                        </h2>
+                        <p class="text-muted mb-4">Follow the breathing pattern to calm your mind</p>
+
+                        <!-- Breathing Circle Animation -->
+                        <div class="breathing-circle-container mb-4">
+                            <div class="breathing-circle" id="breathingCircle">
+                                <div class="breathing-inner">
+                                    <span id="breathingText" style="font-size: 2rem; color: white; font-weight: 600;">Breathe In</span>
+                                </div>
+                            </div>
+                            <div class="breathing-instruction mt-3" id="breathingInstruction">
+                                <p class="h5 mb-0" style="color: #7FB685;" id="instructionText">Ready to Begin</p>
+                                <p class="small text-muted mt-2" id="countdownText"></p>
+                            </div>
+                        </div>
+
+                        <!-- Breathing Pattern Display -->
+                        <div class="breathing-pattern mb-4" id="breathingPattern">
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <p class="mb-0 small text-muted">Breathe In</p>
+                                    <p class="h4 text-primary mb-0" id="breatheInDuration">4s</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <p class="mb-0 small text-muted">Hold</p>
+                                    <p class="h4 text-success mb-0" id="hold1Duration">4s</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-0 small text-muted">Breathe Out</p>
+                                    <p class="h4 text-info mb-0" id="breatheOutDuration">4s</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-0 small text-muted">Hold</p>
+                                    <p class="h4 text-warning mb-0" id="hold2Duration">4s</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timer Display -->
+                        <div class="timer-display mb-4">
+                            <div class="timer-circle">
+                                <div class="timer-content">
+                                    <div class="timer-text" id="timerDisplay">00:00</div>
+                                    <div class="timer-label text-muted small">Time Remaining</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-container mb-4">
+                            <div class="progress" style="height: 8px; border-radius: 10px; background-color: #f0f0f0;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" 
+                                     id="progressBar"
+                                     style="background: linear-gradient(90deg, #6A8EAE, #7FB685);"
+                                     aria-valuenow="0" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2 small text-muted">
+                                <span>0%</span>
+                                <span id="progressText">0% Complete</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Control Buttons -->
+                        <div class="control-buttons mb-4">
+                            <button type="button" class="btn btn-lg btn-primary me-2" id="playPauseBtn" style="min-width: 120px;">
+                                <i class="bi bi-play-fill"></i> Start
+                            </button>
+                            <button type="button" class="btn btn-lg btn-outline-secondary" id="resetBtn" style="min-width: 120px;">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </button>
+                        </div>
+
+                        <!-- Complete Button (hidden initially) -->
+                        <div id="completeSection" style="display: none;">
+                            <div class="alert alert-success mb-3">
+                                <i class="bi bi-check-circle"></i> Exercise Complete! Great job taking time for yourself.
+                            </div>
+                            <form th:action="@{/self-care/breathing/complete}" method="post" id="completeForm">
+                                <input type="hidden" name="technique" th:value="${breathingTechnique}">
+                                <input type="hidden" name="breathDuration" th:value="${breathingBreathDuration}">
+                                <input type="hidden" name="duration" th:value="${breathingDuration}">
+                                <input type="hidden" name="completedDuration" id="completedDuration">
+                                <div class="mb-3">
+                                    <label for="sessionNotes" class="form-label">Optional: Add notes about your session</label>
+                                    <textarea class="form-control" id="sessionNotes" name="notes" rows="3" 
+                                              placeholder="How are you feeling after this breathing exercise?"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="bi bi-check-circle"></i> Complete Exercise
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Early Complete Button -->
+                        <div id="earlyCompleteSection" style="display: none;">
+                            <button type="button" class="btn btn-outline-warning" id="earlyCompleteBtn">
+                                <i class="bi bi-stop-circle"></i> Complete Early
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="card mt-4" style="border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <i class="bi bi-lightbulb"></i> Breathing Tips
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Breathe naturally - don't force it
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Focus on the rhythm and let thoughts pass
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> If you feel lightheaded, slow down or pause
+                            </li>
+                            <li class="mb-0">
+                                <i class="bi bi-check-circle text-success"></i> Practice regularly for best results
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .breathing-session-container {
+        min-height: calc(100vh - 140px);
+        background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+        padding: 20px 0;
+    }
+
+    .breathing-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .breathing-circle-container {
+        position: relative;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .breathing-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6A8EAE 0%, #7FB685 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(106, 142, 174, 0.3);
+        transition: transform 0.1s ease;
+    }
+
+    .breathing-circle.breathing-in {
+        animation: breatheIn 4s ease-in-out infinite;
+    }
+
+    .breathing-circle.breathing-out {
+        animation: breatheOut 4s ease-in-out infinite;
+    }
+
+    .breathing-circle.holding {
+        animation: none;
+    }
+
+    @keyframes breatheIn {
+        0% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(1.4);
+        }
+    }
+
+    @keyframes breatheOut {
+        0% {
+            transform: scale(1.4);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .breathing-pattern {
+        max-width: 400px;
+        margin: 0 auto;
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+    }
+
+    .timer-display {
+        display: flex;
+        justify-content: center;
+    }
+
+    .timer-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6A8EAE 0%, #7FB685 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 20px rgba(106, 142, 174, 0.3);
+    }
+
+    .timer-content {
+        text-align: center;
+        color: white;
+    }
+
+    .timer-text {
+        font-size: 2.5rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .timer-label {
+        font-size: 0.9rem;
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .control-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6A8EAE 0%, #7FB685 100%);
+        border: none;
+        padding: 12px 30px;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a7e9e 0%, #6fa675 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(106, 142, 174, 0.3);
+    }
+
+    .progress-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+        }
+
+        .timer-circle {
+            width: 120px;
+            height: 120px;
+        }
+
+        .timer-text {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        // Get breathing data from Thymeleaf
+        const technique = /*[[${breathingTechnique}]]*/ 'Box Breathing';
+        const breathDuration = /*[[${breathingBreathDuration}]]*/ 4; // in seconds
+        const totalDuration = /*[[${breathingDuration}]]*/ 5; // in minutes
+        const totalSeconds = totalDuration * 60;
+        
+        let remainingSeconds = totalDuration * 60;
+        let isRunning = false;
+        let intervalId = null;
+        let breathingPhase = 'ready'; // ready, in, hold1, out, hold2
+        let breathingPhaseInterval = null;
+        let currentPhaseTime = 0;
+        let startTime = null;
+        let pausedTime = 0;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const breathingCircle = document.getElementById('breathingCircle');
+        const breathingText = document.getElementById('breathingText');
+        const instructionText = document.getElementById('instructionText');
+        const countdownText = document.getElementById('countdownText');
+        const completeSection = document.getElementById('completeSection');
+        const earlyCompleteSection = document.getElementById('earlyCompleteSection');
+        const completedDurationInput = document.getElementById('completedDuration');
+
+        // Update breathing pattern display
+        document.getElementById('breatheInDuration').textContent = breathDuration + 's';
+        document.getElementById('hold1Duration').textContent = breathDuration + 's';
+        document.getElementById('breatheOutDuration').textContent = breathDuration + 's';
+        document.getElementById('hold2Duration').textContent = breathDuration + 's';
+
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Update display
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(remainingSeconds);
+            const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressText.textContent = Math.round(progress) + '% Complete';
+        }
+
+        // Start breathing animation cycle
+        function startBreathingCycle() {
+            breathingPhase = 'in';
+            currentPhaseTime = 0;
+            updateBreathingPhase();
+            
+            breathingPhaseInterval = setInterval(() => {
+                currentPhaseTime++;
+                
+                if (currentPhaseTime >= breathDuration) {
+                    // Move to next phase
+                    switch(breathingPhase) {
+                        case 'in':
+                            breathingPhase = 'hold1';
+                            break;
+                        case 'hold1':
+                            breathingPhase = 'out';
+                            break;
+                        case 'out':
+                            breathingPhase = 'hold2';
+                            break;
+                        case 'hold2':
+                            breathingPhase = 'in';
+                            break;
+                    }
+                    currentPhaseTime = 0;
+                    updateBreathingPhase();
+                } else {
+                    // Update countdown
+                    const remaining = breathDuration - currentPhaseTime;
+                    countdownText.textContent = remaining + 's';
+                }
+            }, 1000);
+        }
+
+        // Update breathing phase display
+        function updateBreathingPhase() {
+            breathingCircle.classList.remove('breathing-in', 'breathing-out', 'holding');
+            
+            switch(breathingPhase) {
+                case 'in':
+                    breathingCircle.classList.add('breathing-in');
+                    breathingText.textContent = 'Breathe In';
+                    instructionText.textContent = 'Breathe In';
+                    instructionText.style.color = '#7FB685';
+                    break;
+                case 'hold1':
+                    breathingCircle.classList.add('holding');
+                    breathingText.textContent = 'Hold';
+                    instructionText.textContent = 'Hold';
+                    instructionText.style.color = '#6A8EAE';
+                    break;
+                case 'out':
+                    breathingCircle.classList.add('breathing-out');
+                    breathingText.textContent = 'Breathe Out';
+                    instructionText.textContent = 'Breathe Out';
+                    instructionText.style.color = '#6A8EAE';
+                    break;
+                case 'hold2':
+                    breathingCircle.classList.add('holding');
+                    breathingText.textContent = 'Hold';
+                    instructionText.textContent = 'Hold';
+                    instructionText.style.color = '#6A8EAE';
+                    break;
+            }
+            countdownText.textContent = breathDuration + 's';
+        }
+
+        // Stop breathing animation
+        function stopBreathingAnimation() {
+            if (breathingPhaseInterval) {
+                clearInterval(breathingPhaseInterval);
+                breathingPhaseInterval = null;
+            }
+            breathingCircle.classList.remove('breathing-in', 'breathing-out', 'holding');
+            breathingText.textContent = 'Ready';
+            instructionText.textContent = 'Ready to Begin';
+            instructionText.style.color = '#6A8EAE';
+            countdownText.textContent = '';
+            breathingPhase = 'ready';
+        }
+
+        // Start timer
+        function startTimer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            startTime = Date.now() - (pausedTime * 1000);
+            startBreathingCycle();
+            
+            playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i> Pause';
+            earlyCompleteSection.style.display = 'block';
+            
+            intervalId = setInterval(() => {
+                remainingSeconds--;
+                updateDisplay();
+                
+                if (remainingSeconds <= 0) {
+                    completeSession();
+                }
+            }, 1000);
+        }
+
+        // Pause timer
+        function pauseTimer() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            pausedTime = totalSeconds - remainingSeconds;
+            stopBreathingAnimation();
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Resume';
+        }
+
+        // Reset timer
+        function resetTimer() {
+            pauseTimer();
+            remainingSeconds = totalSeconds;
+            pausedTime = 0;
+            updateDisplay();
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Start';
+            earlyCompleteSection.style.display = 'none';
+            completeSection.style.display = 'none';
+        }
+
+        // Complete session
+        function completeSession() {
+            pauseTimer();
+            const completedMinutes = Math.ceil((totalSeconds - remainingSeconds) / 60);
+            completedDurationInput.value = completedMinutes;
+            completeSection.style.display = 'block';
+            earlyCompleteSection.style.display = 'none';
+            
+            // Show completion message
+            instructionText.innerHTML = '<i class="bi bi-check-circle"></i> Exercise Complete!';
+            instructionText.style.color = '#28a745';
+        }
+
+        // Event listeners
+        playPauseBtn.addEventListener('click', () => {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetTimer);
+
+        document.getElementById('earlyCompleteBtn')?.addEventListener('click', () => {
+            if (confirm('Are you sure you want to complete this exercise early?')) {
+                completeSession();
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    })();
+</script>
+

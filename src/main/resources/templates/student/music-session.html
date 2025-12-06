@@ -1,0 +1,442 @@
+<!-- Music Session Page -->
+<div class="music-session-container">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <!-- Back Button -->
+                <div class="mb-3">
+                    <a th:href="@{/self-care}" class="btn btn-link text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Back to Self-Care
+                    </a>
+                </div>
+
+                <!-- Music Card -->
+                <div class="card music-card" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    <div class="card-body text-center p-5">
+                        <!-- Title -->
+                        <h2 class="mb-4" style="color: #6A8EAE; font-weight: 300;">
+                            <span style="font-size: 2rem;">🎵</span>
+                            <span th:text="${musicTitle}"></span>
+                        </h2>
+                        <p class="text-muted mb-4">Relax and enjoy the calming sounds</p>
+
+                        <!-- Music Visual -->
+                        <div class="music-visual mb-4">
+                            <div class="music-circle" id="musicCircle">
+                                <div class="music-inner">
+                                    <span id="musicIcon" style="font-size: 4rem;">🎵</span>
+                                </div>
+                            </div>
+                            <div class="music-instruction mt-3" id="musicInstruction">
+                                <p class="h5 mb-0" style="color: #7FB685;">Ready to Play</p>
+                                <p class="small text-muted mt-2" id="musicStatus">Press Start to begin your relaxation session</p>
+                            </div>
+                        </div>
+
+                        <!-- Visualizer -->
+                        <div class="audio-visualizer mb-4" id="audioVisualizer" style="display: none;">
+                            <div class="visualizer-bars">
+                                <div class="bar" style="animation-delay: 0s;"></div>
+                                <div class="bar" style="animation-delay: 0.1s;"></div>
+                                <div class="bar" style="animation-delay: 0.2s;"></div>
+                                <div class="bar" style="animation-delay: 0.3s;"></div>
+                                <div class="bar" style="animation-delay: 0.4s;"></div>
+                                <div class="bar" style="animation-delay: 0.5s;"></div>
+                                <div class="bar" style="animation-delay: 0.6s;"></div>
+                                <div class="bar" style="animation-delay: 0.7s;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Timer Display -->
+                        <div class="timer-display mb-4">
+                            <div class="timer-circle">
+                                <div class="timer-content">
+                                    <div class="timer-text" id="timerDisplay">00:00</div>
+                                    <div class="timer-label text-muted small">Time Remaining</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-container mb-4">
+                            <div class="progress" style="height: 8px; border-radius: 10px; background-color: #f0f0f0;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" 
+                                     id="progressBar"
+                                     style="background: linear-gradient(90deg, #6A8EAE, #7FB685);"
+                                     aria-valuenow="0" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2 small text-muted">
+                                <span>0%</span>
+                                <span id="progressText">0% Complete</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Control Buttons -->
+                        <div class="control-buttons mb-4">
+                            <button type="button" class="btn btn-lg btn-primary me-2" id="playPauseBtn" style="min-width: 120px;">
+                                <i class="bi bi-play-fill"></i> Start
+                            </button>
+                            <button type="button" class="btn btn-lg btn-outline-secondary" id="resetBtn" style="min-width: 120px;">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </button>
+                        </div>
+
+                        <!-- Complete Button (hidden initially) -->
+                        <div id="completeSection" style="display: none;">
+                            <div class="alert alert-success mb-3">
+                                <i class="bi bi-check-circle"></i> Session Complete! Great job taking time for yourself.
+                            </div>
+                            <form th:action="@{/self-care/music/complete}" method="post" id="completeForm">
+                                <input type="hidden" name="title" th:value="${musicTitle}">
+                                <input type="hidden" name="duration" th:value="${musicDuration}">
+                                <input type="hidden" name="completedDuration" id="completedDuration">
+                                <div class="mb-3">
+                                    <label for="sessionNotes" class="form-label">Optional: Add notes about your session</label>
+                                    <textarea class="form-control" id="sessionNotes" name="notes" rows="3" 
+                                              placeholder="How are you feeling after this music session?"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="bi bi-check-circle"></i> Complete Session
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Early Complete Button -->
+                        <div id="earlyCompleteSection" style="display: none;">
+                            <button type="button" class="btn btn-outline-warning" id="earlyCompleteBtn">
+                                <i class="bi bi-stop-circle"></i> Complete Early
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="card mt-4" style="border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <i class="bi bi-lightbulb"></i> Music & Relaxation Tips
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Find a comfortable position
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Close your eyes and let the music guide you
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Focus on your breathing with the rhythm
+                            </li>
+                            <li class="mb-0">
+                                <i class="bi bi-check-circle text-success"></i> Allow yourself to fully relax and unwind
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .music-session-container {
+        min-height: calc(100vh - 140px);
+        background: linear-gradient(135deg, #f3e5f5 0%, #e8f5e9 100%);
+        padding: 20px 0;
+    }
+
+    .music-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .music-visual {
+        position: relative;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .music-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6A8EAE 0%, #9B7EDE 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(106, 142, 174, 0.3);
+        animation: musicPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes musicPulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .music-circle.playing {
+        animation: musicPlaying 1.5s ease-in-out infinite;
+    }
+
+    @keyframes musicPlaying {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 10px 30px rgba(106, 142, 174, 0.3);
+        }
+        50% {
+            transform: scale(1.2);
+            box-shadow: 0 15px 40px rgba(155, 126, 222, 0.5);
+        }
+    }
+
+    .audio-visualizer {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin: 20px 0;
+    }
+
+    .visualizer-bars {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 80px;
+    }
+
+    .bar {
+        width: 8px;
+        background: linear-gradient(180deg, #6A8EAE 0%, #9B7EDE 100%);
+        border-radius: 4px;
+        animation: barAnimation 1s ease-in-out infinite;
+    }
+
+    @keyframes barAnimation {
+        0%, 100% {
+            height: 20px;
+        }
+        50% {
+            height: 60px;
+        }
+    }
+
+    .timer-display {
+        display: flex;
+        justify-content: center;
+    }
+
+    .timer-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6A8EAE 0%, #9B7EDE 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 20px rgba(106, 142, 174, 0.3);
+    }
+
+    .timer-content {
+        text-align: center;
+        color: white;
+    }
+
+    .timer-text {
+        font-size: 2.5rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .timer-label {
+        font-size: 0.9rem;
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .control-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6A8EAE 0%, #9B7EDE 100%);
+        border: none;
+        padding: 12px 30px;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a7e9e 0%, #8b6dce 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(106, 142, 174, 0.3);
+    }
+
+    .progress-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .music-circle {
+            width: 150px;
+            height: 150px;
+        }
+
+        .timer-circle {
+            width: 120px;
+            height: 120px;
+        }
+
+        .timer-text {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        // Get music data from Thymeleaf
+        const musicTitle = /*[[${musicTitle}]]*/ 'Music';
+        const totalDuration = /*[[${musicDuration}]]*/ 30; // in minutes
+        const totalSeconds = totalDuration * 60;
+        
+        let remainingSeconds = totalDuration * 60;
+        let isRunning = false;
+        let intervalId = null;
+        let startTime = null;
+        let pausedTime = 0;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const musicCircle = document.getElementById('musicCircle');
+        const musicInstruction = document.getElementById('musicInstruction');
+        const musicStatus = document.getElementById('musicStatus');
+        const audioVisualizer = document.getElementById('audioVisualizer');
+        const completeSection = document.getElementById('completeSection');
+        const earlyCompleteSection = document.getElementById('earlyCompleteSection');
+        const completedDurationInput = document.getElementById('completedDuration');
+
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Update display
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(remainingSeconds);
+            const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressText.textContent = Math.round(progress) + '% Complete';
+        }
+
+        // Start timer
+        function startTimer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            startTime = Date.now() - (pausedTime * 1000);
+            musicCircle.classList.add('playing');
+            musicCircle.classList.remove('musicPulse');
+            audioVisualizer.style.display = 'flex';
+            musicInstruction.innerHTML = '<p class="h5 mb-0" style="color: #9B7EDE;">Now Playing</p>';
+            musicStatus.textContent = 'Relax and enjoy the calming sounds';
+            
+            playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i> Pause';
+            earlyCompleteSection.style.display = 'block';
+            
+            intervalId = setInterval(() => {
+                remainingSeconds--;
+                updateDisplay();
+                
+                if (remainingSeconds <= 0) {
+                    completeSession();
+                }
+            }, 1000);
+        }
+
+        // Pause timer
+        function pauseTimer() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            pausedTime = totalSeconds - remainingSeconds;
+            musicCircle.classList.remove('playing');
+            audioVisualizer.style.display = 'none';
+            musicInstruction.innerHTML = '<p class="h5 mb-0" style="color: #6A8EAE;">Paused</p>';
+            musicStatus.textContent = 'Click Resume to continue';
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Resume';
+        }
+
+        // Reset timer
+        function resetTimer() {
+            pauseTimer();
+            remainingSeconds = totalSeconds;
+            pausedTime = 0;
+            updateDisplay();
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Start';
+            earlyCompleteSection.style.display = 'none';
+            completeSection.style.display = 'none';
+            musicInstruction.innerHTML = '<p class="h5 mb-0" style="color: #7FB685;">Ready to Play</p>';
+            musicStatus.textContent = 'Press Start to begin your relaxation session';
+        }
+
+        // Complete session
+        function completeSession() {
+            pauseTimer();
+            const completedMinutes = Math.ceil((totalSeconds - remainingSeconds) / 60);
+            completedDurationInput.value = completedMinutes;
+            completeSection.style.display = 'block';
+            earlyCompleteSection.style.display = 'none';
+            
+            // Show completion message
+            musicInstruction.innerHTML = '<p class="h5 mb-0 text-success"><i class="bi bi-check-circle"></i> Session Complete!</p>';
+            musicStatus.textContent = 'Great job taking time for yourself!';
+        }
+
+        // Event listeners
+        playPauseBtn.addEventListener('click', () => {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetTimer);
+
+        document.getElementById('earlyCompleteBtn')?.addEventListener('click', () => {
+            if (confirm('Are you sure you want to complete this session early?')) {
+                completeSession();
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    })();
+</script>
+

@@ -1,0 +1,433 @@
+<!-- Meditation Session Page -->
+<div class="meditation-session-container">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <!-- Back Button -->
+                <div class="mb-3">
+                    <a th:href="@{/self-care}" class="btn btn-link text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Back to Self-Care
+                    </a>
+                </div>
+
+                <!-- Meditation Card -->
+                <div class="card meditation-card" style="border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                    <div class="card-body text-center p-5">
+                        <!-- Title -->
+                        <h2 class="mb-4" style="color: #6A8EAE; font-weight: 300;">
+                            <span style="font-size: 2rem;">🧘</span>
+                            <span th:text="${meditationTitle}"></span>
+                        </h2>
+                        <p class="text-muted mb-4">Take a moment to breathe and find your center</p>
+
+                        <!-- Breathing Circle Animation -->
+                        <div class="breathing-circle-container mb-4">
+                            <div class="breathing-circle" id="breathingCircle">
+                                <div class="breathing-inner">
+                                    <span style="font-size: 3rem;">💨</span>
+                                </div>
+                            </div>
+                            <div class="breathing-instruction mt-3" id="breathingInstruction">
+                                <p class="h5 mb-0" style="color: #7FB685;">Breathe In</p>
+                            </div>
+                        </div>
+
+                        <!-- Timer Display -->
+                        <div class="timer-display mb-4">
+                            <div class="timer-circle">
+                                <div class="timer-content">
+                                    <div class="timer-text" id="timerDisplay">00:00</div>
+                                    <div class="timer-label text-muted small">Time Remaining</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-container mb-4">
+                            <div class="progress" style="height: 8px; border-radius: 10px; background-color: #f0f0f0;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" 
+                                     id="progressBar"
+                                     style="background: linear-gradient(90deg, #6A8EAE, #7FB685);"
+                                     aria-valuenow="0" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2 small text-muted">
+                                <span>0%</span>
+                                <span id="progressText">0% Complete</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+
+                        <!-- Control Buttons -->
+                        <div class="control-buttons mb-4">
+                            <button type="button" class="btn btn-lg btn-primary me-2" id="playPauseBtn" style="min-width: 120px;">
+                                <i class="bi bi-play-fill"></i> Start
+                            </button>
+                            <button type="button" class="btn btn-lg btn-outline-secondary" id="resetBtn" style="min-width: 120px;">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </button>
+                        </div>
+
+                        <!-- Complete Button (hidden initially) -->
+                        <div id="completeSection" style="display: none;">
+                            <div class="alert alert-success mb-3">
+                                <i class="bi bi-check-circle"></i> Session Complete! Great job taking time for yourself.
+                            </div>
+                            <form th:action="@{/self-care/meditation/complete}" method="post" id="completeForm">
+                                <input type="hidden" name="title" th:value="${meditationTitle}">
+                                <input type="hidden" name="duration" th:value="${meditationDuration}">
+                                <input type="hidden" name="completedDuration" id="completedDuration">
+                                <div class="mb-3">
+                                    <label for="sessionNotes" class="form-label">Optional: Add notes about your session</label>
+                                    <textarea class="form-control" id="sessionNotes" name="notes" rows="3" 
+                                              placeholder="How are you feeling after this session?"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="bi bi-check-circle"></i> Complete Session
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Early Complete Button -->
+                        <div id="earlyCompleteSection" style="display: none;">
+                            <button type="button" class="btn btn-outline-warning" id="earlyCompleteBtn">
+                                <i class="bi bi-stop-circle"></i> Complete Early
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Card -->
+                <div class="card mt-4" style="border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <i class="bi bi-lightbulb"></i> Meditation Tips
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Find a comfortable, quiet space
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> Focus on your breathing and let thoughts pass
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i> It's okay if your mind wanders - gently bring it back
+                            </li>
+                            <li class="mb-0">
+                                <i class="bi bi-check-circle text-success"></i> There's no right or wrong way to meditate
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .meditation-session-container {
+        min-height: calc(100vh - 140px);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
+        padding: 20px 0;
+    }
+
+    .meditation-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .breathing-circle-container {
+        position: relative;
+        height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .breathing-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6A8EAE 0%, #7FB685 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 4s ease-in-out;
+        box-shadow: 0 10px 30px rgba(106, 142, 174, 0.3);
+        animation: breathe 8s infinite;
+    }
+
+    .breathing-circle.breathing-in {
+        animation: breatheIn 4s ease-in-out infinite;
+    }
+
+    .breathing-circle.breathing-out {
+        animation: breatheOut 4s ease-in-out infinite;
+    }
+
+    .breathing-inner {
+        color: white;
+        font-size: 3rem;
+    }
+
+    @keyframes breatheIn {
+        0% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(1.3);
+        }
+    }
+
+    @keyframes breatheOut {
+        0% {
+            transform: scale(1.3);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes breathe {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.3);
+        }
+    }
+
+    .breathing-instruction {
+        min-height: 40px;
+        transition: opacity 0.5s ease;
+    }
+
+    .timer-display {
+        display: flex;
+        justify-content: center;
+    }
+
+    .timer-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6A8EAE 0%, #7FB685 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 20px rgba(106, 142, 174, 0.3);
+    }
+
+    .timer-content {
+        text-align: center;
+        color: white;
+    }
+
+    .timer-text {
+        font-size: 2.5rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .timer-label {
+        font-size: 0.9rem;
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .control-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6A8EAE 0%, #7FB685 100%);
+        border: none;
+        padding: 12px 30px;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5a7e9e 0%, #6fa675 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(106, 142, 174, 0.3);
+    }
+
+    .progress-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+        }
+
+        .timer-circle {
+            width: 120px;
+            height: 120px;
+        }
+
+        .timer-text {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        // Get meditation duration from Thymeleaf
+        const totalDuration = /*[[${meditationDuration}]]*/ 10; // in minutes
+        const totalSeconds = totalDuration * 60;
+        
+        let remainingSeconds = totalDuration * 60;
+        let isRunning = false;
+        let intervalId = null;
+        let breathingIntervalId = null;
+        let startTime = null;
+        let pausedTime = 0;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const breathingCircle = document.getElementById('breathingCircle');
+        const breathingInstruction = document.getElementById('breathingInstruction');
+        const completeSection = document.getElementById('completeSection');
+        const earlyCompleteSection = document.getElementById('earlyCompleteSection');
+        const completedDurationInput = document.getElementById('completedDuration');
+
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Update display
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(remainingSeconds);
+            const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressText.textContent = Math.round(progress) + '% Complete';
+        }
+
+        // Start breathing animation
+        function startBreathingAnimation() {
+            let isBreathingIn = true;
+            
+            breathingIntervalId = setInterval(() => {
+                if (isBreathingIn) {
+                    breathingCircle.classList.remove('breathing-out');
+                    breathingCircle.classList.add('breathing-in');
+                    breathingInstruction.innerHTML = '<p class="h5 mb-0" style="color: #7FB685;">Breathe In</p>';
+                    isBreathingIn = false;
+                } else {
+                    breathingCircle.classList.remove('breathing-in');
+                    breathingCircle.classList.add('breathing-out');
+                    breathingInstruction.innerHTML = '<p class="h5 mb-0" style="color: #6A8EAE;">Breathe Out</p>';
+                    isBreathingIn = true;
+                }
+            }, 4000); // 4 seconds for each phase
+        }
+
+        // Stop breathing animation
+        function stopBreathingAnimation() {
+            if (breathingIntervalId) {
+                clearInterval(breathingIntervalId);
+                breathingIntervalId = null;
+            }
+            breathingCircle.classList.remove('breathing-in', 'breathing-out');
+            breathingInstruction.innerHTML = '<p class="h5 mb-0" style="color: #6A8EAE;">Ready to Begin</p>';
+        }
+
+        // Start timer
+        function startTimer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            startTime = Date.now() - (pausedTime * 1000);
+            startBreathingAnimation();
+            
+            playPauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i> Pause';
+            earlyCompleteSection.style.display = 'block';
+            
+            intervalId = setInterval(() => {
+                remainingSeconds--;
+                updateDisplay();
+                
+                if (remainingSeconds <= 0) {
+                    completeSession();
+                }
+            }, 1000);
+        }
+
+        // Pause timer
+        function pauseTimer() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            pausedTime = totalSeconds - remainingSeconds;
+            stopBreathingAnimation();
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+            
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Resume';
+        }
+
+        // Reset timer
+        function resetTimer() {
+            pauseTimer();
+            remainingSeconds = totalSeconds;
+            pausedTime = 0;
+            updateDisplay();
+            playPauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Start';
+            earlyCompleteSection.style.display = 'none';
+            completeSection.style.display = 'none';
+        }
+
+        // Complete session
+        function completeSession() {
+            pauseTimer();
+            const completedMinutes = Math.ceil((totalSeconds - remainingSeconds) / 60);
+            completedDurationInput.value = completedMinutes;
+            completeSection.style.display = 'block';
+            earlyCompleteSection.style.display = 'none';
+            
+            // Show completion message
+            breathingInstruction.innerHTML = '<p class="h5 mb-0 text-success"><i class="bi bi-check-circle"></i> Session Complete!</p>';
+        }
+
+        // Event listeners
+        playPauseBtn.addEventListener('click', () => {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetTimer);
+
+        document.getElementById('earlyCompleteBtn')?.addEventListener('click', () => {
+            if (confirm('Are you sure you want to complete this session early?')) {
+                completeSession();
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    })();
+</script>
+
