@@ -80,11 +80,18 @@
             align-items: center;
             gap: 15px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .professional-card:hover {
             border-color: #667eea;
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .professional-card.selected {
+            background: white;
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
         }
 
         .professional-card .avatar {
@@ -329,16 +336,20 @@
                         <i class="bi bi-person-check"></i> Professional
                     </div>
 
-                    <div class="professional-card">
-                        <div class="avatar">PC</div>
-                        <div class="professional-info">
-                            <p class="professional-name">Professional Counselor</p>
-                            <p class="professional-email">
-                                <i class="bi bi-envelope"></i> prof@educational.edu
-                            </p>
-                            <p class="professional-spec">Specialization: General Mental Health Support</p>
+                    <div id="professionalsContainer">
+                        <div th:each="prof : ${professionals}" class="professional-card" 
+                             th:onclick="selectProfessional(this, [[${prof.id}]], [[${prof.name}]])"
+                             style="cursor: pointer;">
+                            <div class="avatar" th:text="${prof.name.substring(0, 2).toUpperCase()}">PC</div>
+                            <div class="professional-info">
+                                <p class="professional-name" th:text="${prof.name}">Professional Counselor</p>
+                                <p class="professional-email">
+                                    <i class="bi bi-envelope"></i> <span th:text="${prof.email}">prof@educational.edu</span>
+                                </p>
+                                <p class="professional-spec">Specialization: General Mental Health Support</p>
+                            </div>
+                            <i class="bi bi-check-circle check-icon" style="display: none;"></i>
                         </div>
-                        <i class="bi bi-check-circle check-icon"></i>
                     </div>
 
                     <div class="divider"></div>
@@ -387,7 +398,7 @@
                         <a href="/mentalhealthhub/dashboard" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Back to Dashboard
                         </a>
-                        <a href="/mentalhealthhub/appointments" class="btn btn-info">
+                        <a href="/mentalhealthhub/appointments/my-schedule" class="btn btn-info">
                             <i class="bi bi-calendar-check"></i> View All Appointments
                         </a>
                         <button type="button" class="btn btn-primary" onclick="submitAppointment()">
@@ -419,6 +430,25 @@
 <script>
     let selectedDate = null;
     let selectedTime = null;
+    let selectedProfessionalId = null;
+    let selectedProfessionalName = null;
+
+    // Professional selection
+    function selectProfessional(element, profId, profName) {
+        // Remove selection from all professional cards
+        document.querySelectorAll('.professional-card').forEach(card => {
+            card.classList.remove('selected');
+            card.querySelector('.check-icon').style.display = 'none';
+        });
+
+        // Add selection to clicked card
+        element.classList.add('selected');
+        element.querySelector('.check-icon').style.display = 'block';
+        
+        selectedProfessionalId = profId;
+        selectedProfessionalName = profName;
+        updateSummary();
+    }
 
     // Date change listener
     document.getElementById('appointmentDate').addEventListener('change', function() {
@@ -441,7 +471,7 @@
     function updateSummary() {
         const summaryContent = document.getElementById('summaryContent');
 
-        if (!selectedDate && !selectedTime && !document.getElementById('notes').value) {
+        if (!selectedDate && !selectedTime && !selectedProfessionalId && !document.getElementById('notes').value) {
             summaryContent.innerHTML = `
                 <div class="summary-empty">
                     <i class="bi bi-info-circle"></i> Fill in your appointment details
@@ -451,6 +481,15 @@
         }
 
         let html = '';
+
+        if (selectedProfessionalId) {
+            html += `
+                <div class="summary-item">
+                    <span class="summary-label"><i class="bi bi-person"></i> With:</span>
+                    <span class="summary-value">${selectedProfessionalName}</span>
+                </div>
+            `;
+        }
 
         if (selectedDate) {
             const dateObj = new Date(selectedDate);
@@ -483,13 +522,6 @@
             `;
         }
 
-        html += `
-            <div class="summary-item">
-                <span class="summary-label"><i class="bi bi-person"></i> With:</span>
-                <span class="summary-value">Professional Counselor</span>
-            </div>
-        `;
-
         const notes = document.getElementById('notes').value;
         if (notes) {
             html += `
@@ -504,6 +536,11 @@
     }
 
     function submitAppointment() {
+        if (!selectedProfessionalId) {
+            alert('Please select a professional');
+            return;
+        }
+
         if (!selectedDate) {
             alert('Please select a date for your appointment');
             return;
@@ -524,7 +561,7 @@
 
         // Add hidden fields
         const fields = {
-            'professionalId': '1', // Fixed professional ID
+            'professionalId': selectedProfessionalId,
             'appointmentDate': appointmentDateTime,
             'notes': document.getElementById('notes').value || ''
         };
