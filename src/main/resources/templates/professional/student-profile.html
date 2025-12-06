@@ -170,7 +170,7 @@
                                     <small class="text-muted" th:text="${#temporals.format(assessment.completedAt, 'dd MMM yyyy')}">Date</small>
                                 </div>
                                 <span class="badge" 
-                                      th:classappend="${assessment.totalScore >= 24 ? 'bg-success' : assessment.totalScore >= 16 ? 'bg-info' : 'bg-warning'}"
+                                      th:classappend="${assessment.totalScore >= 25 ? 'bg-danger' : assessment.totalScore >= 17 ? 'bg-warning' : assessment.totalScore >= 9 ? 'bg-info' : 'bg-success'}"
                                       th:text="${assessment.totalScore} + ' / 32'">Score</span>
                             </div>
                             <small class="text-muted d-block mb-2" th:text="${assessment.result}">Result category</small>
