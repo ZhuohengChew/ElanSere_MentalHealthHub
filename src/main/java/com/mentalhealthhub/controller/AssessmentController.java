@@ -4,6 +4,7 @@ import com.mentalhealthhub.dto.AssessmentQuestionDTO;
 import com.mentalhealthhub.dto.AssessmentResultDTO;
 import com.mentalhealthhub.model.Assessment;
 import com.mentalhealthhub.model.User;
+import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.service.AssessmentService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class AssessmentController {
 
     @Autowired
     private AssessmentService assessmentService;
+
+    @Autowired
+    private com.mentalhealthhub.repository.AssessmentRepository assessmentRepository;
 
     @GetMapping
     public String listAssessments(Model model, HttpSession session) {
@@ -160,12 +164,20 @@ public class AssessmentController {
             return "redirect:/login";
         }
 
-        Assessment assessment = assessmentService.getUserAssessments(user).stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        Assessment assessment = assessmentRepository.findById(id).orElse(null);
 
         if (assessment == null) {
+            return "redirect:/assessments";
+        }
+
+        // Allow viewing if:
+        // 1. User is the student who took the assessment
+        // 2. User is a PROFESSIONAL (can view any student's assessment)
+        // 3. User is ADMIN or STAFF
+        if (!assessment.getUser().getId().equals(user.getId()) &&
+            user.getRole() != UserRole.PROFESSIONAL &&
+            user.getRole() != UserRole.ADMIN &&
+            user.getRole() != UserRole.STAFF) {
             return "redirect:/assessments";
         }
 

@@ -161,95 +161,14 @@
                                         <small class="text-muted" th:text="${assessment.answers}">Answers</small>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" 
-                                                th:attr="data-bs-target='#assessmentModal' + ${assessment.id}"
-                                                onclick="loadAssessmentDetails(this)">
-                                            View
-                                        </button>
+                                        <a th:href="@{/assessments/{id}(id=${assessment.id})}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Assessment Details Modals -->
-    <div th:each="assessment : ${assessments}" class="modal fade" 
-         th:id="'assessmentModal' + ${assessment.id}" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title">Assessment Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <h6 class="text-muted small">Assessment Date</h6>
-                        <p th:text="${#temporals.format(assessment.completedAt, 'MMMM dd, yyyy hh:mm a')}">Date</p>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h6 class="text-muted small">Total Score</h6>
-                            <p><strong th:text="${assessment.totalScore} + ' / 32'">0/32</strong></p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted small">Category</h6>
-                            <p>
-                                <span class="badge" th:classappend="${assessment.category == 'SEVERE' ? 'bg-danger' : assessment.category == 'MODERATE' ? 'bg-warning text-dark' : assessment.category == 'MILD' ? 'bg-info' : 'bg-success'}" 
-                                      th:text="${assessment.category}">
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <h6 class="text-muted small">Question Responses</h6>
-                        <table class="table table-sm">
-                            <tbody>
-                                <tr>
-                                    <td>Q1: Felt overwhelmed</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q1Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q2: Difficulty concentrating</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q2Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q3: Nervous/anxious</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q3Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q4: Felt down/depressed</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q4Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q5: Sleep troubles</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q5Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q6: Felt tired/low energy</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q6Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q7: Bad about yourself</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q7Score}">0</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Q8: Thoughts of self-harm</td>
-                                    <td><span class="badge bg-secondary" th:text="${assessment.q8Score}">0</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mb-3">
-                        <h6 class="text-muted small">Assessment Notes</h6>
-                        <p class="border-start ps-3" th:text="${assessment.result} ?: 'No additional notes'">Notes</p>
-                    </div>
-                </div>
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -269,10 +188,3 @@
     background-color: #f8f9fa;
 }
 </style>
-
-<script>
-function loadAssessmentDetails(button) {
-    // Modal content is pre-rendered, so this is just a placeholder
-    // In a real application, you might fetch details via AJAX
-}
-</script>

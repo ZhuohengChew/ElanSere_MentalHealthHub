@@ -173,7 +173,13 @@
                                       th:classappend="${assessment.totalScore >= 24 ? 'bg-success' : assessment.totalScore >= 16 ? 'bg-info' : 'bg-warning'}"
                                       th:text="${assessment.totalScore} + ' / 32'">Score</span>
                             </div>
-                            <small class="text-muted d-block" th:text="${assessment.result}">Result category</small>
+                            <small class="text-muted d-block mb-2" th:text="${assessment.result}">Result category</small>
+                            <a th:if="${assessment.id}" th:href="@{/assessments/{id}(id=${assessment.id})}" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a th:unless="${assessment.id}" href="#" class="btn btn-sm btn-outline-secondary disabled">
+                                <i class="bi bi-eye"></i> View
+                            </a>
                         </div>
                         <div th:if="${#lists.size(assessments) > 5}" class="text-center mt-3">
                             <small class="text-muted" th:text="'and ' + (${#lists.size(assessments)} - 5) + ' more assessments'">and more</small>

@@ -1,5 +1,4 @@
 <!-- Assessment View - Enhanced with Better Formatting -->
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <style>
     .assessment-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -247,10 +246,7 @@
 </style>
 
 <div class="container-fluid py-5">
-    <!-- Back Button (hidden for professionals) -->
-    <a th:href="@{/assessments}" class="back-button" sec:authorize="hasRole('STUDENT')">
-        <i class="bi bi-arrow-left"></i> Back to Assessments
-    </a>
+    <!-- Back Button -->
 
     <!-- Header Section -->
     <div class="assessment-header">

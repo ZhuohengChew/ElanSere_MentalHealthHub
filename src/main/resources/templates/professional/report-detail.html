@@ -295,6 +295,9 @@
                     <button type="button" class="btn-back" onclick="history.back()">
                         <i class="bi bi-x"></i> Cancel
                     </button>
+                    <a th:if="${student != null}" th:href="@{/professional/students/{id}(id=${student.id})}" class="btn-book" style="display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                        <i class="bi bi-person-circle"></i> View Patient Detail
+                    </a>
                     <button type="button" class="btn-book" data-bs-toggle="modal" data-bs-target="#appointmentModal">
                         <i class="bi bi-calendar-plus"></i> Schedule Appointment
                     </button>

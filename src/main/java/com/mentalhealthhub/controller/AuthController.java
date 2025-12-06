@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.Report;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.ReportRepository;
 import com.mentalhealthhub.repository.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +31,9 @@ public class AuthController {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
 
     @GetMapping("/")
     public String index() {
@@ -123,11 +128,15 @@ public class AuthController {
                     .filter(u -> u.getRole() == UserRole.STUDENT)
                     .collect(Collectors.toList());
 
+                // Fetch all reports
+                List<Report> reports = reportRepository.findAll();
+
                 model.addAttribute("todayAppointmentsCount", todayCount);
                 model.addAttribute("activeClientsCount", activeClients);
                 model.addAttribute("sessionsCompleted", sessionsCompleted);
                 model.addAttribute("todayAppointments", todayAppointments);
                 model.addAttribute("patientsList", patientsList);
+                model.addAttribute("reports", reports);
                 break;
             case ADMIN:
                 dashboardPage = "dashboard/admin-dashboard";
