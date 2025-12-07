@@ -11,8 +11,12 @@ import java.util.Optional;
 @Repository
 public interface ModuleProgressRepository extends JpaRepository<ModuleProgress, Long> {
     List<ModuleProgress> findByUser(User user);
-    Optional<ModuleProgress> findByUserAndModule(User user, EducationalModule module);
-    List<ModuleProgress> findByUserAndCompletedTrue(User user);
-    Long countByUserAndCompletedTrue(User user);
-}
 
+    Optional<ModuleProgress> findByUserAndModule(User user, EducationalModule module);
+
+    List<ModuleProgress> findByUserAndCompletedTrue(User user);
+
+    Long countByUserAndCompletedTrue(User user);
+
+    void deleteByModule(EducationalModule module);
+}

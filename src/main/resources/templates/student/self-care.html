@@ -25,7 +25,8 @@
     <!-- Tabs -->
     <ul class="nav nav-tabs mb-4" id="selfCareTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="meditation-tab" data-bs-toggle="tab" data-bs-target="#meditation" type="button" role="tab">
+            <button class="nav-link active" id="meditation-tab" data-bs-toggle="tab" data-bs-target="#meditation"
+                type="button" role="tab">
                 Meditation
             </button>
         </li>
@@ -35,17 +36,20 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="breathing-tab" data-bs-toggle="tab" data-bs-target="#breathing" type="button" role="tab">
+            <button class="nav-link" id="breathing-tab" data-bs-toggle="tab" data-bs-target="#breathing" type="button"
+                role="tab">
                 Breathing
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="exercises-tab" data-bs-toggle="tab" data-bs-target="#exercises" type="button" role="tab">
+            <button class="nav-link" id="exercises-tab" data-bs-toggle="tab" data-bs-target="#exercises" type="button"
+                role="tab">
                 Exercises
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="music-tab" data-bs-toggle="tab" data-bs-target="#music" type="button" role="tab">
+            <button class="nav-link" id="music-tab" data-bs-toggle="tab" data-bs-target="#music" type="button"
+                role="tab">
                 Music
             </button>
         </li>
@@ -63,8 +67,9 @@
                     <div class="row g-4">
                         <div class="col-md-4">
                             <div class="card h-100">
-                                <img src="https://images.unsplash.com/photo-1606733572375-35620adc4a18?w=400" 
-                                     class="card-img-top" alt="Morning Mindfulness" style="height: 200px; object-fit: cover;">
+                                <img src="https://images.unsplash.com/photo-1606733572375-35620adc4a18?w=400"
+                                    class="card-img-top" alt="Morning Mindfulness"
+                                    style="height: 200px; object-fit: cover;">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title">Morning Mindfulness</h5>
@@ -85,8 +90,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="card h-100">
-                                <img src="https://images.unsplash.com/photo-1758599879728-d7079db6505b?w=400" 
-                                     class="card-img-top" alt="Stress Relief" style="height: 200px; object-fit: cover;">
+                                <img src="https://images.unsplash.com/photo-1758599879728-d7079db6505b?w=400"
+                                    class="card-img-top" alt="Stress Relief" style="height: 200px; object-fit: cover;">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title">Stress Relief</h5>
@@ -107,8 +112,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="card h-100">
-                                <img src="https://images.unsplash.com/photo-1713428856080-43fc975d2496?w=400" 
-                                     class="card-img-top" alt="Sleep Preparation" style="height: 200px; object-fit: cover;">
+                                <img src="https://images.unsplash.com/photo-1713428856080-43fc975d2496?w=400"
+                                    class="card-img-top" alt="Sleep Preparation"
+                                    style="height: 200px; object-fit: cover;">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h5 class="card-title">Sleep Preparation</h5>
@@ -143,11 +149,11 @@
                     <form th:action="@{/self-care/mood}" method="post" id="moodForm">
                         <div class="row g-3 mb-4">
                             <div class="col-6 col-md-4 col-lg-2">
-                                <input type="radio" class="btn-check" name="mood" id="mood-great" value="great" 
-                                       th:checked="${todayMood != null && todayMood.mood == 'great'}" required>
+                                <input type="radio" class="btn-check" name="mood" id="mood-great" value="great"
+                                    th:checked="${todayMood != null && todayMood.mood == 'great'}">
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-great">
-                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                         style="width: 48px; height: 48px;">
+                                    <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                        style="width: 48px; height: 48px;">
                                         <span style="font-size: 1.5rem;">😊</span>
                                     </div>
                                     <div class="small">Great</div>
@@ -155,10 +161,10 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-good" value="good"
-                                       th:checked="${todayMood != null && todayMood.mood == 'good'}" required>
+                                    th:checked="${todayMood != null && todayMood.mood == 'good'}">
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-good">
-                                    <div class="bg-success bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                         style="width: 48px; height: 48px;">
+                                    <div class="bg-success bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                        style="width: 48px; height: 48px;">
                                         <span style="font-size: 1.5rem;">🙂</span>
                                     </div>
                                     <div class="small">Good</div>
@@ -166,10 +172,10 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-okay" value="okay"
-                                       th:checked="${todayMood != null && todayMood.mood == 'okay'}" required>
+                                    th:checked="${todayMood != null && todayMood.mood == 'okay'}">
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-okay">
-                                    <div class="bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                         style="width: 48px; height: 48px;">
+                                    <div class="bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                        style="width: 48px; height: 48px;">
                                         <span style="font-size: 1.5rem;">😐</span>
                                     </div>
                                     <div class="small">Okay</div>
@@ -177,21 +183,22 @@
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
                                 <input type="radio" class="btn-check" name="mood" id="mood-low" value="low"
-                                       th:checked="${todayMood != null && todayMood.mood == 'low'}" required>
+                                    th:checked="${todayMood != null && todayMood.mood == 'low'}">
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-low">
-                                    <div class="bg-warning bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                         style="width: 48px; height: 48px;">
+                                    <div class="bg-warning bg-opacity-75 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                        style="width: 48px; height: 48px;">
                                         <span style="font-size: 1.5rem;">😔</span>
                                     </div>
                                     <div class="small">Low</div>
                                 </label>
                             </div>
                             <div class="col-6 col-md-4 col-lg-2">
-                                <input type="radio" class="btn-check" name="mood" id="mood-struggling" value="struggling"
-                                       th:checked="${todayMood != null && todayMood.mood == 'struggling'}" required>
+                                <input type="radio" class="btn-check" name="mood" id="mood-struggling"
+                                    value="struggling"
+                                    th:checked="${todayMood != null && todayMood.mood == 'struggling'}">
                                 <label class="btn btn-outline-primary w-100 p-4 text-center" for="mood-struggling">
-                                    <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                                         style="width: 48px; height: 48px;">
+                                    <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                        style="width: 48px; height: 48px;">
                                         <span style="font-size: 1.5rem;">😢</span>
                                     </div>
                                     <div class="small">Struggling</div>
@@ -207,7 +214,9 @@
                     </form>
 
                     <div th:if="${todayMood != null}" class="alert alert-success mt-3">
-                        <span style="font-size: 1rem;">✅</span> Mood logged for <span th:text="${#temporals.format(todayMood.activityDate, 'MMMM dd, yyyy')}"></span>. Keep tracking daily to see your patterns!
+                        <span style="font-size: 1rem;">✅</span> Mood logged for <span
+                            th:text="${#temporals.format(todayMood.activityDate, 'MMMM dd, yyyy')}"></span>. Keep
+                        tracking daily to see your patterns!
                     </div>
                 </div>
             </div>
@@ -226,20 +235,20 @@
                         <div th:each="mood : ${moodHistory}" class="d-flex align-items-center mb-3">
                             <div class="w-100 me-3">
                                 <div class="progress" style="height: 30px;">
-                                    <div class="progress-bar" 
-                                         th:classappend="${mood.mood == 'great'} ? 'bg-success' : 
-                                                          (mood.mood == 'good') ? 'bg-success bg-opacity-75' : 
-                                                          (mood.mood == 'okay') ? 'bg-warning' : 
-                                                          (mood.mood == 'low') ? 'bg-warning bg-opacity-75' : 'bg-danger'"
-                                         th:style="${mood.mood == 'great'} ? 'width: 100%' : 
-                                                          (mood.mood == 'good') ? 'width: 80%' : 
-                                                          (mood.mood == 'okay') ? 'width: 60%' : 
-                                                          (mood.mood == 'low') ? 'width: 40%' : 'width: 20%'">
+                                    <div class="progress-bar"
+                                        th:classappend="${mood.mood == 'great' ? 'bg-success' : 
+                                                          (mood.mood == 'good' ? 'bg-success bg-opacity-75' : 
+                                                          (mood.mood == 'okay' ? 'bg-warning' : 
+                                                          (mood.mood == 'low' ? 'bg-warning bg-opacity-75' : 'bg-danger')))}" th:style="${mood.mood == 'great' ? 'width: 100%' : 
+                                                          (mood.mood == 'good' ? 'width: 80%' : 
+                                                          (mood.mood == 'okay' ? 'width: 60%' : 
+                                                          (mood.mood == 'low' ? 'width: 40%' : 'width: 20%')))}">
                                         <span th:text="${#strings.capitalize(mood.mood)}"></span>
                                     </div>
                                 </div>
                             </div>
-                            <small class="text-muted" th:text="${#temporals.format(mood.activityDate, 'MMM dd')}"></small>
+                            <small class="text-muted"
+                                th:text="${#temporals.format(mood.activityDate, 'MMM dd')}"></small>
                         </div>
                     </div>
                 </div>
@@ -256,17 +265,18 @@
                 <div class="card-body">
                     <div class="row justify-content-center">
                         <div class="col-md-8">
-                            <div class="bg-gradient-to-br from-primary to-success rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center" 
-                                 style="width: 256px; height: 256px; background: linear-gradient(135deg, #6A8EAE, #7FB685);">
+                            <div class="bg-gradient-to-br from-primary to-success rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center"
+                                style="width: 256px; height: 256px; background: linear-gradient(135deg, #6A8EAE, #7FB685);">
                                 <span style="font-size: 5rem; color: white;">💨</span>
                             </div>
 
                             <form th:action="@{/self-care/breathing}" method="post">
                                 <div class="mb-4">
-                                    <label class="form-label">Breath Duration: <span id="breathDurationValue">4</span> seconds</label>
-                                    <input type="range" class="form-range" name="breathDuration" id="breathDuration" 
-                                           min="3" max="8" value="4" step="1" 
-                                           oninput="document.getElementById('breathDurationValue').textContent = this.value">
+                                    <label class="form-label">Breath Duration: <span id="breathDurationValue">4</span>
+                                        seconds</label>
+                                    <input type="range" class="form-range" name="breathDuration" id="breathDuration"
+                                        min="3" max="8" value="4" step="1"
+                                        oninput="document.getElementById('breathDurationValue').textContent = this.value">
                                 </div>
 
                                 <div class="bg-light rounded p-4 mb-4">
@@ -365,13 +375,18 @@
                                 </div>
                                 <div class="card-body">
                                     <p class="small text-muted mb-3">
-                                        Systematically tense and relax different muscle groups to release physical tension.
+                                        Systematically tense and relax different muscle groups to release physical
+                                        tension.
                                     </p>
                                     <div class="bg-light rounded p-3 mb-3 small">
-                                        <p class="mb-1"><strong>1.</strong> Start with your toes - tense for 5 seconds, then release</p>
-                                        <p class="mb-1"><strong>2.</strong> Move up to calves, thighs, abdomen, chest</p>
-                                        <p class="mb-1"><strong>3.</strong> Continue with hands, arms, shoulders, neck, face</p>
-                                        <p class="mb-0"><strong>4.</strong> Notice the difference between tension and relaxation</p>
+                                        <p class="mb-1"><strong>1.</strong> Start with your toes - tense for 5 seconds,
+                                            then release</p>
+                                        <p class="mb-1"><strong>2.</strong> Move up to calves, thighs, abdomen, chest
+                                        </p>
+                                        <p class="mb-1"><strong>3.</strong> Continue with hands, arms, shoulders, neck,
+                                            face</p>
+                                        <p class="mb-0"><strong>4.</strong> Notice the difference between tension and
+                                            relaxation</p>
                                     </div>
                                     <form th:action="@{/self-care/exercise}" method="post">
                                         <input type="hidden" name="title" value="Progressive Muscle Relaxation">
@@ -396,14 +411,17 @@
                                     </p>
                                     <div class="bg-light rounded p-3 mb-3 small">
                                         <p class="mb-1"><strong>1.</strong> Walk slowly, focusing on each step</p>
-                                        <p class="mb-1"><strong>2.</strong> Notice the sensation of your feet touching the ground</p>
+                                        <p class="mb-1"><strong>2.</strong> Notice the sensation of your feet touching
+                                            the ground</p>
                                         <p class="mb-1"><strong>3.</strong> Pay attention to your breathing rhythm</p>
-                                        <p class="mb-0"><strong>4.</strong> Observe your surroundings without judgment</p>
+                                        <p class="mb-0"><strong>4.</strong> Observe your surroundings without judgment
+                                        </p>
                                     </div>
                                     <form th:action="@{/self-care/exercise}" method="post">
                                         <input type="hidden" name="title" value="Mindful Walking">
                                         <input type="hidden" name="duration" value="10">
-                                        <button type="submit" class="btn btn-primary w-100" style="background-color: #9B7EDE; border-color: #9B7EDE;">
+                                        <button type="submit" class="btn btn-primary w-100"
+                                            style="background-color: #9B7EDE; border-color: #9B7EDE;">
                                             <span style="font-size: 1rem;">▶️</span> Start Guided Walk (10 min)
                                         </button>
                                     </form>
@@ -451,7 +469,8 @@
                                     </p>
                                     <div class="bg-light rounded p-3 mb-3 small">
                                         <p class="mb-1"><strong>1.</strong> Neck rolls - slowly rotate your head</p>
-                                        <p class="mb-1"><strong>2.</strong> Shoulder shrugs - lift and drop shoulders</p>
+                                        <p class="mb-1"><strong>2.</strong> Shoulder shrugs - lift and drop shoulders
+                                        </p>
                                         <p class="mb-1"><strong>3.</strong> Arm stretches - reach up and across</p>
                                         <p class="mb-0"><strong>4.</strong> Seated twists - gentle spine rotation</p>
                                     </div>
@@ -486,7 +505,8 @@
                                     <small class="text-muted">Gentle ocean sounds for deep relaxation</small>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 small text-muted">
                                         <span><span style="font-size: 0.9rem;">🕐</span> 30 min</span>
                                     </div>
                                     <form th:action="@{/self-care/music}" method="post">
@@ -506,7 +526,8 @@
                                     <small class="text-muted">Soothing rain sounds to calm your mind</small>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 small text-muted">
                                         <span><span style="font-size: 0.9rem;">🕐</span> 45 min</span>
                                     </div>
                                     <form th:action="@{/self-care/music}" method="post">
@@ -526,7 +547,8 @@
                                     <small class="text-muted">Peaceful piano melodies for mindfulness</small>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 small text-muted">
                                         <span><span style="font-size: 0.9rem;">🕐</span> 25 min</span>
                                     </div>
                                     <form th:action="@{/self-care/music}" method="post">
@@ -546,7 +568,8 @@
                                     <small class="text-muted">Natural forest sounds with birds chirping</small>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 small text-muted">
                                         <span><span style="font-size: 0.9rem;">🕐</span> 60 min</span>
                                     </div>
                                     <form th:action="@{/self-care/music}" method="post">
@@ -566,7 +589,8 @@
                                     <small class="text-muted">Warm fireplace sounds for cozy relaxation</small>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 small text-muted">
                                         <span><span style="font-size: 0.9rem;">🕐</span> 40 min</span>
                                     </div>
                                     <form th:action="@{/self-care/music}" method="post">
@@ -586,7 +610,8 @@
                                     <small class="text-muted">Ethereal ambient music for deep focus</small>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3 small text-muted">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-3 small text-muted">
                                         <span><span style="font-size: 0.9rem;">🕐</span> 50 min</span>
                                     </div>
                                     <form th:action="@{/self-care/music}" method="post">
@@ -645,63 +670,33 @@
 
 <script>
     // Update breathing display when slider changes
-    const breathDurationSlider = document.getElementById('breathDuration');
-    if (breathDurationSlider) {
-        breathDurationSlider.addEventListener('input', function() {
-            const value = this.value;
-            const breatheIn = document.getElementById('breatheIn');
-            const hold1 = document.getElementById('hold1');
-            const breatheOut = document.getElementById('breatheOut');
-            const hold2 = document.getElementById('hold2');
-            if (breatheIn) breatheIn.textContent = value + 's';
-            if (hold1) hold1.textContent = value + 's';
-            if (breatheOut) breatheOut.textContent = value + 's';
-            if (hold2) hold2.textContent = value + 's';
-        });
-    }
-
-    // Mood form validation
-    document.getElementById('moodForm')?.addEventListener('submit', function(e) {
-        const selectedMood = document.querySelector('input[name="mood"]:checked');
-        const errorDiv = document.getElementById('moodError');
-        
-        if (!selectedMood) {
-            e.preventDefault();
-            if (errorDiv) {
-                errorDiv.style.display = 'block';
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-            return false;
-        } else {
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
-        }
+    document.getElementById('breathDuration')?.addEventListener('input', function () {
+        const value = this.value;
+        document.getElementById('breatheIn').textContent = value + 's';
+        document.getElementById('hold1').textContent = value + 's';
+        document.getElementById('breatheOut').textContent = value + 's';
+        document.getElementById('hold2').textContent = value + 's';
     });
 
-    // Tab switching - let Bootstrap handle it natively, only customize initial tab selection
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get activeTab from hidden input (flash attribute from server)
-        const activeTabInput = document.getElementById('activeTabValue');
-        let activeTabFromServer = activeTabInput ? activeTabInput.value : null;
-        
-        // Fallback: Check success message for mood-related text
-        if (!activeTabFromServer || activeTabFromServer.trim() === '') {
-            const successMessage = document.querySelector('.alert-success');
-            if (successMessage && successMessage.textContent.includes('Mood logged')) {
-                activeTabFromServer = 'mood';
-            }
-        }
-        
-        // Ensure default tab state is correct (meditation tab should be active by default)
-        const defaultTab = document.querySelector('[data-bs-target="#meditation"]');
-        const defaultPane = document.querySelector('#meditation');
-        
-        // Function to switch tabs manually (fallback)
-        function switchTabManually(tabButton, paneId) {
-            // Remove active from all tabs
-            document.querySelectorAll('#selfCareTabs .nav-link').forEach(link => {
-                link.classList.remove('active');
+    // Fixed tab switching - simple and reliable approach
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check for flash attribute indicating which tab to show
+        const successMessage = document.querySelector('.alert-success');
+        const shouldShowMoodTab = successMessage && successMessage.textContent.includes('Mood logged');
+
+        // Initialize tab switching - simple event delegation
+        const tabList = document.querySelector('#selfCareTabs');
+        if (tabList) {
+            tabList.addEventListener('click', function (e) {
+                const button = e.target.closest('[data-bs-toggle="tab"]');
+                if (button) {
+                    const targetId = button.getAttribute('data-bs-target');
+                    if (targetId) {
+                        // Allow all tabs to switch freely
+                        const tab = new bootstrap.Tab(button);
+                        tab.show();
+                    }
+                }
             });
             // Remove active from all panes
             document.querySelectorAll('.tab-pane').forEach(pane => {
@@ -717,19 +712,13 @@
             }
         }
 
-        // Show specific tab if activeTab is set from server (e.g., after mood save)
-        if (activeTabFromServer && activeTabFromServer.trim() !== '') {
-            setTimeout(function() {
-                const targetTab = document.querySelector('[data-bs-target="#' + activeTabFromServer + '"]');
-                if (targetTab) {
-                    try {
-                        // Use Bootstrap's Tab API for proper activation
-                        const tab = new bootstrap.Tab(targetTab);
-                        tab.show();
-                    } catch (error) {
-                        // Fallback manual switching
-                        switchTabManually(targetTab, '#' + activeTabFromServer);
-                    }
+        // Show mood tab if we just submitted mood, otherwise show default
+        if (shouldShowMoodTab) {
+            setTimeout(function () {
+                const moodTab = document.querySelector('[data-bs-target="#mood"]');
+                if (moodTab) {
+                    const tab = new bootstrap.Tab(moodTab);
+                    tab.show();
                 }
             }, 300);
         } else {
@@ -776,11 +765,13 @@
     .nav-tabs .nav-link {
         color: #6c757d;
     }
+
     .nav-tabs .nav-link.active {
         color: #495057;
         font-weight: 600;
     }
-    .btn-check:checked + .btn {
+
+    .btn-check:checked+.btn {
         border-color: #6A8EAE;
         background-color: rgba(106, 142, 174, 0.1);
     }

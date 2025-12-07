@@ -27,7 +27,7 @@ public class ForumController {
 
     @GetMapping
     public String listPosts(Model model, HttpSession session,
-                           @RequestParam(required = false) String category) {
+            @RequestParam(required = false) String category) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -40,7 +40,7 @@ public class ForumController {
         } else {
             posts = forumPostRepository.findAllByOrderByCreatedAtDesc();
         }
-        
+
         // Limit to prevent lag (only show recent 50 posts)
         if (posts.size() > 50) {
             posts = posts.subList(0, 50);
@@ -50,8 +50,8 @@ public class ForumController {
         long totalPosts = forumPostRepository.count();
         long userPosts = forumPostRepository.countByUser(user);
         long totalInteractions = forumPostRepository.findAll().stream()
-            .mapToLong(p -> (long) p.getReplies())
-            .sum();
+                .mapToLong(p -> (long) p.getReplies())
+                .sum();
 
         model.addAttribute("posts", posts);
         model.addAttribute("user", user);
@@ -84,7 +84,7 @@ public class ForumController {
 
         // Get comments
         List<ForumComment> comments = commentRepository.findByPostOrderByCreatedAtAsc(post);
-        
+
         // Update replies count
         post.setReplies(comments.size());
         forumPostRepository.save(post);
@@ -116,37 +116,37 @@ public class ForumController {
 
     @PostMapping("/save")
     public String savePost(@RequestParam String title,
-                           @RequestParam String content,
-                           @RequestParam(required = false) String category,
-                           HttpSession session,
-                           RedirectAttributes redirectAttributes) {
+            @RequestParam String content,
+            @RequestParam(required = false) String category,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
 
         ForumPost post = ForumPost.builder()
-            .user(user)
-            .title(title)
-            .content(content)
-            .category(category != null && !category.isEmpty() ? category : "General")
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .views(0)
-            .replies(0)
-            .build();
+                .user(user)
+                .title(title)
+                .content(content)
+                .category(category != null && !category.isEmpty() ? category : "General")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .views(0)
+                .replies(0)
+                .build();
 
         forumPostRepository.save(post);
         redirectAttributes.addFlashAttribute("success", "Your post has been published successfully! 🎉");
-        
+
         return "redirect:/forum";
     }
 
     @PostMapping("/{id}/comment")
     public String addComment(@PathVariable Long id,
-                            @RequestParam String content,
-                            HttpSession session,
-                            RedirectAttributes redirectAttributes) {
+            @RequestParam String content,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -171,7 +171,7 @@ public class ForumController {
         forumPostRepository.save(post);
 
         redirectAttributes.addFlashAttribute("success", "Comment posted successfully!");
-        
+
         return "redirect:/forum/" + id;
     }
 }
