@@ -21,10 +21,10 @@
                 <div class="card-body">
                     <div class="d-flex gap-3 mb-3">
                         <div class="flex-shrink-0">
-                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" 
-                                 style="width: 48px; height: 48px;">
-                                <span class="text-primary fw-bold" 
-                                      th:text="${#strings.substring(post.user.name, 0, 2).toUpperCase()}">AS</span>
+                            <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                style="width: 48px; height: 48px;">
+                                <span class="text-primary fw-bold"
+                                    th:text="${post.user.name != null && post.user.name.length() >= 2 ? #strings.substring(post.user.name, 0, 2).toUpperCase() : (post.user.name != null ? post.user.name.toUpperCase() : 'AN')}">AS</span>
                             </div>
                         </div>
                         <div class="flex-grow-1">
@@ -32,15 +32,16 @@
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <small class="text-muted">
                                     <span th:text="${post.user.name}">Anonymous Student</span> •
-                                    <span th:text="${#temporals.format(post.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                    <span
+                                        th:text="${#temporals.format(post.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
                                 </small>
-                                <span class="badge" 
-                                      th:classappend="${post.category == 'Academic Stress'} ? 'bg-warning text-dark' : 
-                                                      (post.category == 'Anxiety') ? 'bg-warning text-dark' : 
-                                                      (post.category == 'Depression') ? 'bg-info text-white' : 
-                                                      (post.category == 'Self-Care') ? 'bg-success' : 
-                                                      (post.category == 'Motivation') ? 'bg-primary' : 'bg-secondary'"
-                                      th:text="${post.category != null ? post.category : 'General'}">Category</span>
+                                <span class="badge"
+                                    th:classappend="${post.category == 'Academic Stress' ? 'bg-warning text-dark' : 
+                                                      (post.category == 'Anxiety' ? 'bg-warning text-dark' : 
+                                                      (post.category == 'Depression' ? 'bg-info text-white' : 
+                                                      (post.category == 'Self-Care' ? 'bg-success' : 
+                                                      (post.category == 'Motivation' ? 'bg-primary' : 'bg-secondary'))))}"
+                                    th:text="${post.category != null ? post.category : 'General'}">Category</span>
                             </div>
                         </div>
                     </div>
@@ -64,20 +65,23 @@
                         <div class="mb-3" th:each="comment : ${comments}">
                             <div class="d-flex gap-3">
                                 <div class="flex-shrink-0">
-                                    <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center" 
-                                         style="width: 40px; height: 40px;">
-                                        <span class="text-success fw-bold small" 
-                                              th:text="${#strings.substring(comment.user.name, 0, 2).toUpperCase()}">AS</span>
+                                    <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center"
+                                        style="width: 40px; height: 40px;">
+                                        <span class="text-success fw-bold small"
+                                            th:text="${comment.user.name != null && comment.user.name.length() >= 2 ? #strings.substring(comment.user.name, 0, 2).toUpperCase() : (comment.user.name != null ? comment.user.name.toUpperCase() : 'AN')}">AS</span>
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="bg-light rounded p-3">
                                         <div class="d-flex align-items-center gap-2 mb-2">
-                                            <span class="small fw-medium" th:text="${comment.user.name}">Anonymous Student</span>
-                                            <span class="small text-muted" 
-                                                  th:text="${#temporals.format(comment.createdAt, 'MMM dd, yyyy HH:mm')}">Time ago</span>
+                                            <span class="small fw-medium" th:text="${comment.user.name}">Anonymous
+                                                Student</span>
+                                            <span class="small text-muted"
+                                                th:text="${#temporals.format(comment.createdAt, 'MMM dd, yyyy HH:mm')}">Time
+                                                ago</span>
                                         </div>
-                                        <p class="mb-0 small" style="white-space: pre-wrap;" th:text="${comment.content}">Comment content...</p>
+                                        <p class="mb-0 small" style="white-space: pre-wrap;"
+                                            th:text="${comment.content}">Comment content...</p>
                                     </div>
                                 </div>
                             </div>
@@ -98,8 +102,8 @@
                             <label class="form-label fw-medium">
                                 <span style="font-size: 1rem;">💬</span> Add a comment
                             </label>
-                            <textarea class="form-control mb-3" name="content" rows="3" 
-                                      placeholder="Share your thoughts, advice, or support..." required></textarea>
+                            <textarea class="form-control mb-3" name="content" rows="3"
+                                placeholder="Share your thoughts, advice, or support..." required></textarea>
                             <button type="submit" class="btn btn-primary">
                                 <span style="font-size: 1rem;">📝</span> Post Comment
                             </button>
@@ -138,11 +142,12 @@
                 </div>
                 <div class="card-body">
                     <p class="small text-muted mb-2">
-                        Be respectful, kind, and supportive in your comments. Remember that everyone is here to support each other.
+                        Be respectful, kind, and supportive in your comments. Remember that everyone is here to support
+                        each other.
                     </p>
                     <div class="alert alert-warning small mb-0">
                         <span style="font-size: 0.9rem;">⚠️</span>
-                        If you see concerning content, please use the 
+                        If you see concerning content, please use the
                         <a th:href="@{/concerns/report}" class="text-decoration-none">Report Concern</a> feature.
                     </div>
                 </div>
