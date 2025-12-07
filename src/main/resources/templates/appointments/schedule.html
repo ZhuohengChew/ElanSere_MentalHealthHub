@@ -382,7 +382,7 @@
                             <button class="btn btn-outline-secondary btn-small">
                                 <i class="bi bi-person-circle"></i> View Student
                             </button>
-                            <button class="btn btn-outline-danger btn-small float-end">
+                            <button class="btn btn-outline-danger btn-small float-end" onclick="deleteAppointment(${apt.id}, this)">
                                 <i class="bi bi-x-circle"></i>
                             </button>
                         </div>
@@ -412,6 +412,49 @@
         });
 
         // Calendar will be initialized after appointments are loaded from API
+        
+        function deleteAppointment(appointmentId, button) {
+            if (!confirm('Are you sure you want to reject this appointment?')) {
+                return;
+            }
+
+            fetch(`/mentalhealthhub/appointments/api/${appointmentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Remove the appointment card from the UI
+                    const card = button.closest('.appointment-card');
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(-100%)';
+                    card.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        // Remove from data array
+                        appointmentsData = appointmentsData.filter(apt => apt.id !== appointmentId);
+                        // Refresh the display
+                        displayAppointmentsForDate(selectedDate);
+                    }, 300);
+                    
+                    return response.json();
+                } else if (response.status === 401) {
+                    alert('You are not authorized to delete this appointment');
+                } else if (response.status === 403) {
+                    alert('You do not have permission to delete this appointment');
+                } else if (response.status === 404) {
+                    alert('Appointment not found');
+                } else {
+                    throw new Error('Failed to delete appointment');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting appointment:', error);
+                alert('Error deleting appointment. Please try again.');
+            });
+        }
     </script>
 </body>
 </html>

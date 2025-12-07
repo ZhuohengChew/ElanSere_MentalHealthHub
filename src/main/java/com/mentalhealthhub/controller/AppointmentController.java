@@ -10,9 +10,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
 
 import com.mentalhealthhub.model.Appointment;
 import com.mentalhealthhub.model.AppointmentStatus;
@@ -172,5 +175,28 @@ List<Appointment> allAppointments = appointmentRepository.findByStudentOrProfess
                 Map.entry("name", apt.getProfessional().getName())
             ))
         )).toList();
+    }
+
+    @DeleteMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteAppointment(@PathVariable Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+
+        Appointment appointment = appointmentRepository.findById(id).orElse(null);
+        if (appointment == null) {
+            return ResponseEntity.status(404).body(Map.of("error", "Appointment not found"));
+        }
+
+        // Check if user is either the student or professional for this appointment
+        if (!appointment.getStudent().getId().equals(user.getId()) && 
+            !appointment.getProfessional().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body(Map.of("error", "Unauthorized to delete this appointment"));
+        }
+
+        appointmentRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Appointment deleted successfully"));
     }
 }
