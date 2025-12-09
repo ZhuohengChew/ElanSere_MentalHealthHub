@@ -122,6 +122,22 @@ List<Appointment> allAppointments = appointmentRepository.findByStudentOrProfess
         return "redirect:/appointments/my-schedule";
     }
 
+    @GetMapping("/api/current-user")
+    @ResponseBody
+    public Map<String, Object> getCurrentUser(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return Map.of("id", 0L, "role", "GUEST");
+        }
+        
+        return Map.ofEntries(
+            Map.entry("id", user.getId()),
+            Map.entry("name", user.getName()),
+            Map.entry("email", user.getEmail()),
+            Map.entry("role", user.getRole().toString())
+        );
+    }
+
     @GetMapping("/api/my-schedule")
     @ResponseBody
     public List<Map<String, Object>> myScheduleApi(HttpSession session) {
