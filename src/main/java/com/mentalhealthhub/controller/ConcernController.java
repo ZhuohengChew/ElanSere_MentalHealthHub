@@ -31,19 +31,26 @@ public class ConcernController {
     private UserRepository userRepository;
 
     @GetMapping("/concerns")
+    public String viewConcernForm(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("page", "concerns/report");
+        model.addAttribute("title", "Report a Concern");
+
+        return "layout";
+    }
+
+    @GetMapping("/concerns/list")
     public String viewMyReports(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
 
-        // Get reports for the current student
-        List<Report> studentReports = reportRepository.findAll().stream()
-                .filter(r -> r.getStudent() != null && r.getStudent().getId().equals(user.getId()))
-                .sorted((a, b) -> b.getSubmittedAt().compareTo(a.getSubmittedAt()))
-                .collect(Collectors.toList());
-
-        model.addAttribute("reports", studentReports);
         model.addAttribute("user", user);
         model.addAttribute("page", "concerns/list");
         model.addAttribute("title", "My Reports");
@@ -116,6 +123,33 @@ public class ConcernController {
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(studentData);
+    }
+
+    @GetMapping("/concerns/api/my-reports")
+    @ResponseBody
+    public List<Map<String, Object>> getMyReports(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return List.of();
+        }
+
+        // Get reports for the current student
+        List<Report> studentReports = reportRepository.findAll().stream()
+                .filter(r -> r.getStudent() != null && r.getStudent().getId().equals(user.getId()))
+                .sorted((a, b) -> b.getSubmittedAt().compareTo(a.getSubmittedAt()))
+                .collect(Collectors.toList());
+
+        // Convert to map for JSON response
+        return studentReports.stream().map(report -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", report.getId());
+            map.put("type", report.getType());
+            map.put("description", report.getDescription());
+            map.put("status", report.getStatus());
+            map.put("urgency", report.getUrgency());
+            map.put("submittedAt", report.getSubmittedAt().toString());
+            return map;
+        }).collect(Collectors.toList());
     }
 
     @PostMapping("/concerns/staff-submit")
