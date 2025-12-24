@@ -678,72 +678,32 @@
         document.getElementById('hold2').textContent = value + 's';
     });
 
-    // Fixed tab switching - simple and reliable approach
     document.addEventListener('DOMContentLoaded', function () {
         // Check for flash attribute indicating which tab to show
         const successMessage = document.querySelector('.alert-success');
         const shouldShowMoodTab = successMessage && successMessage.textContent.includes('Mood logged');
 
-        // Initialize tab switching - simple event delegation
-        const tabList = document.querySelector('#selfCareTabs');
-        if (tabList) {
-            tabList.addEventListener('click', function (e) {
-                const button = e.target.closest('[data-bs-toggle="tab"]');
-                if (button) {
-                    const targetId = button.getAttribute('data-bs-target');
-                    if (targetId) {
-                        // Allow all tabs to switch freely
-                        const tab = new bootstrap.Tab(button);
-                        tab.show();
-                    }
-                }
-            });
-            // Remove active from all panes
-            document.querySelectorAll('.tab-pane').forEach(pane => {
-                pane.classList.remove('show', 'active');
-            });
-            // Activate target tab and pane
-            if (tabButton) {
-                tabButton.classList.add('active');
-            }
-            const targetPane = document.querySelector(paneId);
-            if (targetPane) {
-                targetPane.classList.add('show', 'active');
-            }
+        // Decide which tab should be active on load:
+        // 1) If mood was just logged, show Mood tab
+        // 2) Else if controller set an activeTab value, use that
+        // 3) Otherwise, default to Meditation
+        const activeTabValueInput = document.getElementById('activeTabValue');
+        const activeTabValue = activeTabValueInput ? activeTabValueInput.value : null;
+
+        let targetTabId = '#meditation';
+        if (shouldShowMoodTab) {
+            targetTabId = '#mood';
+        } else if (activeTabValue) {
+            targetTabId = '#' + activeTabValue;
         }
 
-        // Show mood tab if we just submitted mood, otherwise show default
-        if (shouldShowMoodTab) {
-            setTimeout(function () {
-                const moodTab = document.querySelector('[data-bs-target="#mood"]');
-                if (moodTab) {
-                    const tab = new bootstrap.Tab(moodTab);
-                    tab.show();
-                }
-            }, 300);
-        } else {
-            // Ensure default tab is active if no specific tab is requested
-            // This fixes issues after session completions
-            setTimeout(function() {
-                if (defaultTab && defaultPane) {
-                    // Check if no tab is currently active
-                    const activeTab = document.querySelector('#selfCareTabs .nav-link.active');
-                    const activePane = document.querySelector('.tab-pane.show.active');
-                    
-                    // If no tab is active, activate default meditation tab
-                    if (!activeTab || !activePane) {
-                        try {
-                            const tab = new bootstrap.Tab(defaultTab);
-                            tab.show();
-                        } catch (error) {
-                            // Fallback: manually set active states
-                            switchTabManually(defaultTab, '#meditation');
-                        }
-                    }
-                }
-            }, 200);
+        // Activate the chosen tab using Bootstrap's built-in tab component
+        const targetButton = document.querySelector('[data-bs-target="' + targetTabId + '"]');
+        if (targetButton) {
+            const tab = new bootstrap.Tab(targetButton);
+            tab.show();
         }
-        
+
         // Ensure all tab buttons are properly initialized for Bootstrap
         // Bootstrap will handle the click events natively via data-bs-toggle="tab"
         // We just need to make sure Bootstrap knows about them

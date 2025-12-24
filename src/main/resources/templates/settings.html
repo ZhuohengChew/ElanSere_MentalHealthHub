@@ -7,69 +7,129 @@
         </div>
     </div>
 
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <div class="row">
         <div class="col-md-4">
             <div class="list-group">
-                <a href="#profile" class="list-group-item list-group-item-action active">
+                <a href="#profile" class="list-group-item list-group-item-action active" onclick="showSection('profile'); return false;">
                     <i class="bi bi-person-circle"></i> Profile Settings
                 </a>
-                <a href="#privacy" class="list-group-item list-group-item-action">
+                <a href="#privacy" class="list-group-item list-group-item-action" onclick="showSection('privacy'); return false;">
                     <i class="bi bi-shield-lock"></i> Privacy & Security
-                </a>
-                <a href="#notifications" class="list-group-item list-group-item-action">
-                    <i class="bi bi-bell"></i> Notifications
                 </a>
             </div>
         </div>
 
         <div class="col-md-8">
             <!-- Profile Settings -->
-            <div class="card mb-3">
+            <div id="profile-section" class="card mb-3">
                 <div class="card-header border-0">
                     <h6 class="mb-0">Profile Information</h6>
                 </div>
                 <div class="card-body">
-                    <form>
+                    <form method="post" th:action="@{/settings/update-profile}">
                         <div class="mb-3">
                             <label for="settingsName" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="settingsName" th:value="${user.name}">
+                            <input type="text" class="form-control" id="settingsName" name="name" 
+                                   th:value="${user.name}" required>
                         </div>
                         <div class="mb-3">
                             <label for="settingsEmail" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="settingsEmail" th:value="${user.email}">
+                            <input type="email" class="form-control" id="settingsEmail" name="email" 
+                                   th:value="${user.email}" required>
                         </div>
                         <div class="mb-3">
                             <label for="settingsRole" class="form-label">Role</label>
                             <input type="text" class="form-control" id="settingsRole" 
                                    th:value="${user.role.displayName}" disabled>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
                     </form>
                 </div>
             </div>
 
             <!-- Privacy & Security -->
-            <div class="card">
+            <div id="privacy-section" class="card" style="display: none;">
                 <div class="card-header border-0">
                     <h6 class="mb-0">Privacy & Security</h6>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Change Password</label>
-                        <button class="btn btn-outline-primary btn-sm">Change Password</button>
-                    </div>
-                    <hr>
-                    <div class="mb-3">
-                        <label class="form-label d-flex justify-content-between align-items-center">
-                            <span>Two-Factor Authentication</span>
-                            <div class="form-check form-switch m-0">
-                                <input class="form-check-input" type="checkbox" id="twoFA">
-                            </div>
-                        </label>
-                        <small class="text-muted">Add an extra layer of security to your account</small>
-                    </div>
+                    <!-- Change Password Form -->
+                    <form method="post" th:action="@{/settings/change-password}">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" 
+                                   placeholder="Enter your current password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" 
+                                   placeholder="Enter new password (min. 6 characters)" minlength="6" required>
+                            <small class="text-muted">Password must be at least 6 characters long</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" 
+                                   placeholder="Re-enter new password" minlength="6" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-key"></i> Change Password
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function showSection(section) {
+        // Hide all sections
+        document.getElementById('profile-section').style.display = 'none';
+        document.getElementById('privacy-section').style.display = 'none';
+        
+        // Remove active class from all nav items
+        document.querySelectorAll('.list-group-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Show selected section
+        if (section === 'profile') {
+            document.getElementById('profile-section').style.display = 'block';
+            document.querySelectorAll('.list-group-item')[0].classList.add('active');
+        } else if (section === 'privacy') {
+            document.getElementById('privacy-section').style.display = 'block';
+            document.querySelectorAll('.list-group-item')[1].classList.add('active');
+        }
+    }
+
+    // Password confirmation validation
+    document.getElementById('confirmPassword')?.addEventListener('input', function() {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = this.value;
+        
+        if (confirmPassword && newPassword !== confirmPassword) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    document.getElementById('newPassword')?.addEventListener('input', function() {
+        const confirmPassword = document.getElementById('confirmPassword');
+        if (confirmPassword && confirmPassword.value) {
+            confirmPassword.dispatchEvent(new Event('input'));
+        }
+    });
+</script>

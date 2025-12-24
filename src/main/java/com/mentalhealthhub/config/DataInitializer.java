@@ -152,6 +152,34 @@ public class DataInitializer implements CommandLineRunner {
                 module8.setCreatedAt(LocalDateTime.now());
                 module8.setUpdatedAt(LocalDateTime.now());
                 moduleRepository.save(module8);
+
+                EducationalModule module9 = new EducationalModule();
+                module9.setTitle("Digital Wellbeing & Social Media");
+                module9.setDescription(
+                                "Understand how social media and screen time impact your mental health, and learn strategies for healthy digital habits.");
+                module9.setDurationMinutes(20);
+                module9.setCategory("Wellness");
+                module9.setImageUrl("https://images.unsplash.com/photo-1517244864778-5ee2fda3db5e?w=400");
+                module9.setContent(
+                                "This module explores the relationship between digital technology and mental wellbeing, including practical steps for managing notifications, curating your feeds, and setting boundaries with devices.");
+                module9.setActive(true);
+                module9.setCreatedAt(LocalDateTime.now());
+                module9.setUpdatedAt(LocalDateTime.now());
+                moduleRepository.save(module9);
+
+                EducationalModule module10 = new EducationalModule();
+                module10.setTitle("Self‑Compassion and Positive Self‑Talk");
+                module10.setDescription(
+                                "Learn how to treat yourself with kindness, challenge negative self‑talk, and build healthier inner dialogue.");
+                module10.setDurationMinutes(18);
+                module10.setCategory("Personal Growth");
+                module10.setImageUrl("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400");
+                module10.setContent(
+                                "In this module, you will practice self‑compassion exercises, learn how to reframe harsh self‑criticism, and create personal affirmations that support your resilience.");
+                module10.setActive(true);
+                module10.setCreatedAt(LocalDateTime.now());
+                module10.setUpdatedAt(LocalDateTime.now());
+                moduleRepository.save(module10);
         }
 
         private void initializeForumPosts() {

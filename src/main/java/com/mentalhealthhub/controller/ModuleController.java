@@ -5,13 +5,20 @@ import com.mentalhealthhub.model.ModuleProgress;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.repository.EducationalModuleRepository;
 import com.mentalhealthhub.repository.ModuleProgressRepository;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +35,8 @@ public class ModuleController {
 
     @GetMapping
     public String listModules(HttpSession session, Model model,
-                              @RequestParam(required = false) String search,
-                              @RequestParam(required = false) String category) {
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String category) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -46,13 +53,13 @@ public class ModuleController {
 
         // Get user's progress for each module
         List<ModuleProgress> userProgress = progressRepository.findByUser(user);
-        
+
         // Create a map of module IDs to progress for easy lookup in template
         java.util.Map<Long, ModuleProgress> progressMap = new java.util.HashMap<>();
         for (ModuleProgress progress : userProgress) {
             progressMap.put(progress.getModule().getId(), progress);
         }
-        
+
         // Calculate overall progress
         long completedCount = progressRepository.countByUserAndCompletedTrue(user);
         double progressPercentage = modules.isEmpty() ? 0 : (completedCount * 100.0 / modules.size());
@@ -113,7 +120,7 @@ public class ModuleController {
 
         Optional<ModuleProgress> progressOpt = progressRepository.findByUserAndModule(user, module);
         ModuleProgress progress;
-        
+
         if (progressOpt.isPresent()) {
             progress = progressOpt.get();
             if (progress.getStartedAt() == null) {
@@ -130,7 +137,7 @@ public class ModuleController {
 
         progressRepository.save(progress);
         redirectAttributes.addFlashAttribute("success", "Module started!");
-        
+
         return "redirect:/modules/" + id;
     }
 
@@ -148,7 +155,7 @@ public class ModuleController {
 
         Optional<ModuleProgress> progressOpt = progressRepository.findByUserAndModule(user, module);
         ModuleProgress progress;
-        
+
         if (progressOpt.isPresent()) {
             progress = progressOpt.get();
         } else {
@@ -162,16 +169,16 @@ public class ModuleController {
         progress.setProgressPercentage(100);
         progress.setCompletedAt(LocalDateTime.now());
         progressRepository.save(progress);
-        
+
         redirectAttributes.addFlashAttribute("success", "Module completed! Great job!");
-        
+
         return "redirect:/modules/" + id;
     }
 
     @PostMapping("/{id}/progress")
-    public String updateProgress(@PathVariable Long id, 
-                                @RequestParam Integer percentage,
-                                HttpSession session, RedirectAttributes redirectAttributes) {
+    public String updateProgress(@PathVariable Long id,
+            @RequestParam Integer percentage,
+            HttpSession session, RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
@@ -184,7 +191,7 @@ public class ModuleController {
 
         Optional<ModuleProgress> progressOpt = progressRepository.findByUserAndModule(user, module);
         ModuleProgress progress;
-        
+
         if (progressOpt.isPresent()) {
             progress = progressOpt.get();
         } else {
@@ -199,10 +206,68 @@ public class ModuleController {
             progress.setCompleted(true);
             progress.setCompletedAt(LocalDateTime.now());
         }
-        
+
         progressRepository.save(progress);
-        
+
         return "redirect:/modules/" + id;
     }
-}
 
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> downloadModulePdf(@PathVariable Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            // If not logged in, just redirect to login page URL
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.LOCATION, "/login");
+            return ResponseEntity.status(302).headers(headers).build();
+        }
+
+        EducationalModule module = moduleRepository.findById(id).orElse(null);
+        if (module == null || !Boolean.TRUE.equals(module.getActive())) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Document document = new Document();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            document.add(new Paragraph(module.getTitle()));
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Category: " + module.getCategory()));
+            document.add(new Paragraph("Estimated duration: " + module.getDurationMinutes() + " minutes"));
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Overview:"));
+            document.add(new Paragraph(module.getDescription()));
+            document.add(new Paragraph(" "));
+
+            String rawContent = module.getContent() != null ? module.getContent() : "";
+            // Very simple HTML tag stripping for PDF text
+            String textContent = rawContent.replaceAll("<[^>]*>", "");
+            if (!textContent.isBlank()) {
+                document.add(new Paragraph("Module Content:"));
+                document.add(new Paragraph(textContent));
+            } else {
+                document.add(new Paragraph("Module content will be available soon."));
+            }
+
+            document.close();
+
+            byte[] pdfBytes = baos.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData(
+                    "attachment",
+                    module.getTitle().replaceAll("[^a-zA-Z0-9\\-_]", "_") + ".pdf");
+
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+}

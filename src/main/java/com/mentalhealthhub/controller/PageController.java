@@ -21,6 +21,7 @@ import com.mentalhealthhub.repository.AssessmentRepository;
 import com.mentalhealthhub.repository.ReportRepository;
 import com.mentalhealthhub.repository.UserRepository;
 import com.mentalhealthhub.service.AssessmentService;
+import com.mentalhealthhub.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,28 +33,108 @@ public class PageController {
     private final AssessmentService assessmentService;
     private final UserRepository userRepository;
     private final AssessmentRepository assessmentRepository;
+    private final UserService userService;
 
-    public PageController(ReportRepository reportRepository, AppointmentRepository appointmentRepository, AssessmentService assessmentService, UserRepository userRepository, AssessmentRepository assessmentRepository) {
+    public PageController(ReportRepository reportRepository, AppointmentRepository appointmentRepository,
+            AssessmentService assessmentService, UserRepository userRepository,
+            AssessmentRepository assessmentRepository, UserService userService) {
         this.reportRepository = reportRepository;
         this.appointmentRepository = appointmentRepository;
         this.assessmentService = assessmentService;
         this.userRepository = userRepository;
         this.assessmentRepository = assessmentRepository;
+        this.userService = userService;
     }
 
     @GetMapping("/settings")
-    public String settings(HttpSession session, Model model) {
+    public String settings(HttpSession session, Model model,
+            @RequestParam(required = false) String success,
+            @RequestParam(required = false) String error) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
 
-        model.addAttribute("user", user);
+        // Refresh user from database to get latest data
+        user = userRepository.findById(user.getId()).orElse(user);
+        session.setAttribute("user", user); // Update session with fresh data
 
+        if (success != null) {
+            model.addAttribute("success", success);
+        }
+        if (error != null) {
+            model.addAttribute("error", error);
+        }
+
+        model.addAttribute("user", user);
         model.addAttribute("page", "settings");
         model.addAttribute("title", "Settings");
 
         return "layout";
+    }
+
+    @PostMapping("/settings/update-profile")
+    public String updateProfile(@RequestParam String name,
+            @RequestParam String email,
+            HttpSession session,
+            Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            // Get fresh user from database
+            user = userRepository.findById(user.getId()).orElse(user);
+
+            // Update profile
+            User updatedUser = userService.updateProfile(user, name, email);
+
+            // Update session with new user data
+            session.setAttribute("user", updatedUser);
+
+            return "redirect:/settings?success=Profile updated successfully";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/settings?error=" + e.getMessage();
+        } catch (Exception e) {
+            return "redirect:/settings?error=Failed to update profile: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/settings/change-password")
+    public String changePassword(@RequestParam String currentPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            HttpSession session,
+            Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            // Validate password match
+            if (!newPassword.equals(confirmPassword)) {
+                return "redirect:/settings?error=New passwords do not match";
+            }
+
+            // Get fresh user from database
+            user = userRepository.findById(user.getId()).orElse(user);
+
+            // Verify current password
+            if (!userService.verifyPassword(user, currentPassword)) {
+                return "redirect:/settings?error=Current password is incorrect";
+            }
+
+            // Update password
+            userService.updatePassword(user, newPassword);
+
+            return "redirect:/settings?success=Password changed successfully";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/settings?error=" + e.getMessage();
+        } catch (Exception e) {
+            return "redirect:/settings?error=Failed to change password: " + e.getMessage();
+        }
     }
 
     @GetMapping("/notifications")
@@ -71,12 +152,11 @@ public class PageController {
         } else {
             model.addAttribute("page", "notifications/notifications");
         }
-        
+
         model.addAttribute("title", "Notifications");
         model.addAttribute("activePage", "notifications");
         return "layout";
     }
-
 
     @GetMapping("/professional/reports")
     public String professionalReports(HttpSession session, Model model) {
@@ -142,10 +222,10 @@ public class PageController {
 
     @PostMapping("/professional/appointments/book")
     public String bookAppointment(@RequestParam Long reportId,
-                                  @RequestParam String appointmentDate,
-                                  @RequestParam String appointmentTime,
-                                  @RequestParam(required = false) String notes,
-                                  HttpSession session) {
+            @RequestParam String appointmentDate,
+            @RequestParam String appointmentTime,
+            @RequestParam(required = false) String notes,
+            HttpSession session) {
         User professional = (User) session.getAttribute("user");
         if (professional == null) {
             return "redirect:/login";
@@ -225,7 +305,8 @@ public class PageController {
     @GetMapping("/professional/students/{id}")
     public String viewStudentProfile(@PathVariable Long id, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null || (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF && user.getRole() != UserRole.ADMIN)) {
+        if (user == null || (user.getRole() != UserRole.PROFESSIONAL && user.getRole() != UserRole.STAFF
+                && user.getRole() != UserRole.ADMIN)) {
             return "redirect:/login";
         }
 
@@ -235,8 +316,8 @@ public class PageController {
         }
 
         List<Assessment> assessments = assessmentRepository.findAll().stream()
-            .filter(a -> a.getUser() != null && a.getUser().getId().equals(id))
-            .toList();
+                .filter(a -> a.getUser() != null && a.getUser().getId().equals(id))
+                .toList();
 
         model.addAttribute("student", student);
         model.addAttribute("assessments", assessments);

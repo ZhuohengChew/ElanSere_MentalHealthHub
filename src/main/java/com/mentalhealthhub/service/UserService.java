@@ -109,4 +109,47 @@ public class UserService {
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    /**
+     * Update user profile information (name and email)
+     */
+    public User updateProfile(User user, String name, String email) {
+        // Validate name
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        // Validate email format
+        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
+
+        // Check if email is being changed and if new email already exists
+        if (!user.getEmail().equals(email)) {
+            if (userRepository.findByEmail(email).isPresent()) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+        }
+
+        // Update user information
+        user.setName(name.trim());
+        user.setEmail(email.trim().toLowerCase());
+
+        return userRepository.save(user);
+    }
+
+    /**
+     * Verify current password before allowing password change
+     */
+    public boolean verifyPassword(User user, String currentPassword) {
+        String storedPassword = user.getPassword();
+
+        // Check if password is hashed
+        if (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$")) {
+            return passwordEncoder.matches(currentPassword, storedPassword);
+        } else {
+            // Legacy plain text password support
+            return storedPassword.equals(currentPassword);
+        }
+    }
 }

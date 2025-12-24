@@ -1,8 +1,11 @@
 package com.mentalhealthhub.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +16,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.AppointmentStatus;
+import com.mentalhealthhub.model.EducationalModule;
 import com.mentalhealthhub.model.Report;
+import com.mentalhealthhub.model.SelfCare;
+import com.mentalhealthhub.model.SelfCareType;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.EducationalModuleRepository;
+import com.mentalhealthhub.repository.ModuleProgressRepository;
 import com.mentalhealthhub.repository.ReportRepository;
+import com.mentalhealthhub.repository.SelfCareRepository;
 import com.mentalhealthhub.repository.UserRepository;
 import com.mentalhealthhub.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
-import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -38,6 +47,15 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SelfCareRepository selfCareRepository;
+
+    @Autowired
+    private EducationalModuleRepository educationalModuleRepository;
+
+    @Autowired
+    private ModuleProgressRepository moduleProgressRepository;
 
     @GetMapping("/")
     public String index() {
@@ -174,6 +192,73 @@ public class AuthController {
         String dashboardPage;
         switch (user.getRole()) {
             case STUDENT:
+                // ===== Student dashboard dynamic data =====
+                // 1. Mood this week (based on self-care mood tracking)
+                LocalDate todayDate = LocalDate.now();
+                LocalDate weekAgo = todayDate.minusDays(6); // last 7 days including today
+                List<SelfCare> moodEntries = selfCareRepository
+                        .findByUserAndTypeAndActivityDateBetween(user, SelfCareType.MOOD, weekAgo, todayDate);
+
+                if (!moodEntries.isEmpty()) {
+                    double averageMoodScore = moodEntries.stream()
+                            .map(SelfCare::getMood)
+                            .filter(m -> m != null && !m.isEmpty())
+                            .mapToInt(this::getMoodScore)
+                            .average()
+                            .orElse(0);
+
+                    String moodLabel = getMoodLabel(averageMoodScore);
+                    String moodEmoji = getMoodEmoji(averageMoodScore);
+
+                    model.addAttribute("hasMoodData", true);
+                    model.addAttribute("moodLabel", moodLabel);
+                    model.addAttribute("moodEmoji", moodEmoji);
+                    model.addAttribute("moodDescription", "Based on your mood check-ins this week");
+                } else {
+                    model.addAttribute("hasMoodData", false);
+                }
+
+                // 2. Educational modules progress
+                List<EducationalModule> activeModules = educationalModuleRepository
+                        .findByActiveTrueOrderByCreatedAtDesc();
+                int totalModules = activeModules.size();
+                long completedModules = moduleProgressRepository.countByUserAndCompletedTrue(user);
+                int remainingModules = Math.max(0, totalModules - (int) completedModules);
+
+                model.addAttribute("completedModules", completedModules);
+                model.addAttribute("totalModules", totalModules);
+                model.addAttribute("remainingModules", remainingModules);
+
+                // 3. Next appointment
+                LocalDateTime now = LocalDateTime.now();
+                List<Appointment> studentAppointments = appointmentRepository.findByStudent(user);
+
+                Appointment nextAppointment = studentAppointments.stream()
+                        .filter(a -> a.getAppointmentDate() != null
+                                && a.getAppointmentDate().isAfter(now)
+                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.SCHEDULED))
+                        .sorted(Comparator.comparing(Appointment::getAppointmentDate))
+                        .findFirst()
+                        .orElse(null);
+
+                if (nextAppointment != null) {
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd");
+                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm a");
+
+                    model.addAttribute("hasNextAppointment", true);
+                    model.addAttribute("nextAppointmentDate",
+                            nextAppointment.getAppointmentDate().format(dateFormatter));
+                    model.addAttribute("nextAppointmentTime",
+                            nextAppointment.getAppointmentDate().format(timeFormatter));
+                    String professionalName = (nextAppointment.getProfessional() != null
+                            && nextAppointment.getProfessional().getName() != null)
+                                    ? nextAppointment.getProfessional().getName()
+                                    : "Your counsellor";
+                    model.addAttribute("nextAppointmentProfessional", professionalName);
+                } else {
+                    model.addAttribute("hasNextAppointment", false);
+                }
+
                 dashboardPage = "dashboard/student-dashboard";
                 break;
             case STAFF:
@@ -266,6 +351,55 @@ public class AuthController {
         model.addAttribute("activePage", "analytics");
         model.addAttribute("title", "Analytics Report");
         return "layout";
+    }
+
+    // ===== Helper methods for student dashboard =====
+    private int getMoodScore(String mood) {
+        if (mood == null) {
+            return 50;
+        }
+        switch (mood.toLowerCase()) {
+            case "great":
+                return 90;
+            case "good":
+                return 75;
+            case "okay":
+                return 55;
+            case "low":
+                return 35;
+            case "struggling":
+                return 15;
+            default:
+                return 50;
+        }
+    }
+
+    private String getMoodLabel(double score) {
+        if (score >= 80) {
+            return "Great Mood";
+        } else if (score >= 60) {
+            return "Good Mood";
+        } else if (score >= 40) {
+            return "Okay Mood";
+        } else if (score >= 20) {
+            return "Low Mood";
+        } else {
+            return "Struggling";
+        }
+    }
+
+    private String getMoodEmoji(double score) {
+        if (score >= 80) {
+            return "😄";
+        } else if (score >= 60) {
+            return "😊";
+        } else if (score >= 40) {
+            return "😐";
+        } else if (score >= 20) {
+            return "😔";
+        } else {
+            return "😢";
+        }
     }
 
 }

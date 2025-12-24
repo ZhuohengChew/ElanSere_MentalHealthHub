@@ -104,9 +104,10 @@
                                 <span style="font-size: 1rem;">🔄</span> Review Module
                             </button>
                         </form>
-                        <button class="btn btn-outline-secondary w-100" onclick="alert('PDF download feature coming soon!')">
+                        <a class="btn btn-outline-secondary w-100"
+                           th:href="@{'/modules/' + ${module.id} + '/download'}">
                             <span style="font-size: 1rem;">📥</span> Download PDF
-                        </button>
+                        </a>
                     </div>
 
                     <div th:if="${progress != null && progress.startedAt != null}" class="mt-4">
