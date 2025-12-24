@@ -14,17 +14,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
   
   datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
+    url: jdbc:mysql://localhost:3306/mental_health_hub
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
     password:
-  
-  h2:
-    console:
-      enabled: true
   
   thymeleaf:
     cache: false
@@ -38,7 +34,7 @@ spring:
     static-path-pattern: /static/**
 
 server:
-  port: 8080
+  port: 8888
   servlet:
     context-path: /mentalhealthhub
     session:

@@ -1,7 +1,9 @@
 package com.mentalhealthhub.controller;
 
 import com.mentalhealthhub.model.User;
+import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.UserRepository;
+import com.mentalhealthhub.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping
     public String listUsers(Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -29,7 +34,7 @@ public class UserController {
 
         model.addAttribute("page", "users/manage-users");
         model.addAttribute("title", "Manage Users");
-        
+
         return "layout";
     }
 
@@ -47,7 +52,7 @@ public class UserController {
 
         model.addAttribute("user", targetUser);
         model.addAttribute("currentUser", user);
-        
+
         model.addAttribute("page", "users/user-detail");
         model.addAttribute("title", "User Details");
 
@@ -72,28 +77,21 @@ public class UserController {
 
     @PostMapping("/add")
     public String addUser(@RequestParam String name,
-                          @RequestParam String email,
-                          @RequestParam String password,
-                          @RequestParam String role,
-                          HttpSession session) {
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String role,
+            HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null || !currentUser.getRole().toString().equals("ADMIN")) {
             return "redirect:/login";
         }
 
-        if (userRepository.findByEmail(email).isPresent()) {
-            return "redirect:/users?error=User with this email already exists";
+        try {
+            UserRole userRole = UserRole.valueOf(role.toUpperCase());
+            userService.registerUser(email, password, name, userRole);
+            return "redirect:/users";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/users?error=" + e.getMessage();
         }
-
-        User newUser = User.builder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .role(com.mentalhealthhub.model.UserRole.valueOf(role.toUpperCase()))
-                .active(true)
-                .build();
-
-        userRepository.save(newUser);
-        return "redirect:/users";
     }
 }

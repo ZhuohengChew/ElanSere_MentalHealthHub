@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Mental Health Hub</title>
+    <title>Register - Mental Health Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -18,15 +18,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
-        .login-container {
+        .register-container {
             background: white;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             padding: 40px;
             width: 100%;
-            max-width: 420px;
+            max-width: 500px;
         }
 
         .logo-container {
@@ -47,13 +48,13 @@
             font-size: 2.5rem;
         }
 
-        .login-container h2 {
+        .register-container h2 {
             color: var(--primary-color);
             font-weight: 700;
             margin-bottom: 10px;
         }
 
-        .login-container p {
+        .register-container p {
             color: #666;
             font-size: 0.9rem;
             margin-bottom: 25px;
@@ -86,7 +87,7 @@
             border-left: 2px solid var(--primary-color);
         }
 
-        .btn-login {
+        .btn-register {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             border: none;
             padding: 12px;
@@ -98,32 +99,11 @@
             transition: all 0.3s ease;
         }
 
-        .btn-login:hover {
+        .btn-register:hover {
             background: linear-gradient(135deg, #5a7e9e 0%, #6fa675 100%);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .form-check-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .forgot-password {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .forgot-password a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .forgot-password a:hover {
-            text-decoration: underline;
         }
 
         .label {
@@ -142,32 +122,38 @@
             margin-bottom: 20px;
         }
 
-        .register-link {
+        .login-link {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 20px;
             color: #666;
             font-size: 0.9rem;
         }
 
-        .register-link a {
+        .login-link a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
         }
 
-        .register-link a:hover {
+        .login-link a:hover {
             text-decoration: underline;
+        }
+
+        .password-strength {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="register-container">
         <div class="logo-container">
             <div class="logo">
                 <i class="bi bi-heart-pulse"></i>
             </div>
-            <h2>Mental Health Hub</h2>
-            <p>Supporting your mental wellbeing journey</p>
+            <h2>Create Account</h2>
+            <p>Join Mental Health Hub today</p>
         </div>
 
         <!-- Error Message -->
@@ -175,11 +161,31 @@
             <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
         </div>
 
-        <form method="post" th:action="@{/login}" class="login-form">
+        <form method="post" th:action="@{/register}" class="register-form">
+            <div class="form-group">
+                <label for="name" class="label">Full Name</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <input type="text" class="form-control" id="name" name="name" 
+                           placeholder="Enter your full name" required
+                           th:value="${name != null ? name : ''}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="label">Email Address</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                    <input type="email" class="form-control" id="email" name="email" 
+                           placeholder="your.email@university.edu" required
+                           th:value="${email != null ? email : ''}">
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="role" class="label">Select Your Role</label>
                 <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    <span class="input-group-text"><i class="bi bi-person-badge-fill"></i></span>
                     <select class="form-select" id="role" name="role" required>
                         <option value="">Choose your role...</option>
                         <option value="STUDENT">Student</option>
@@ -191,40 +197,57 @@
             </div>
 
             <div class="form-group">
-                <label for="email" class="label">Email Address</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                    <input type="email" class="form-control" id="email" name="email" 
-                           placeholder="your.email@university.edu" required>
-                </div>
-            </div>
-
-            <div class="form-group">
                 <label for="password" class="label">Password</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                     <input type="password" class="form-control" id="password" name="password" 
-                           placeholder="Enter your password" required>
+                           placeholder="Enter password (min. 6 characters)" required
+                           minlength="6">
+                </div>
+                <div class="password-strength">Password must be at least 6 characters long</div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="label">Confirm Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" 
+                           placeholder="Re-enter password" required
+                           minlength="6">
                 </div>
             </div>
 
-            <div class="form-check" style="margin-bottom: 20px;">
-                <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                <label class="form-check-label" for="remember">
-                    Remember me
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-login">
-                <i class="bi bi-box-arrow-in-right"></i> Login
+            <button type="submit" class="btn btn-register">
+                <i class="bi bi-person-plus-fill"></i> Create Account
             </button>
 
-            <div class="register-link">
-                Don't have an account? <a th:href="@{/register}">Register here</a>
+            <div class="login-link">
+                Already have an account? <a th:href="@{/login}">Login here</a>
             </div>
         </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (confirmPassword.value) {
+                confirmPassword.dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
 </body>
 </html>
+

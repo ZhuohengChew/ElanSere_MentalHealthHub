@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +19,10 @@ import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.AppointmentRepository;
 import com.mentalhealthhub.repository.ReportRepository;
 import com.mentalhealthhub.repository.UserRepository;
+import com.mentalhealthhub.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -35,13 +36,19 @@ public class AuthController {
     @Autowired
     private ReportRepository reportRepository;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/")
     public String index() {
         return "redirect:/login";
     }
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(@RequestParam(required = false) String error, Model model) {
+        if (error != null) {
+            model.addAttribute("error", error);
+        }
         return "auth/login";
     }
 
@@ -51,33 +58,102 @@ public class AuthController {
             @RequestParam(required = false) String role,
             HttpSession session,
             Model model) {
-        // Determine selected role (default to STUDENT)
-        UserRole selectedRole = role != null
-                ? UserRole.valueOf(role.toUpperCase())
-                : UserRole.STUDENT;
+        try {
+            // Authenticate user
+            Optional<User> userOpt = userService.authenticateUser(email, password);
 
-        // Create or fetch user
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .email(email)
-                            .password(password)
-                            .name(email.split("@")[0])
-                            .role(selectedRole)
-                            .active(true)
-                            .build();
-                    return userRepository.save(newUser);
-                });
+            if (userOpt.isEmpty()) {
+                model.addAttribute("error", "Invalid email or password");
+                return "auth/login";
+            }
 
-        // Always update user's role to match the latest selection
-        user.setRole(selectedRole);
-        user = userRepository.save(user);
+            User user = userOpt.get();
 
-        session.setAttribute("user", user);
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("userRole", user.getRole().toString());
+            // If role is specified, verify it matches user's role
+            if (role != null && !role.isEmpty()) {
+                UserRole selectedRole = UserRole.valueOf(role.toUpperCase());
+                if (user.getRole() != selectedRole) {
+                    model.addAttribute("error", "Invalid role for this account. Please select the correct role.");
+                    return "auth/login";
+                }
+            }
 
-        return "redirect:/dashboard";
+            // Set session attributes
+            session.setAttribute("user", user);
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("userRole", user.getRole().toString());
+
+            return "redirect:/dashboard";
+        } catch (Exception e) {
+            model.addAttribute("error", "Login failed: " + e.getMessage());
+            return "auth/login";
+        }
+    }
+
+    @GetMapping("/register")
+    public String registerPage(@RequestParam(required = false) String error, Model model) {
+        if (error != null) {
+            model.addAttribute("error", error);
+        }
+        return "auth/register";
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            @RequestParam String name,
+            @RequestParam String role,
+            HttpSession session,
+            Model model) {
+        try {
+            // Validate password match
+            if (!password.equals(confirmPassword)) {
+                model.addAttribute("error", "Passwords do not match");
+                model.addAttribute("email", email);
+                model.addAttribute("name", name);
+                return "auth/register";
+            }
+
+            // Validate password length
+            if (password.length() < 6) {
+                model.addAttribute("error", "Password must be at least 6 characters long");
+                model.addAttribute("email", email);
+                model.addAttribute("name", name);
+                return "auth/register";
+            }
+
+            // Validate role
+            UserRole userRole;
+            try {
+                userRole = UserRole.valueOf(role.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("error", "Invalid role selected");
+                model.addAttribute("email", email);
+                model.addAttribute("name", name);
+                return "auth/register";
+            }
+
+            // Register user
+            User user = userService.registerUser(email, password, name, userRole);
+
+            // Auto-login after registration
+            session.setAttribute("user", user);
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("userRole", user.getRole().toString());
+
+            return "redirect:/dashboard";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("email", email);
+            model.addAttribute("name", name);
+            return "auth/register";
+        } catch (Exception e) {
+            model.addAttribute("error", "Registration failed: " + e.getMessage());
+            model.addAttribute("email", email);
+            model.addAttribute("name", name);
+            return "auth/register";
+        }
     }
 
     @GetMapping("/logout")
@@ -108,25 +184,26 @@ public class AuthController {
                 List<Appointment> profAppointments = appointmentRepository.findByProfessional(user);
                 LocalDate today = LocalDate.now();
                 List<Appointment> todayAppointments = profAppointments.stream()
-                    .filter(a -> a.getAppointmentDate() != null && a.getAppointmentDate().toLocalDate().isEqual(today))
-                    .sorted(Comparator.comparing(Appointment::getAppointmentDate))
-                    .collect(Collectors.toList());
+                        .filter(a -> a.getAppointmentDate() != null
+                                && a.getAppointmentDate().toLocalDate().isEqual(today))
+                        .sorted(Comparator.comparing(Appointment::getAppointmentDate))
+                        .collect(Collectors.toList());
 
                 long todayCount = todayAppointments.size();
                 long activeClients = profAppointments.stream()
-                    .filter(a -> a.getStudent() != null && a.getStudent().getId() != null)
-                    .map(a -> a.getStudent().getId())
-                    .distinct()
-                    .count();
+                        .filter(a -> a.getStudent() != null && a.getStudent().getId() != null)
+                        .map(a -> a.getStudent().getId())
+                        .distinct()
+                        .count();
 
                 long sessionsCompleted = profAppointments.stream()
-                    .filter(a -> a.getStatus() != null && a.getStatus().name().equals("COMPLETED"))
-                    .count();
+                        .filter(a -> a.getStatus() != null && a.getStatus().name().equals("COMPLETED"))
+                        .count();
 
                 // Show ALL students as active patients (not just those with appointments)
                 List<?> patientsList = userRepository.findAll().stream()
-                    .filter(u -> u.getRole() == UserRole.STUDENT)
-                    .collect(Collectors.toList());
+                        .filter(u -> u.getRole() == UserRole.STUDENT)
+                        .collect(Collectors.toList());
 
                 // Fetch all reports
                 List<Report> reports = reportRepository.findAll();
@@ -150,6 +227,7 @@ public class AuthController {
         model.addAttribute("title", "Dashboard");
         return "layout";
     }
+
     @GetMapping("/manage-users")
     public String manageUsers(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
@@ -189,5 +267,5 @@ public class AuthController {
         model.addAttribute("title", "Analytics Report");
         return "layout";
     }
-    
+
 }
