@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -61,9 +62,9 @@ public class ConcernController {
 
     @PostMapping("/concerns/submit")
     public String submitConcern(@RequestParam(required = false, name = "concerns") String[] concerns,
-                                @RequestParam String description,
-                                @RequestParam(required = false) String urgency,
-                                HttpSession session) {
+            @RequestParam String description,
+            @RequestParam(required = false) String urgency,
+            HttpSession session) {
         User user = (User) session.getAttribute("user");
         Report report = new Report();
 
@@ -90,7 +91,7 @@ public class ConcernController {
     @GetMapping("/concerns/staff-report")
     public String staffReportPage(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
-        
+
         // Check if user is staff
         if (user == null || user.getRole() != UserRole.STAFF) {
             return "redirect:/login";
@@ -99,7 +100,7 @@ public class ConcernController {
         model.addAttribute("page", "concerns/staff-report");
         model.addAttribute("title", "Create Student Report");
         model.addAttribute("activePage", "reports");
-        
+
         return "layout";
     }
 
@@ -110,7 +111,7 @@ public class ConcernController {
         List<User> students = userRepository.findAll().stream()
                 .filter(u -> u.getRole() == UserRole.STUDENT)
                 .collect(Collectors.toList());
-        
+
         // Return simplified student data (id, name, email)
         List<Map<String, Object>> studentData = students.stream()
                 .map(s -> {
@@ -121,7 +122,7 @@ public class ConcernController {
                     return map;
                 })
                 .collect(Collectors.toList());
-        
+
         return ResponseEntity.ok(studentData);
     }
 
@@ -154,12 +155,12 @@ public class ConcernController {
 
     @PostMapping("/concerns/staff-submit")
     public String staffSubmitConcern(@RequestParam(required = false, name = "concerns") String[] concerns,
-                                     @RequestParam String description,
-                                     @RequestParam(required = false) String urgency,
-                                     @RequestParam Long studentId,
-                                     HttpSession session) {
+            @RequestParam String description,
+            @RequestParam(required = false) String urgency,
+            @RequestParam Long studentId,
+            HttpSession session) {
         User staff = (User) session.getAttribute("user");
-        
+
         // Check if user is staff
         if (staff == null || staff.getRole() != UserRole.STAFF) {
             return "redirect:/login";
@@ -189,5 +190,30 @@ public class ConcernController {
         // Redirect back to staff report page
         return "redirect:/concerns/staff-report";
     }
-}
 
+    @GetMapping("/concerns/{id}")
+    public String viewMyReportDetail(@PathVariable Long id, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        Report report = reportRepository.findById(id).orElse(null);
+        if (report == null) {
+            return "redirect:/concerns/list";
+        }
+
+        // Verify that the report belongs to the current user
+        if (report.getStudent() == null || !report.getStudent().getId().equals(user.getId())) {
+            return "redirect:/concerns/list";
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("report", report);
+        model.addAttribute("page", "concerns/report-detail");
+        model.addAttribute("title", "Report Details");
+        model.addAttribute("activePage", "concerns");
+
+        return "layout";
+    }
+}

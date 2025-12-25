@@ -23,15 +23,14 @@
                         <div class="flex-shrink-0">
                             <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
                                 style="width: 48px; height: 48px;">
-                                <span class="text-primary fw-bold"
-                                    th:text="${post.user.name != null && post.user.name.length() >= 2 ? #strings.substring(post.user.name, 0, 2).toUpperCase() : (post.user.name != null ? post.user.name.toUpperCase() : 'AN')}">AS</span>
+                                <span class="text-primary fw-bold">AN</span>
                             </div>
                         </div>
                         <div class="flex-grow-1">
                             <h4 class="mb-2" th:text="${post.title}">Post Title</h4>
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <small class="text-muted">
-                                    <span th:text="${post.user.name}">Anonymous Student</span> •
+                                    <span>Anonymous</span> •
                                     <span
                                         th:text="${#temporals.format(post.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
                                 </small>
@@ -67,15 +66,13 @@
                                 <div class="flex-shrink-0">
                                     <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center"
                                         style="width: 40px; height: 40px;">
-                                        <span class="text-success fw-bold small"
-                                            th:text="${comment.user.name != null && comment.user.name.length() >= 2 ? #strings.substring(comment.user.name, 0, 2).toUpperCase() : (comment.user.name != null ? comment.user.name.toUpperCase() : 'AN')}">AS</span>
+                                        <span class="text-success fw-bold small">AN</span>
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="bg-light rounded p-3">
                                         <div class="d-flex align-items-center gap-2 mb-2">
-                                            <span class="small fw-medium" th:text="${comment.user.name}">Anonymous
-                                                Student</span>
+                                            <span class="small fw-medium">Anonymous</span>
                                             <span class="small text-muted"
                                                 th:text="${#temporals.format(comment.createdAt, 'MMM dd, yyyy HH:mm')}">Time
                                                 ago</span>
