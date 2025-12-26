@@ -1,0 +1,71 @@
+<!-- Audit Log View -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a th:href="@{/users/{id}(id=${targetUser.id})}" class="btn btn-sm btn-outline-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Back to User
+            </a>
+            <h1 class="mb-2" th:text="'Audit Log: ' + ${targetUser.name}">Audit Log</h1>
+            <p class="text-muted">Track all admin actions performed on this user account</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Activity History (<span th:text="${auditPage.totalElements}"></span>)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>Action</th>
+                                    <th>Performed By</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="log : ${auditLogs}">
+                                    <td>
+                                        <small th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-01 12:00:00</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" th:classappend="${log.action == 'USER_CREATED' ? 'bg-success' : log.action == 'USER_ARCHIVED' ? 'bg-danger' : log.action == 'PASSWORD_RESET' ? 'bg-warning text-dark' : log.action == 'USER_ACTIVATED' ? 'bg-info' : log.action == 'USER_DEACTIVATED' ? 'bg-secondary' : 'bg-primary'}" th:text="${log.action}">ACTION</span>
+                                    </td>
+                                    <td>
+                                        <small th:text="${log.performedBy}">Admin ID</small>
+                                    </td>
+                                    <td>
+                                        <small th:text="${log.details}">Details</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" th:if="${auditPage.totalPages > 0}">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${auditPage.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/users/{id}/audit(id=${targetUser.id}, page=${currentPage-1}, size=${pageSize})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, auditPage.totalPages-1)}" th:classappend="${i==currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/users/{id}/audit(id=${targetUser.id}, page=${i}, size=${pageSize})}" th:text="${i+1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${auditPage.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/users/{id}/audit(id=${targetUser.id}, page=${currentPage+1}, size=${pageSize})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div th:if="${auditLogs.size() == 0}" class="alert alert-info mt-3">
+                        No audit logs found for this user.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

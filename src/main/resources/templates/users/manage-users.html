@@ -6,9 +6,53 @@
             <p class="text-muted">View and manage all system users</p>
         </div>
         <div class="col-md-4 text-end">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal" th:if="${currentUser.role.name() == 'ADMIN'}">
                 <i class="bi bi-plus-circle"></i> Add User
             </button>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+            <div th:if="${resetMessage}" class="alert alert-info" th:text="${resetMessage}"></div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <form th:action="@{/users}" method="get" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <input type="text" name="q" th:value="${query}" class="form-control form-control-sm" placeholder="Search name or email">
+                </div>
+                <div class="col-auto">
+                    <select class="form-select form-select-sm" name="role">
+                        <option value="" th:selected="${roleFilter==null}">All roles</option>
+                        <option value="STUDENT" th:selected="${roleFilter=='STUDENT'}">Student</option>
+                        <option value="STAFF" th:selected="${roleFilter=='STAFF'}">Staff</option>
+                        <option value="PROFESSIONAL" th:selected="${roleFilter=='PROFESSIONAL'}">Professional</option>
+                        <option value="ADMIN" th:selected="${roleFilter=='ADMIN'}">Admin</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select class="form-select form-select-sm" name="active">
+                        <option value="" th:selected="${activeFilter==null}">Any status</option>
+                        <option value="true" th:selected="${activeFilter==true}">Active</option>
+                        <option value="false" th:selected="${activeFilter==false}">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select class="form-select form-select-sm" name="sort">
+                        <option value="name" th:selected="${sort=='name'}">Sort: Name</option>
+                        <option value="role" th:selected="${sort=='role'}">Sort: Role</option>
+                        <option value="createdAt" th:selected="${sort=='createdAt'}">Sort: Created</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -17,11 +61,7 @@
             <div class="card">
                 <div class="card-header border-0 pb-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0">All Users (<span th:text="${users.size()}"></span>)</h6>
-                        <div>
-                            <input type="text" class="form-control form-control-sm" 
-                                   placeholder="Search users..." style="width: 200px;">
-                        </div>
+                        <h6 class="mb-0">All Users (<span th:text="${usersPage.totalElements}"></span>)</h6>
                     </div>
                 </div>
                 <div class="card-body">
@@ -33,6 +73,7 @@
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Status</th>
+                                    <th>Created</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -56,17 +97,47 @@
                                         <span class="badge bg-success" th:if="${usr.active}">Active</span>
                                         <span class="badge bg-secondary" th:unless="${usr.active}">Inactive</span>
                                     </td>
+                                    <td th:text="${#temporals.format(usr.createdAt, 'yyyy-MM-dd')}">Created</td>
                                     <td>
                                         <a th:href="@{/users/{id}(id=${usr.id})}" class="btn btn-sm btn-outline-primary">View</a>
-                                            <form th:if="${usr.active}" th:action="@{/users/{id}/deactivate(id=${usr.id})}" method="post" style="display: inline;">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Deactivate</button>
-                                            </form>
-                                            <span class="text-muted small" th:unless="${usr.active}">Deactivated</span>
+                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal"
+                                                th:attr="data-id=${usr.id},data-name=${usr.name},data-email=${usr.email},data-role=${usr.role.name()},data-picture=${usr.profilePicture}"
+                                                th:if="${currentUser.role.name() == 'ADMIN'}">Edit</button>
+
+                                        <form th:if="${usr.active and currentUser.role.name() == 'ADMIN'}" th:action="@{/users/{id}/deactivate(id=${usr.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Deactivate</button>
+                                        </form>
+
+                                        <form th:if="${!usr.active and currentUser.role.name() == 'ADMIN'}" th:action="@{/users/{id}/activate(id=${usr.id})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">Activate</button>
+                                        </form>
+
+                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#archiveConfirmModal" th:attr="data-id=${usr.id}" th:if="${currentUser.role.name() == 'ADMIN'}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetConfirmModal" th:attr="data-id=${usr.id}" th:if="${currentUser.role.name() == 'ADMIN'}">Reset Password</button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" th:if="${usersPage.totalPages > 0}">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${usersPage.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/users(page=${currentPage-1}, size=${pageSize}, q=${query}, role=${roleFilter}, active=${activeFilter}, sort=${sort})}">Previous</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, usersPage.totalPages-1)}" th:classappend="${i==currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/users(page=${i}, size=${pageSize}, q=${query}, role=${roleFilter}, active=${activeFilter}, sort=${sort})}" th:text="${i+1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${usersPage.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/users(page=${currentPage+1}, size=${pageSize}, q=${query}, role=${roleFilter}, active=${activeFilter}, sort=${sort})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+
                 </div>
             </div>
         </div>
@@ -113,4 +184,128 @@
         </div>
     </div>
 </div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editUserForm" th:action="@{/users/0/edit}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editUserId" name="id" />
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRole" class="form-label">Role</label>
+                        <select class="form-select" id="editRole" name="role" required>
+                            <option value="STUDENT">Student</option>
+                            <option value="STAFF">Staff</option>
+                            <option value="PROFESSIONAL">Professional</option>
+                            <option value="ADMIN">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editProfilePicture" class="form-label">Profile Picture (URL)</label>
+                        <input type="text" class="form-control" id="editProfilePicture" name="profilePicture">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Archive Confirmation Modal -->
+<div class="modal fade" id="archiveConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p>Are you sure you want to archive this user? This hides the user from the main list.</p>
+                <div class="text-end">
+                    <form id="archiveForm" th:action="@{/users/0/archive}" method="post">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Archive</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Confirmation Modal -->
+<div class="modal fade" id="resetConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p>Reset this user's password? A new password will be generated.</p>
+                <div class="text-end">
+                    <form id="resetForm" th:action="@{/users/0/reset-password}" method="post">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">Reset</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+    // Populate edit modal when opened
+    var editModal = document.getElementById('editUserModal');
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var name = button.getAttribute('data-name');
+            var email = button.getAttribute('data-email');
+            var role = button.getAttribute('data-role');
+            var picture = button.getAttribute('data-picture');
+
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editRole').value = role;
+            document.getElementById('editProfilePicture').value = picture || '';
+
+            // set form action to correct user id
+            var form = document.getElementById('editUserForm');
+            form.setAttribute('action', '/users/' + id + '/edit');
+        });
+    }
+
+    // Archive modal wiring
+    var archiveModal = document.getElementById('archiveConfirmModal');
+    if (archiveModal) {
+        archiveModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var form = document.getElementById('archiveForm');
+            form.setAttribute('action', '/users/' + id + '/archive');
+        });
+    }
+
+    // Reset modal wiring
+    var resetModal = document.getElementById('resetConfirmModal');
+    if (resetModal) {
+        resetModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var form = document.getElementById('resetForm');
+            form.setAttribute('action', '/users/' + id + '/reset-password');
+        });
+    }
+</script>

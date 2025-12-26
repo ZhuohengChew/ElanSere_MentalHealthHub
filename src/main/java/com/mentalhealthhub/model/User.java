@@ -34,6 +34,15 @@ public class User {
     private Integer anxietyLevel;     // 0-100
     private Integer wellbeingScore;   // 0-100
     private LocalDateTime lastAssessmentDate;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     // Constructors
     public User() {
@@ -79,6 +88,30 @@ public class User {
 
     public void setLastAssessmentDate(LocalDateTime lastAssessmentDate) {
         this.lastAssessmentDate = lastAssessmentDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public static Builder builder() {

@@ -23,6 +23,33 @@
                           th:text="${user.role.displayName}">Role</span>
                 </div>
             </div>
+
+            <div class="card mt-3" th:if="${currentUser != null and currentUser.role.name() == 'ADMIN'}">
+                <div class="card-header border-0"><h6 class="mb-0">Admin Actions</h6></div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/users/{id}/deactivate(id=${user.id})}" style="display: inline;" th:if="${user.active}">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="bi bi-lock"></i> Deactivate User
+                        </button>
+                    </form>
+
+                    <form method="post" th:action="@{/users/{id}/activate(id=${user.id})}" style="display: inline;" th:unless="${user.active}">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-unlock"></i> Activate User
+                        </button>
+                    </form>
+
+                    <form method="post" th:action="@{/users/{id}/reset-password(id=${user.id})}" style="display: inline;">
+                        <button type="submit" class="btn btn-warning btn-sm">Reset Password</button>
+                    </form>
+
+                    <form method="post" th:action="@{/users/{id}/archive(id=${user.id})}" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
+                    </form>
+
+                    <a th:href="@{/users/{id}/audit(id=${user.id})}" class="btn btn-outline-secondary btn-sm">View Audit</a>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-8">
@@ -57,16 +84,27 @@
 
             <div class="card">
                 <div class="card-header border-0">
-                    <h6 class="mb-0">Actions</h6>
+                    <h6 class="mb-0">Activity & Assessments</h6>
                 </div>
                 <div class="card-body">
-                    <form method="post" th:action="@{/users/{id}/deactivate(id=${user.id})}" style="display: inline;">
-                        <button type="submit" class="btn btn-danger btn-sm" th:if="${user.active}">
-                            <i class="bi bi-lock"></i> Deactivate User
-                        </button>
-                    </form>
+                    <p class="text-muted">Summary of recent activity and assessment scores.</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p class="small text-muted">Last Assessment</p>
+                            <p th:text="${user.lastAssessmentDate != null ? #dates.format(user.lastAssessmentDate, 'yyyy-MM-dd') : 'N/A'}">N/A</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="small text-muted">Stress</p>
+                            <p th:text="${user.stressLevel != null ? user.stressLevel + '%' : 'N/A'}">N/A</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="small text-muted">Wellbeing</p>
+                            <p th:text="${user.wellbeingScore != null ? user.wellbeingScore + '%' : 'N/A'}">N/A</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

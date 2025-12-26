@@ -237,6 +237,26 @@ CREATE TABLE reports (
 );
 
 -- =====================================================
+-- 11. AUDIT_LOGS TABLE
+-- =====================================================
+CREATE TABLE audit_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    performed_by BIGINT NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    -- Values: USER_CREATED, USER_UPDATED, USER_ACTIVATED, USER_DEACTIVATED, USER_ARCHIVED, PASSWORD_RESET
+    user_id BIGINT,
+    details LONGTEXT,
+    -- JSON format: {"field": "old_value -> new_value", ...}
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE RESTRICT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_performed_by (performed_by),
+    INDEX idx_user_id (user_id),
+    INDEX idx_action (action),
+    INDEX idx_created_at (created_at)
+);
+
+-- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 -- Additional indexes for common queries
