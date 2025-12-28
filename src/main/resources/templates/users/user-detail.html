@@ -91,7 +91,7 @@
                     <div class="row">
                         <div class="col-md-4">
                             <p class="small text-muted">Last Assessment</p>
-                            <p th:text="${user.lastAssessmentDate != null ? #dates.format(user.lastAssessmentDate, 'yyyy-MM-dd') : 'N/A'}">N/A</p>
+                            <p th:text="${user.lastAssessmentDate != null ? #temporals.format(user.lastAssessmentDate, 'yyyy-MM-dd') : 'N/A'}">N/A</p>
                         </div>
                         <div class="col-md-4">
                             <p class="small text-muted">Stress</p>

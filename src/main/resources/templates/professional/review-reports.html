@@ -184,7 +184,23 @@
                             Scheduled (<span class="scheduled-count">0</span>)
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="resolved-tab" data-bs-toggle="tab" data-bs-target="#resolved" type="button">
+                            Resolved (<span class="resolved-count">0</span>)
+                        </button>
+                    </li>
                 </ul>
+
+                <!-- Sort Dropdown -->
+                <div class="mb-3">
+                    <label for="sortSelect" class="form-label">Sort by:</label>
+                    <select id="sortSelect" class="form-select d-inline-block" style="width: auto;" onchange="sortReports(this.value)">
+                        <option value="newest">Newest to Oldest</option>
+                        <option value="oldest">Oldest to Newest</option>
+                        <option value="urgent">Urgent to Low</option>
+                        <option value="low">Low to Urgent</option>
+                    </select>
+                </div>
 
                 <div class="tab-content" id="reportTabContent">
                     <!-- All Reports Tab -->
@@ -194,7 +210,7 @@
                                 <div class="card p-4 text-center">No reports found.</div>
                             </div>
 
-                            <div th:each="report : ${reports}" th:classappend=" ${report.urgency == 'urgent'} ? 'urgent-replace' : ''">
+                            <div th:each="report : ${reports}" th:classappend=" ${report.urgency == 'urgent'} ? 'urgent-replace' : ''" th:attr="data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
                                 <div class="col-12">
                                     <div class="card report-card" th:classappend=" ${report.urgency} == 'urgent' ? ' urgent' : ( ${report.urgency} == 'high' ? ' high' : ( ${report.urgency} == 'medium' ? ' medium' : ' low' ) )" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
                                         ">
@@ -207,7 +223,10 @@
                                                             <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
                                                             <div class="d-flex gap-2 flex-wrap">
                                                                 <span class="badge badge-category" th:text="${report.type}">Type</span>
-                                                                <span class="badge" th:classappend=" ${report.urgency == 'urgent' ? ' bg-danger text-white' : (report.urgency == 'high' ? ' bg-warning text-dark' : (report.urgency == 'medium' ? ' bg-info text-dark' : ' bg-success text-white')) }" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge" th:classappend=" ${report.urgency == 'high' ? ' bg-danger text-white' : (report.urgency == 'moderate' ? ' bg-warning text-dark' : ' bg-success text-white')} " th:if="${report.urgency}">
+                                                                    <i class="bi" th:classappend="${report.urgency == 'high' ? 'bi-exclamation-circle-fill' : (report.urgency == 'moderate' ? 'bi-exclamation-circle' : 'bi-info-circle')}"></i>
+                                                                    <span th:text="${#strings.capitalize(report.urgency)}">Urgency</span>
+                                                                </span>
                                                                 <span class="badge badge-category" th:text="${report.status}">status</span>
                                                             </div>
                                                         </div>
@@ -247,7 +266,7 @@
                     <!-- Pending Tab -->
                     <div class="tab-pane fade" id="pending" role="tabpanel">
                         <div class="row g-4">
-                            <div th:each="report : ${reports}" th:if="${report.status} == 'pending'">
+                            <div th:each="report : ${reports}" th:if="${report.status} == 'pending'" th:attr="data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
                                 <div class="col-12">
                                     <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
                                         <div class="card-body">
@@ -259,7 +278,10 @@
                                                             <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
                                                             <div class="d-flex gap-2 flex-wrap">
                                                                 <span class="badge badge-category" th:text="${report.type}">Type</span>
-                                                                <span class="badge" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge" th:classappend=" ${report.urgency == 'high' ? ' bg-danger text-white' : (report.urgency == 'moderate' ? ' bg-warning text-dark' : ' bg-success text-white')} " th:if="${report.urgency}">
+                                                                    <i class="bi" th:classappend="${report.urgency == 'high' ? 'bi-exclamation-circle-fill' : (report.urgency == 'moderate' ? 'bi-exclamation-circle' : 'bi-info-circle')}"></i>
+                                                                    <span th:text="${#strings.capitalize(report.urgency)}">Urgency</span>
+                                                                </span>
                                                                 <span class="badge badge-category" th:text="${report.status}">status</span>
                                                             </div>
                                                         </div>
@@ -299,7 +321,7 @@
                     <!-- Reviewed Tab -->
                     <div class="tab-pane fade" id="reviewed" role="tabpanel">
                         <div class="row g-4">
-                            <div th:each="report : ${reports}" th:if="${report.status} == 'reviewed'">
+                            <div th:each="report : ${reports}" th:if="${report.status} == 'reviewed'" th:attr="data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
                                 <div class="col-12">
                                     <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
                                         <div class="card-body">
@@ -311,7 +333,10 @@
                                                             <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
                                                             <div class="d-flex gap-2 flex-wrap">
                                                                 <span class="badge badge-category" th:text="${report.type}">Type</span>
-                                                                <span class="badge" th:text="${report.urgency}">urgency</span>
+                                                                <span class="badge" th:classappend=" ${report.urgency == 'high' ? ' bg-danger text-white' : (report.urgency == 'moderate' ? ' bg-warning text-dark' : ' bg-success text-white')} " th:if="${report.urgency}">
+                                                                    <i class="bi" th:classappend="${report.urgency == 'high' ? 'bi-exclamation-circle-fill' : (report.urgency == 'moderate' ? 'bi-exclamation-circle' : 'bi-info-circle')}"></i>
+                                                                    <span th:text="${#strings.capitalize(report.urgency)}">Urgency</span>
+                                                                </span>
                                                                 <span class="badge badge-category" th:text="${report.status}">status</span>
                                                             </div>
                                                         </div>
@@ -351,7 +376,7 @@
                     <!-- Scheduled Tab -->
                     <div class="tab-pane fade" id="scheduled" role="tabpanel">
                         <div class="row g-4">
-                            <div th:each="report : ${reports}" th:if="${report.status} == 'scheduled'">
+                            <div th:each="report : ${reports}" th:if="${report.status} == 'scheduled'" th:attr="data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
                                 <div class="col-12">
                                     <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
                                         <div class="card-body">
@@ -359,6 +384,61 @@
                                                 <div class="flex-grow-1">
                                                     <div class="d-flex align-items-center gap-3 mb-3">
                                                         <span style="font-size: 1.5rem;">📅</span>
+                                                        <div class="flex-grow-1">
+                                                            <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <span class="badge badge-category" th:text="${report.type}">Type</span>
+                                                                <span class="badge" th:classappend=" ${report.urgency == 'high' ? ' bg-danger text-white' : (report.urgency == 'moderate' ? ' bg-warning text-dark' : ' bg-success text-white')} " th:if="${report.urgency}">
+                                                                    <i class="bi" th:classappend="${report.urgency == 'high' ? 'bi-exclamation-circle-fill' : (report.urgency == 'moderate' ? 'bi-exclamation-circle' : 'bi-info-circle')}"></i>
+                                                                    <span th:text="${#strings.capitalize(report.urgency)}">Urgency</span>
+                                                                </span>
+                                                                <span class="badge badge-category" th:text="${report.status}">status</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mt-3">
+                                                        <div class="col-md-4">
+                                                            <div class="info-box">
+                                                                <p class="text-muted small mb-1">Student</p>
+                                                                <p class="fw-medium mb-0" style="color: #9B7EDE;" th:text="${report.student != null ? report.student.name : 'Unknown'}">Student Name</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box blue">
+                                                                <p class="text-muted small mb-1">Submitted</p>
+                                                                <p class="fw-medium mb-0" style="color: #6A8EAE;" th:text="${#temporals.format(report.submittedAt, 'yyyy-MM-dd HH:mm')}">submitted</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="info-box green">
+                                                                <p class="text-muted small mb-1">Scores (S/A/D)</p>
+                                                                <p class="fw-medium mb-0" style="color: #7FB685;" th:text="${(report.student != null && report.student.stressLevel != null ? report.student.stressLevel : '-') + ' / ' + (report.student != null && report.student.anxietyLevel != null ? report.student.anxietyLevel : '-') + ' / ' + (report.student != null && report.student.wellbeingScore != null ? report.student.wellbeingScore : '-')}">scores</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-link text-decoration-none">
+                                                    <span th:text="|View|">View</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resolved Tab -->
+                    <div class="tab-pane fade" id="resolved" role="tabpanel">
+                        <div class="row g-4">
+                            <div th:each="report : ${#lists.isEmpty(allReports) ? reports : allReports}" th:if="${report.status} == 'resolved'" th:attr="data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
+                                <div class="col-12">
+                                    <div class="card report-card" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                                        <span style="font-size: 1.5rem;">✅</span>
                                                         <div class="flex-grow-1">
                                                             <h5 class="mb-2" th:text="${#strings.abbreviate(report.description, 80)}">Report title</h5>
                                                             <div class="d-flex gap-2 flex-wrap">
@@ -485,12 +565,14 @@
             var pendingCount = /*[[${pendingCount}]]*/ 0;
             var reviewedCount = /*[[${reviewedCount}]]*/ 0;
             var scheduledCount = /*[[${scheduledCount}]]*/ 0;
+            var resolvedCount = /*[[${resolvedCount}]]*/ 0;
             var urgentCount = /*[[${urgentCount}]]*/ 0;
 
             var allElem = document.querySelector('.all-count');
             var pendingElem = document.querySelector('.pending-count');
             var reviewedElem = document.querySelector('.reviewed-count');
             var scheduledElem = document.querySelector('.scheduled-count');
+            var resolvedElem = document.querySelector('.resolved-count');
             var urgentSection = document.querySelector('.urgent-reports-section');
             var urgentCountElem = document.querySelector('.urgent-count');
 
@@ -498,11 +580,71 @@
             if (pendingElem) pendingElem.textContent = pendingCount;
             if (reviewedElem) reviewedElem.textContent = reviewedCount;
             if (scheduledElem) scheduledElem.textContent = scheduledCount;
+            if (resolvedElem) resolvedElem.textContent = resolvedCount;
             if (urgentCount > 0 && urgentSection && urgentCountElem) {
                 urgentSection.style.display = 'block';
                 urgentCountElem.textContent = urgentCount;
             }
         })();
+
+        // Urgency order for sorting
+        const urgencyOrder = {
+            'urgent': 4,
+            'high': 3,
+            'medium': 2,
+            'low': 1,
+            'critical': 5
+        };
+
+        function sortReports(sortType) {
+            const activePane = document.querySelector('.tab-pane.show.active');
+            if (!activePane) return;
+
+            const container = activePane.querySelector('.row.g-4');
+            if (!container) return;
+
+            // Get all report rows (the divs with data attributes)
+            const reportRows = Array.from(container.querySelectorAll('[data-submitted-time]'));
+            
+            reportRows.sort((a, b) => {
+                const timeA = new Date(a.getAttribute('data-submitted-time'));
+                const timeB = new Date(b.getAttribute('data-submitted-time'));
+                const urgencyA = urgencyOrder[a.getAttribute('data-urgency-value')] || 0;
+                const urgencyB = urgencyOrder[b.getAttribute('data-urgency-value')] || 0;
+
+                if (sortType === 'newest') {
+                    return timeB - timeA; // Newest first
+                } else if (sortType === 'oldest') {
+                    return timeA - timeB; // Oldest first
+                } else if (sortType === 'urgent') {
+                    return urgencyB - urgencyA; // Urgent first
+                } else if (sortType === 'low') {
+                    return urgencyA - urgencyB; // Low first
+                }
+                return 0;
+            });
+
+            // Re-insert sorted elements
+            reportRows.forEach(row => {
+                container.appendChild(row);
+            });
+        }
+
+        // Initialize default sorting on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortReports(sortSelect.value);
+            }
+        });
+
+        // Re-sort when tab changes
+        document.addEventListener('shown.bs.tab', function() {
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortReports(sortSelect.value);
+            }
+        });
         /*]]>*/
     </script>
 </body>

@@ -97,8 +97,8 @@
                                         <a th:href="@{/professional/students/{id}(id=${patient.id})}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-person-circle"></i> View
                                         </a>
-                                        <a href="#" class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-calendar"></i> History
+                                        <a th:href="@{/staff/patients/{id}/reports(id=${patient.id})}" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-file-earmark-text"></i> Reports
                                         </a>
                                     </td>
                                 </tr>

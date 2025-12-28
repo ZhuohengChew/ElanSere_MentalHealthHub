@@ -417,7 +417,7 @@
                 <!-- Submit Button -->
                 <div class="row justify-content-center mb-4">
                     <div class="col-lg-8">
-                        <button type="submit" id="submitBtn" class="btn btn-gradient-red w-100 py-3 fw-bold" disabled>
+                        <button type="button" onclick="showStaffConfirmModal()" id="submitBtn" class="btn btn-gradient-red w-100 py-3 fw-bold" disabled>
                             <i class="bi bi-send me-2"></i>
                             Submit Report
                         </button>
@@ -577,6 +577,102 @@
             }
 
             // Submit form
+            document.getElementById('concernForm').submit();
+        }
+
+        function showStaffConfirmModal() {
+            // Gather form data for confirmation
+            const studentBadge = document.getElementById('selectedStudentBadge').textContent;
+            const urgency = document.querySelector('input[name="urgency"]:checked')?.value || 'Not selected';
+            const concerns = Array.from(document.querySelectorAll('input[name="concerns"]:checked'))
+                .map(cb => cb.value)
+                .join(', ') || 'Not selected';
+            const description = document.getElementById('description').value;
+            
+            // Create and show modal
+            showStaffConfirmationModal(studentBadge, urgency, concerns, description);
+        }
+
+        function showStaffConfirmationModal(studentInfo, urgency, concerns, description) {
+            const modal = document.getElementById('staffConfirmationModal');
+            if (!modal) {
+                createStaffConfirmationModal();
+            }
+            
+            // Update modal content
+            document.getElementById('confirmStudentInfo').textContent = studentInfo;
+            document.getElementById('confirmStaffUrgency').textContent = urgency;
+            document.getElementById('confirmStaffConcerns').textContent = concerns;
+            document.getElementById('confirmStaffDescription').textContent = description.substring(0, 150) + (description.length > 150 ? '...' : '');
+            
+            // Show modal
+            const bootstrapModal = new bootstrap.Modal(document.getElementById('staffConfirmationModal'));
+            bootstrapModal.show();
+        }
+
+        function createStaffConfirmationModal() {
+            const modalHTML = `
+                <div class="modal fade" id="staffConfirmationModal" tabindex="-1" aria-labelledby="staffConfirmationLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-gradient" style="background: linear-gradient(135deg, #ef4444, #f97316); color: white;">
+                                <h5 class="modal-title" id="staffConfirmationLabel">
+                                    <i class="bi bi-check-circle me-2"></i>Confirm Report Submission
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info d-flex align-items-start" role="alert">
+                                    <i class="bi bi-info-circle me-2 flex-shrink-0" style="margin-top: 2px;"></i>
+                                    <div>
+                                        Please review the student's concern information below before final submission.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small class="text-muted d-block mb-2"><i class="bi bi-person-fill me-1"></i><strong>Student:</strong></small>
+                                    <div id="confirmStudentInfo" style="background: #dbeafe; padding: 10px; border-radius: 6px; border-left: 3px solid #2563eb; font-weight: 500;">
+                                        Student info
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small class="text-muted d-block mb-2"><i class="bi bi-exclamation-triangle me-1"></i><strong>Urgency Level:</strong></small>
+                                    <p id="confirmStaffUrgency" class="mb-0" style="font-weight: 500;">Urgency</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small class="text-muted d-block mb-2"><i class="bi bi-tag me-1"></i><strong>Type of Concerns:</strong></small>
+                                    <p id="confirmStaffConcerns" class="mb-0" style="font-weight: 500;">Concerns</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small class="text-muted d-block mb-2"><i class="bi bi-chat-left me-1"></i><strong>Description:</strong></small>
+                                    <small id="confirmStaffDescription" class="text-muted d-block mt-2">Description will be submitted</small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-arrow-left me-1"></i>Cancel
+                                </button>
+                                <button type="button" class="btn btn-gradient-red" onclick="submitStaffReportForm()">
+                                    <i class="bi bi-check-lg me-1"></i>Confirm & Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function submitStaffReportForm() {
+            // Close modal first
+            const modal = bootstrap.Modal.getInstance(document.getElementById('staffConfirmationModal'));
+            if (modal) modal.hide();
+            
+            // Submit the form
             document.getElementById('concernForm').submit();
         }
 

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 50%, #fef9c3 100%);
+            min-height: 100vh;
+        }
+
+        .header-card {
+            border-left: 4px solid #6A8EAE;
+            background: linear-gradient(135deg, #dbeafe, transparent);
+        }
+
+        .report-card {
+            border-left: 4px solid #9B7EDE;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-in_progress {
+            background-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .status-resolved {
+            background-color: #c7d2fe;
+            color: #3730a3;
+        }
+
+        .status-closed {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .urgency-badge {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .urgency-low {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .urgency-medium {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .urgency-high {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .report-type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            background: rgba(155, 126, 222, 0.1);
+            color: #5b21b6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+
+        .filter-chip {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 4px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .filter-chip:hover {
+            background-color: #e5e7eb;
+        }
+
+        .filter-chip.active {
+            background-color: #9B7EDE;
+            color: white;
+            border-color: #7c3aed;
+        }
+
+        .student-info-card {
+            background: linear-gradient(135deg, #dbeafe, transparent);
+            border-left: 4px solid #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid p-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-lg-10 offset-lg-1">
+                <div class="card header-card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h1 class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-file-text" style="color: #6A8EAE;"></i>
+                                    Student Reports
+                                </h1>
+                                <p class="text-muted mb-0">View all concerns and reports submitted by this student</p>
+                            </div>
+                            <button class="btn btn-secondary" onclick="window.history.back()">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Info Card -->
+        <div class="row mb-4">
+            <div class="col-lg-10 offset-lg-1">
+                <div class="card student-info-card shadow-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-weight: bold; font-size: 1.5rem;">
+                                        <span th:text="${#strings.substring(student.name, 0, 1).toUpperCase()}">S</span>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0" th:text="${student.name}">Student Name</h5>
+                                        <small class="text-muted" th:text="${student.email}">email@example.com</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">Student ID</small>
+                                    <strong th:text="${student.id}">ID</strong>
+                                </div>
+                                <span class="badge bg-success" th:if="${student.active}">Active</span>
+                                <span class="badge bg-secondary" th:unless="${student.active}">Inactive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-lg-10 offset-lg-1">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-9">
+                                <p class="text-muted mb-2">Filter by Status:</p>
+                                <div>
+                                    <span class="filter-chip active" onclick="filterReports('all')">
+                                        <i class="bi bi-funnel me-1"></i>All Reports
+                                    </span>
+                                    <span class="filter-chip" onclick="filterReports('pending')">
+                                        <i class="bi bi-clock me-1"></i>Pending
+                                    </span>
+                                    <span class="filter-chip" onclick="filterReports('reviewed')">
+                                        <i class="bi bi-eye me-1"></i>Reviewed
+                                    </span>
+                                    <span class="filter-chip" onclick="filterReports('scheduled')">
+                                        <i class="bi bi-calendar-check me-1"></i>Scheduled
+                                    </span>
+                                    <span class="filter-chip" onclick="filterReports('resolved')">
+                                        <i class="bi bi-check-circle me-1"></i>Resolved
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="sortSelect" class="form-label">Sort by:</label>
+                                <select id="sortSelect" class="form-select" onchange="sortReports(this.value)">
+                                    <option value="newest">Newest to Oldest</option>
+                                    <option value="oldest">Oldest to Newest</option>
+                                    <option value="urgent">Urgent to Low</option>
+                                    <option value="low">Low to Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports List -->
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
+                <!-- Empty State -->
+                <div th:if="${reports.isEmpty()}" class="card shadow-sm border-0">
+                    <div class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <h5 class="text-muted">No reports found</h5>
+                        <p class="text-muted small">This student hasn't submitted any reports yet.</p>
+                    </div>
+                </div>
+
+                <!-- Reports Grid -->
+                <div th:unless="${reports.isEmpty()}" class="row g-3" id="reportsContainer">
+                    <div th:each="report : ${reports}" class="col-12 report-item" th:attr="data-status=${report.status},data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
+                        <div class="card report-card shadow-sm h-100">
+                            <div class="card-body">
+                                <!-- Report Type Badge -->
+                                <div class="mb-2">
+                                    <span class="report-type-badge">
+                                        <i class="bi me-1" th:classappend="${report.type.contains('Mental') ? 'bi-heart-pulse' : report.type.contains('Academic') ? 'bi-book' : report.type.contains('Physical') ? 'bi-activity' : report.type.contains('Social') ? 'bi-people' : report.type.contains('Financial') ? 'bi-currency-dollar' : report.type.contains('Housing') ? 'bi-house' : 'bi-question-circle'}"></i>
+                                        <span th:text="${report.type} ?: 'General'">Type</span>
+                                    </span>
+                                </div>
+
+                                <!-- Status & Urgency -->
+                                <div class="mb-3">
+                                    <span class="status-badge" th:classappend="${'status-' + report.status}">
+                                        <i class="bi" th:classappend="${report.status == 'resolved' ? 'bi-check-circle-fill' : report.status == 'pending' ? 'bi-clock' : report.status == 'closed' ? 'bi-lock-fill' : 'bi-hourglass-split'}"></i>
+                                        <span th:text="${#strings.capitalize(report.status)}">Status</span>
+                                    </span>
+                                    <span class="urgency-badge ms-2" th:classappend="${'urgency-' + #strings.toLowerCase(report.urgency)}" th:if="${report.urgency}">
+                                        <i class="bi" th:classappend="${report.urgency.toLowerCase() == 'high' ? 'bi-exclamation-circle-fill' : report.urgency.toLowerCase() == 'medium' ? 'bi-exclamation-circle' : 'bi-info-circle'}"></i>
+                                        <span th:text="${#strings.capitalize(report.urgency)}">Urgency</span>
+                                    </span>
+                                </div>
+
+                                <!-- Description Preview -->
+                                <p class="card-text text-muted small mb-3" th:text="${#strings.abbreviate(report.description, 100)}">
+                                    Report description preview...
+                                </p>
+
+                                <!-- Dates -->
+                                <div class="small text-muted mb-3">
+                                    <div>
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        <span>Submitted: </span>
+                                        <span th:text="${#temporals.format(report.submittedAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                    </div>
+                                    <div th:if="${report.resolvedAt != null}">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        <span>Resolved: </span>
+                                        <span th:text="${#temporals.format(report.resolvedAt, 'MMM dd, yyyy')}">Date</span>
+                                    </div>
+                                </div>
+
+                                <!-- View Button - Staff Only Access -->
+                                <a th:href="@{/staff/reports/{id}(id=${report.id})}" class="btn btn-sm btn-primary w-100">
+                                    <i class="bi bi-eye me-1"></i>View Full Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentFilter = 'all';
+
+        // Urgency order for sorting
+        const urgencyOrder = {
+            'urgent': 4,
+            'high': 3,
+            'medium': 2,
+            'low': 1,
+            'critical': 5
+        };
+
+        function filterReports(status) {
+            currentFilter = status;
+            
+            // Update active chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.closest('.filter-chip').classList.add('active');
+
+            // Filter reports
+            const container = document.getElementById('reportsContainer');
+            const reportItems = container.querySelectorAll('.report-item');
+            let visibleCount = 0;
+            
+            reportItems.forEach(item => {
+                const itemStatus = item.getAttribute('data-status');
+                // If 'all' filter is selected, exclude resolved reports
+                if (status === 'all') {
+                    if (itemStatus !== 'resolved') {
+                        item.style.display = '';
+                        visibleCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else if (itemStatus === status) {
+                    item.style.display = '';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide empty state
+            let emptyState = container.querySelector('.empty-state-placeholder');
+            if (visibleCount === 0) {
+                if (!emptyState) {
+                    emptyState = document.createElement('div');
+                    emptyState.className = 'col-12 empty-state-placeholder';
+                    emptyState.innerHTML = '<div class="card shadow-sm border-0"><div class="empty-state"><i class="bi bi-inbox"></i><h5 class="text-muted">No reports found</h5><p class="text-muted small">No reports match the selected filter.</p></div></div>';
+                    container.appendChild(emptyState);
+                }
+            } else {
+                if (emptyState) {
+                    emptyState.remove();
+                }
+            }
+
+            // Re-sort after filtering
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect) {
+                sortReports(sortSelect.value);
+            }
+        }
+
+        function sortReports(sortType) {
+            const reportItems = Array.from(document.querySelectorAll('.report-item'));
+            const visibleItems = reportItems.filter(item => item.style.display !== 'none');
+
+            visibleItems.sort((a, b) => {
+                const timeA = new Date(a.getAttribute('data-submitted-time'));
+                const timeB = new Date(b.getAttribute('data-submitted-time'));
+                const urgencyA = urgencyOrder[a.getAttribute('data-urgency-value')] || 0;
+                const urgencyB = urgencyOrder[b.getAttribute('data-urgency-value')] || 0;
+
+                if (sortType === 'newest') {
+                    return timeB - timeA; // Newest first
+                } else if (sortType === 'oldest') {
+                    return timeA - timeB; // Oldest first
+                } else if (sortType === 'urgent') {
+                    return urgencyA - urgencyB; // Urgent first (higher urgency values first)
+                } else if (sortType === 'low') {
+                    return urgencyB - urgencyA; // Low first (lower urgency values first)
+                }
+                return 0;
+            });
+
+            // Re-insert sorted elements
+            const container = document.getElementById('reportsContainer');
+            if (container && visibleItems.length > 0) {
+                visibleItems.forEach(item => {
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        // Initialize: hide resolved reports on page load and apply default sorting
+        window.addEventListener('DOMContentLoaded', function() {
+            const reportItems = document.querySelectorAll('.report-item');
+            reportItems.forEach(item => {
+                const itemStatus = item.getAttribute('data-status');
+                if (itemStatus === 'resolved') {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Apply default sorting (Newest to Oldest)
+            sortReports('newest');
+        });
+    </script>
+</body>
+</html>

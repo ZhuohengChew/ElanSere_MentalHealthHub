@@ -171,18 +171,25 @@ public class PageController {
         }
 
         List<Report> reports = reportRepository.findAll();
-        long allCount = reports.size();
+        // Exclude resolved reports from the "all" view
+        List<Report> activeReports = reports.stream()
+                .filter(r -> !"resolved".equalsIgnoreCase(r.getStatus()))
+                .toList();
+        long allCount = activeReports.size();
         long pendingCount = reports.stream().filter(r -> "pending".equalsIgnoreCase(r.getStatus())).count();
         long reviewedCount = reports.stream().filter(r -> "reviewed".equalsIgnoreCase(r.getStatus())).count();
         long scheduledCount = reports.stream().filter(r -> "scheduled".equalsIgnoreCase(r.getStatus())).count();
+        long resolvedCount = reports.stream().filter(r -> "resolved".equalsIgnoreCase(r.getStatus())).count();
         long urgentCount = reports.stream().filter(r -> "urgent".equalsIgnoreCase(r.getUrgency())).count();
 
         model.addAttribute("user", user);
-        model.addAttribute("reports", reports);
+        model.addAttribute("reports", activeReports);
+        model.addAttribute("allReports", reports);
         model.addAttribute("allCount", allCount);
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("reviewedCount", reviewedCount);
         model.addAttribute("scheduledCount", scheduledCount);
+        model.addAttribute("resolvedCount", resolvedCount);
         model.addAttribute("urgentCount", urgentCount);
         model.addAttribute("page", "professional/review-reports");
         model.addAttribute("title", "Review Reports");
@@ -258,6 +265,37 @@ public class PageController {
             return "redirect:/professional/reports?success=true";
         } catch (Exception e) {
             return "redirect:/professional/reports/" + reportId + "?error=true";
+        }
+    }
+
+    @PostMapping("/professional/reports/{id}/resolve")
+    public String resolveReport(@PathVariable Long id,
+            @RequestParam String resolutionNotes,
+            HttpSession session) {
+        User professional = (User) session.getAttribute("user");
+        if (professional == null) {
+            return "redirect:/login";
+        }
+
+        if (professional.getRole() != UserRole.PROFESSIONAL) {
+            return "redirect:/dashboard";
+        }
+
+        Report report = reportRepository.findById(id).orElse(null);
+        if (report == null) {
+            return "redirect:/404";
+        }
+
+        try {
+            // Update report with resolution information
+            report.setStatus("resolved");
+            report.setResolutionNotes(resolutionNotes);
+            report.setResolvedAt(LocalDateTime.now());
+            reportRepository.save(report);
+
+            return "redirect:/professional/reports/" + id + "?success=true";
+        } catch (Exception e) {
+            return "redirect:/professional/reports/" + id + "?error=true";
         }
     }
 
@@ -339,3 +377,4 @@ public class PageController {
         return "404";
     }
 }
+
