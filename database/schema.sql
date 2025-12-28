@@ -223,12 +223,11 @@ CREATE TABLE reports (
     -- Values: pending, in_progress, resolved, closed
     urgency VARCHAR(50),
     -- Values: low, medium, high, critical
-    stress_score INT,
-    anxiety_score INT,
-    depression_score INT,
     submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    resolution_notes LONGTEXT,
+    resolved_at DATETIME,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_student_id (student_id),
     INDEX idx_status (status),
