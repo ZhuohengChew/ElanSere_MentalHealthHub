@@ -2,6 +2,7 @@ package com.mentalhealthhub.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -65,4 +66,34 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     // Find by resolved status for history
     @Query("SELECT r FROM Report r WHERE r.status = 'resolved' OR r.status = 'closed' ORDER BY r.resolvedAt DESC")
     List<Report> findResolvedReports();
+
+    // Analytics queries
+    @Query("SELECT COUNT(r) FROM Report r WHERE r.submittedAt > :dateTime")
+    Long countBySubmittedAtAfter(@Param("dateTime") LocalDateTime dateTime);
+
+    @Query(value = "SELECT AVG(" +
+            "TIMESTAMPDIFF(SECOND, r.submitted_at, r.resolved_at)" +
+            ") / 3600 " +
+            "FROM reports r " +
+            "WHERE r.resolved_at IS NOT NULL",
+            nativeQuery = true)
+    Double getAverageResolutionTimeHours();
+
+    @Query("SELECT r.type as type, COUNT(r) as count FROM Report r GROUP BY r.type")
+    List<Object[]> getReportsByType();
+
+    @Query(value = "SELECT DATE_FORMAT(r.submitted_at, '%Y-%m') AS month, COUNT(*) " +
+            "FROM reports r " +
+            "GROUP BY DATE_FORMAT(r.submitted_at, '%Y-%m') " +
+            "ORDER BY month DESC",
+            nativeQuery = true)
+    List<Object[]> getMonthlyReportTrend();
+
+    @Query(value = "SELECT DATE_FORMAT(r.resolved_at, '%Y-%m') AS month, COUNT(*) " +
+            "FROM reports r " +
+            "WHERE r.resolved_at IS NOT NULL " +
+            "GROUP BY DATE_FORMAT(r.resolved_at, '%Y-%m') " +
+            "ORDER BY month DESC",
+            nativeQuery = true)
+    List<Object[]> getMonthlyResolutions();
 }

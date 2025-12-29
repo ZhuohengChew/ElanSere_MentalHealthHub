@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -24,4 +26,38 @@ public interface UserRepository extends JpaRepository<User, Long> {
                            @Param("role") UserRole role,
                            @Param("active") Boolean active,
                            Pageable pageable);
+
+    // Analytics queries for admin dashboard
+    @Query("SELECT COUNT(u) FROM User u WHERE u.deletedAt IS NULL")
+    Long countTotalUsers();
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.active = true AND u.deletedAt IS NULL")
+    Long countActiveUsers();
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.active = false AND u.deletedAt IS NULL")
+    Long countInactiveUsers();
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role AND u.deletedAt IS NULL")
+    Long countByRole(@Param("role") UserRole role);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt > :dateTime AND u.deletedAt IS NULL")
+    Long countNewUsersSince(@Param("dateTime") java.time.LocalDateTime dateTime);
+
+    @Query("SELECT u FROM User u WHERE u.active = true AND u.deletedAt IS NULL ORDER BY u.createdAt DESC")
+    List<User> findAllActiveUsers();
+
+    @Query("SELECT u FROM User u WHERE u.role = :role AND u.deletedAt IS NULL")
+    List<User> findByRole(@Param("role") UserRole role);
+
+    @Query("SELECT AVG(CAST(u.stressLevel AS DOUBLE)) FROM User u WHERE u.stressLevel IS NOT NULL AND u.deletedAt IS NULL")
+    Double getAverageStressLevel();
+
+    @Query("SELECT AVG(CAST(u.anxietyLevel AS DOUBLE)) FROM User u WHERE u.anxietyLevel IS NOT NULL AND u.deletedAt IS NULL")
+    Double getAverageAnxietyLevel();
+
+    @Query("SELECT AVG(CAST(u.wellbeingScore AS DOUBLE)) FROM User u WHERE u.wellbeingScore IS NOT NULL AND u.deletedAt IS NULL")
+    Double getAverageWellbeingScore();
+
+    @Query("SELECT FUNCTION('DATE_FORMAT', u.createdAt, '%Y-%m') as month, COUNT(u) FROM User u WHERE u.deletedAt IS NULL GROUP BY FUNCTION('DATE_FORMAT', u.createdAt, '%Y-%m') ORDER BY month DESC")
+    java.util.Map<String, Long> getUserRegistrationTrend();
 }

@@ -1,21 +1,27 @@
-<!-- Analytics Report Page -->
+<!-- Analytics Report Page - Comprehensive Dashboard -->
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-md-12">
-            <h1 class="mb-2">Analytics Report</h1>
-            <p class="text-muted">Comprehensive system analytics and performance metrics</p>
+            <h1 class="mb-2">Analytics Dashboard</h1>
+            <p class="text-muted">Comprehensive system analytics, mental health trends, and engagement metrics</p>
         </div>
     </div>
 
-    <!-- Key Metrics -->
+    <!-- ==================== 1. USER OVERVIEW ANALYTICS ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-people"></i> User Overview Analytics</h5>
+        </div>
+    </div>
+
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="stat-card border-left-primary">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6 class="text-muted mb-2">Total Users</h6>
-                        <div class="stat-number">1,248</div>
-                        <small class="text-success"><i class="bi bi-arrow-up"></i> +52 this month</small>
+                        <div class="stat-number" id="totalUsers">-</div>
+                        <small class="text-success"><span id="newUsersMonth">-</span> new this month</small>
                     </div>
                     <i class="bi bi-people text-primary" style="font-size: 1.5rem;"></i>
                 </div>
@@ -25,11 +31,11 @@
             <div class="stat-card" style="border-left: 4px solid #7FB685;">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h6 class="text-muted mb-2">Active Sessions</h6>
-                        <div class="stat-number">347</div>
-                        <small class="text-muted">Real-time users</small>
+                        <h6 class="text-muted mb-2">Active vs Inactive</h6>
+                        <div class="stat-number" id="activeUsers">-</div>
+                        <small class="text-muted"><span id="inactiveUsers">-</span> inactive</small>
                     </div>
-                    <i class="bi bi-activity text-success" style="font-size: 1.5rem;"></i>
+                    <i class="bi bi-person-check text-success" style="font-size: 1.5rem;"></i>
                 </div>
             </div>
         </div>
@@ -37,11 +43,11 @@
             <div class="stat-card" style="border-left: 4px solid #9B7EDE;">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h6 class="text-muted mb-2">System Health</h6>
-                        <div class="stat-number">98.5%</div>
-                        <small class="text-muted">Uptime this month</small>
+                        <h6 class="text-muted mb-2">Students</h6>
+                        <div class="stat-number" id="studentCount">-</div>
+                        <small class="text-muted">Primary users</small>
                     </div>
-                    <i class="bi bi-heart-pulse text-success" style="font-size: 1.5rem;"></i>
+                    <i class="bi bi-mortarboard text-info" style="font-size: 1.5rem;"></i>
                 </div>
             </div>
         </div>
@@ -49,17 +55,17 @@
             <div class="stat-card" style="border-left: 4px solid #FF9F1C;">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h6 class="text-muted mb-2">Engagement Rate</h6>
-                        <div class="stat-number">76%</div>
-                        <small class="text-success"><i class="bi bi-arrow-up"></i> +4% from last month</small>
+                        <h6 class="text-muted mb-2">Professionals & Staff</h6>
+                        <div class="stat-number" id="professionalCount">-</div>
+                        <small class="text-muted"><span id="staffCount">-</span> staff</small>
                     </div>
-                    <i class="bi bi-graph-up text-warning" style="font-size: 1.5rem;"></i>
+                    <i class="bi bi-briefcase text-warning" style="font-size: 1.5rem;"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Charts Row -->
+    <!-- User Distribution Chart -->
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card">
@@ -74,61 +80,490 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header border-0">
-                    <h6 class="mb-0">Feature Usage (Last 30 Days)</h6>
+                    <h6 class="mb-0">New Registrations Trend (Last 6 Months)</h6>
                 </div>
                 <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Self-Assessment</span>
-                            <span class="badge bg-primary">892 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Self-Care Tools</span>
-                            <span class="badge bg-success">756 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Educational Modules</span>
-                            <span class="badge bg-info">643 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Peer Support Forum</span>
-                            <span class="badge bg-warning text-dark">521 uses</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between">
-                            <span>Telehealth Appointments</span>
-                            <span class="badge bg-secondary">287 uses</span>
-                        </div>
+                    <canvas id="userRegistrationTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 2. MENTAL HEALTH TRENDS ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-heart-pulse"></i> Mental Health Trends</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #FF6B6B;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Stress Level</h6>
+                        <div class="stat-number" id="avgStressLevel">-</div>
+                        <small class="text-muted">Out of 100</small>
                     </div>
-                    <!-- Individual Student Button -->
-                    <div class="mt-4 pt-3 border-top">
-                        <a th:href="@{/patients}" class="btn btn-primary btn-lg w-100">
-                            <i class="bi bi-person"></i> Individual Student Analytics
-                        </a>
+                    <i class="bi bi-exclamation-circle text-danger" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #FFA500;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Anxiety Level</h6>
+                        <div class="stat-number" id="avgAnxietyLevel">-</div>
+                        <small class="text-muted">Out of 100</small>
                     </div>
+                    <i class="bi bi-chat-dots text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #4CAF50;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Wellbeing</h6>
+                        <div class="stat-number" id="avgWellbeing">-</div>
+                        <small class="text-muted">Out of 100</small>
+                    </div>
+                    <i class="bi bi-emoji-smile text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #2196F3;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Assessments Done</h6>
+                        <div class="stat-number" id="totalAssessments">-</div>
+                        <small class="text-muted">Total completed</small>
+                    </div>
+                    <i class="bi bi-clipboard-check text-info" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mental Health Distribution and Trend -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Score Distribution (0-100)</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="mentalHealthDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Mental Health Score Trend (Last 6 Months)</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="mentalHealthTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 3. APPOINTMENT ANALYTICS ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-calendar-check"></i> Appointment Analytics</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card border-left-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Appointments</h6>
+                        <div class="stat-number" id="totalAppointments">-</div>
+                        <small class="text-muted">All time</small>
+                    </div>
+                    <i class="bi bi-calendar2 text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #4CAF50;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Completed</h6>
+                        <div class="stat-number" id="completedAppointments">-</div>
+                        <small class="text-muted"><span id="completedPercent">-</span>%</small>
+                    </div>
+                    <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #FFC107;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Scheduled</h6>
+                        <div class="stat-number" id="scheduledAppointments">-</div>
+                        <small class="text-muted"><span id="scheduledPercent">-</span>%</small>
+                    </div>
+                    <i class="bi bi-clock text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #DC3545;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Cancelled</h6>
+                        <div class="stat-number" id="cancelledAppointments">-</div>
+                        <small class="text-muted"><span id="cancelledPercent">-</span>%</small>
+                    </div>
+                    <i class="bi bi-x-circle text-danger" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Status and Professional Workload -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Appointment Status Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="appointmentStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Monthly Appointment Trends</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="appointmentTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Workload -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Professional Workload</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="professionalWorkloadChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 4. EDUCATIONAL MODULES ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-book"></i> Educational Module Analytics</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #2196F3;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Progress</h6>
+                        <div class="stat-number" id="avgModuleProgress">-</div>
+                        <small class="text-muted">Percentage</small>
+                    </div>
+                    <i class="bi bi-progress-bar text-info" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #4CAF50;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Completions</h6>
+                        <div class="stat-number" id="totalModuleCompletions">-</div>
+                        <small class="text-muted">Total modules</small>
+                    </div>
+                    <i class="bi bi-check2-square text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Monthly Module Completions</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="moduleCompletionTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Most Accessed Modules -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Most Accessed Educational Modules</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="moduleAccessChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 5. SELF-CARE ANALYTICS ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-flower1"></i> Self-Care Activity Analytics</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Self-Care Activity Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="selfCareActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Mood Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="moodDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 6. FORUM ANALYTICS ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-chat-dots"></i> Forum Analytics</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card border-left-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Posts</h6>
+                        <div class="stat-number" id="totalForumPosts">-</div>
+                        <small class="text-muted">All time</small>
+                    </div>
+                    <i class="bi bi-file-text text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #7FB685;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Comments</h6>
+                        <div class="stat-number" id="totalForumComments">-</div>
+                        <small class="text-muted">Discussions</small>
+                    </div>
+                    <i class="bi bi-chat-left-text text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #9B7EDE;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Views/Post</h6>
+                        <div class="stat-number" id="avgViewsPerPost">-</div>
+                        <small class="text-muted">Average</small>
+                    </div>
+                    <i class="bi bi-eye text-info" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #FF9F1C;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Replies/Post</h6>
+                        <div class="stat-number" id="avgRepliesPerPost">-</div>
+                        <small class="text-muted">Engagement</small>
+                    </div>
+                    <i class="bi bi-chat-dots-fill text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forum Category Distribution and Top Posts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Posts by Category</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="forumCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Most Active Users</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="activeUsersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 7. REPORTS / INCIDENTS ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-exclamation-triangle"></i> Reports & Incidents Analytics</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card border-left-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Reports</h6>
+                        <div class="stat-number" id="totalReports">-</div>
+                        <small class="text-muted">All time</small>
+                    </div>
+                    <i class="bi bi-file-earmark-pdf text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #FFC107;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pending</h6>
+                        <div class="stat-number" id="pendingReports">-</div>
+                        <small class="text-muted">Awaiting action</small>
+                    </div>
+                    <i class="bi bi-hourglass text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #4CAF50;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Resolved</h6>
+                        <div class="stat-number" id="resolvedReports">-</div>
+                        <small class="text-muted">Closed</small>
+                    </div>
+                    <i class="bi bi-check-circle text-success" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="border-left: 4px solid #2196F3;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Avg Resolution Time</h6>
+                        <div class="stat-number" id="avgResolutionTime">-</div>
+                        <small class="text-muted">Hours</small>
+                    </div>
+                    <i class="bi bi-speedometer2 text-info" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Status and Urgency Distribution -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Report Status Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="reportStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Report Urgency Levels</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="reportUrgencyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Trends -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Monthly Report Submissions & Resolutions</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="reportTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 8. ADMIN ACTIVITY ==================== -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h5 class="mb-3"><i class="bi bi-shield-lock"></i> Admin Activity & System Logs</h5>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="stat-card border-left-primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Actions This Week</h6>
+                        <div class="stat-number" id="actionsThisWeek">-</div>
+                        <small class="text-muted">Admin operations</small>
+                    </div>
+                    <i class="bi bi-activity text-primary" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h6 class="mb-0">Most Active Admins</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="adminActivityChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script th:inline="javascript">
-document.addEventListener('DOMContentLoaded', function() {
-    // User Distribution Chart
-    if (document.getElementById('userDistributionChart')) {
-        new Chart(document.getElementById('userDistributionChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Students', 'Staff', 'Professionals', 'Admins'],
-                datasets: [{
-                    data: [1189, 42, 15, 2],
-                    backgroundColor: ['#6A8EAE', '#7FB685', '#9B7EDE', '#FF9F1C']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true
-            }
-        });
-    }
-});
-</script>
+<script th:src="@{/static/js/analytics.js}"></script>
