@@ -1,423 +1,134 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .container {
-            max-width: 1000px;
-        }
-
-        .booking-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        .booking-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .booking-header h1 {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .booking-header p {
-            margin: 10px 0 0 0;
-            opacity: 0.95;
-        }
-
-        .booking-content {
-            padding: 40px;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title i {
-            color: #667eea;
-            font-size: 1.5rem;
-        }
-
-        .divider {
-            height: 1px;
-            background: #e0e0e0;
-            margin: 30px 0;
-        }
-
-        /* Professional Card */
-        .professional-card {
-            background: #f8f9ff;
-            border: 2px solid #e0e7ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .professional-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
-        }
-
-        .professional-card.selected {
-            background: white;
-            border-color: #667eea;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .professional-card .avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .professional-info {
-            flex-grow: 1;
-        }
-
-        .professional-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .professional-email {
-            color: #667eea;
-            margin: 5px 0;
-            font-size: 0.95rem;
-        }
-
-        .professional-spec {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .check-icon {
-            color: #28a745;
-            font-size: 1.8rem;
-            flex-shrink: 0;
-        }
-
-        /* Date Picker */
-        .date-section {
-            margin-bottom: 30px;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .form-control {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-
-        /* Time Slots */
-        .time-slots-section {
-            margin-bottom: 30px;
-        }
-
-        .time-slots-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 12px;
-        }
-
-        .time-slot {
-            padding: 12px;
-            text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            color: #333;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .time-slot:hover {
-            border-color: #667eea;
-            color: #667eea;
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.1);
-        }
-
-        .time-slot.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        /* Notes */
-        .notes-section {
-            margin-bottom: 30px;
-        }
-
-        .form-control textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* Summary Sidebar */
-        .summary-sidebar {
-            background: #f8f9ff;
-            border: 2px solid #e0e7ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            position: sticky;
-            top: 20px;
-        }
-
-        .summary-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .summary-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .summary-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .summary-label {
-            font-weight: 500;
-            color: #666;
-            min-width: 80px;
-        }
-
-        .summary-value {
-            color: #333;
-            font-weight: 500;
-        }
-
-        .summary-empty {
-            color: #999;
-            font-style: italic;
-            padding: 10px;
-            text-align: center;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .booking-content {
-                padding: 20px;
-            }
-
-            .booking-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .time-slots-grid {
-                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            }
-
-            .summary-sidebar {
-                position: static;
-            }
-        }
-
-        .alert {
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="booking-card">
-        <div class="booking-header">
-            <h1><i class="bi bi-calendar-check"></i> Book Appointment</h1>
-            <p>Schedule a session with our professional counselor</p>
+<!-- Book Appointment Page -->
+<div class="container-lg">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-2"><i class="bi bi-calendar-plus"></i> Book Appointment</h1>
+            <p class="text-muted">Schedule a session with a mental health professional</p>
         </div>
+    </div>
 
-        <div class="booking-content">
-            <div class="row">
-                <div class="col-lg-8">
-                    <!-- Professional Selection -->
-                    <div class="section-title">
-                        <i class="bi bi-person-check"></i> Professional
-                    </div>
+    <div class="row">
+        <!-- Main Content (Left) -->
+        <div class="col-lg-8">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
 
-                    <div id="professionalsContainer">
-                        <div th:each="prof : ${professionals}" class="professional-card" 
-                             th:onclick="selectProfessional(this, [[${prof.id}]], [[${prof.name}]])"
-                             style="cursor: pointer;">
-                            <div class="avatar" th:text="${prof.name.substring(0, 2).toUpperCase()}">PC</div>
-                            <div class="professional-info">
-                                <p class="professional-name" th:text="${prof.name}">Professional Counselor</p>
-                                <p class="professional-email">
-                                    <i class="bi bi-envelope"></i> <span th:text="${prof.email}">prof@educational.edu</span>
-                                </p>
-                                <p class="professional-spec">Specialization: General Mental Health Support</p>
+            <form id="bookingForm" method="POST" action="/mentalhealthhub/appointments/save">
+                <!-- Professional Selection Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-person-check"></i> Select Professional
+                        </h5>
+
+                        <div id="professionalsContainer">
+                            <div th:if="${professionals.isEmpty()}" class="alert alert-warning">
+                                <i class="bi bi-exclamation-circle"></i> No professionals available
                             </div>
-                            <i class="bi bi-check-circle check-icon" style="display: none;"></i>
+                            <div th:each="prof : ${professionals}" class="mb-3">
+                                <label class="professional-card" 
+                                       th:classappend="${prof.id == 1} ? 'selected' : ''"
+                                       onclick="updateSummary(); updateAvailableSlots();">
+                                    <input type="radio" name="professionalId" th:value="${prof.id}" 
+                                           class="professional-radio"
+                                           th:checked="${prof.id == 1}">
+                                    <div class="professional-info">
+                                        <p class="professional-name" th:text="${prof.name}">Professional Name</p>
+                                        <p class="professional-email">
+                                            <i class="bi bi-envelope"></i> <span th:text="${prof.email}">email@example.com</span>
+                                        </p>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Date Selection -->
-                    <div class="section-title">
-                        <i class="bi bi-calendar"></i> Select Date
-                    </div>
-
-                    <div class="date-section">
-                        <input type="date" id="appointmentDate" class="form-control" required
-                               th:min="${#temporals.format(#dates.createNow(), 'yyyy-MM-dd')}">
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Time Slots -->
-                    <div class="section-title">
-                        <i class="bi bi-clock"></i> Select Time
-                    </div>
-
-                    <div class="time-slots-section">
-                        <div class="time-slots-grid" id="timeSlots">
-                            <button type="button" class="time-slot" onclick="selectTime(this, '09:00')">09:00 AM</button>
-                            <button type="button" class="time-slot" onclick="selectTime(this, '10:00')">10:00 AM</button>
-                            <button type="button" class="time-slot" onclick="selectTime(this, '11:00')">11:00 AM</button>
-                            <button type="button" class="time-slot" onclick="selectTime(this, '14:00')">2:00 PM</button>
-                            <button type="button" class="time-slot" onclick="selectTime(this, '15:00')">3:00 PM</button>
-                            <button type="button" class="time-slot" onclick="selectTime(this, '16:00')">4:00 PM</button>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Notes -->
-                    <div class="section-title">
-                        <i class="bi bi-chat-left-dots"></i> Additional Notes (Optional)
-                    </div>
-
-                    <div class="notes-section">
-                        <textarea id="notes" class="form-control" placeholder="Share any concerns or topics you'd like to discuss..."></textarea>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="button-group">
-                        <a href="/mentalhealthhub/dashboard" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to Dashboard
-                        </a>
-                        <a href="/mentalhealthhub/appointments/my-schedule" class="btn btn-info">
-                            <i class="bi bi-calendar-check"></i> View All Appointments
-                        </a>
-                        <button type="button" class="btn btn-primary" onclick="submitAppointment()">
-                            <i class="bi bi-check-circle"></i> Confirm Appointment
-                        </button>
                     </div>
                 </div>
 
-                <!-- Summary Sidebar -->
-                <div class="col-lg-4">
-                    <div class="summary-sidebar">
-                        <div class="summary-title">
-                            <i class="bi bi-info-circle"></i> Appointment Summary
+                <!-- Date Selection Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-calendar"></i> Select Date
+                        </h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Date</label>
+                            <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" 
+                                   required onchange="updateAvailableSlots(); updateSummary();"
+                                   th:min="${minDate}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Slots Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-clock"></i> Select Time Slots (Continuous Selection Required)
+                        </h5>
+
+                        <div id="timeSlotsSection" style="display: none;">
+                            <!-- Morning Slots -->
+                            <div class="time-period-label"><i class="bi bi-sunrise"></i> Morning (8:00 AM - 1:00 PM)</div>
+                            <div class="time-slots-grid" id="morningSlots">
+                                <!-- Populated by JavaScript -->
+                            </div>
+
+                            <!-- Afternoon Slots -->
+                            <div class="time-period-label"><i class="bi bi-cloud-sun"></i> Afternoon (2:00 PM - 5:00 PM)</div>
+                            <div class="time-slots-grid" id="afternoonSlots">
+                                <!-- Populated by JavaScript -->
+                            </div>
+
+                            <div id="durationDisplay" class="duration-badge" style="display: none;"></div>
                         </div>
 
-                        <div id="summaryContent">
-                            <div class="summary-empty">
-                                <i class="bi bi-info-circle"></i> Fill in your appointment details
-                            </div>
+                        <!-- Validation Message -->
+                        <div id="validationMessage" style="display: none; margin-top: 20px;"></div>
+                    </div>
+                </div>
+
+                <!-- Notes Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="bi bi-chat-left-dots"></i> Additional Notes (Optional)
+                        </h5>
+
+                        <div>
+                            <textarea id="notes" class="form-control" 
+                                      placeholder="Share any concerns or topics you'd like to discuss..." onchange="updateSummary()"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 mb-4">
+                    <a href="/mentalhealthhub/dashboard" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="/mentalhealthhub/appointments" class="btn btn-secondary">
+                        <i class="bi bi-calendar-check"></i> View My Appointments
+                    </a>
+                    <button type="button" class="btn btn-primary ms-auto" onclick="submitAppointment()" id="submitBtn">
+                        <i class="bi bi-check-circle"></i> Confirm Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Summary Sidebar (Right) -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 90px;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-info-circle"></i> Appointment Summary
+                    </h5>
+
+                    <div id="summaryContent">
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+                            <p class="mt-2">Fill in appointment details</p>
                         </div>
                     </div>
                 </div>
@@ -426,169 +137,616 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    let selectedDate = null;
-    let selectedTime = null;
-    let selectedProfessionalId = null;
-    let selectedProfessionalName = null;
-
-    // Professional selection
-    function selectProfessional(element, profId, profName) {
-        // Remove selection from all professional cards
-        document.querySelectorAll('.professional-card').forEach(card => {
-            card.classList.remove('selected');
-            card.querySelector('.check-icon').style.display = 'none';
-        });
-
-        // Add selection to clicked card
-        element.classList.add('selected');
-        element.querySelector('.check-icon').style.display = 'block';
-        
-        selectedProfessionalId = profId;
-        selectedProfessionalName = profName;
-        updateSummary();
+<style>
+    .professional-card {
+        background: #f8f9ff;
+        border: 2px solid #e0e7ff;
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
 
-    // Date change listener
-    document.getElementById('appointmentDate').addEventListener('change', function() {
-        selectedDate = this.value;
+    .professional-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+    }
+
+    .professional-card.selected {
+        background: white;
+        border-color: #667eea;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .professional-radio {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+    }
+
+    .professional-info {
+        flex-grow: 1;
+    }
+
+    .professional-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .professional-email {
+        color: #667eea;
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .form-control {
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .time-slots-section {
+        margin-bottom: 20px;
+    }
+
+    .time-period-label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #667eea;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e0e7ff;
+    }
+
+    .time-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .time-slot-wrapper {
+        display: flex;
+        align-items: center;
+    }
+
+    .time-slot-checkbox {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+    }
+
+    .time-slot-label {
+        display: block;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #333;
+        transition: all 0.3s ease;
+        background: white;
+        flex-grow: 1;
+        text-align: center;
+        user-select: none;
+        font-size: 0.9rem;
+    }
+
+    .time-slot-checkbox:checked + .time-slot-label {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+    }
+
+    .time-slot-label:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    input[type="checkbox"]:disabled + .time-slot-label {
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+        background-color: #f5f5f5 !important;
+        border-color: #ccc !important;
+        color: #999 !important;
+        pointer-events: none !important;
+    }
+
+    input[type="checkbox"]:disabled + .time-slot-label:hover {
+        border-color: #ccc !important;
+        color: #999 !important;
+    }
+
+    .duration-badge {
+        display: inline-block;
+        background: #e0e7ff;
+        color: #667eea;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: 15px;
+    }
+
+    .disabled-slot {
+        opacity: 0.6;
+    }
+
+    /* Summary Styles */
+    .summary-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 0.95rem;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .summary-item i {
+        color: #667eea;
+        min-width: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .time-slots-grid {
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        }
+
+        .card {
+            margin-bottom: 1rem !important;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let selectedProfessionalId = null;
+    let selectedDate = null;
+    let selectedSlots = [];
+    let allSlots = [];
+    let availableSlots = [];
+    let currentUserId = null;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch current user ID
+        fetch('/mentalhealthhub/appointments/api/current-user')
+            .then(response => response.json())
+            .then(data => {
+                currentUserId = data.id;
+                console.log('Current user ID:', currentUserId);
+            })
+            .catch(error => console.error('Error fetching user ID:', error));
+        
+        const firstRadio = document.querySelector('input[name="professionalId"]');
+        if (firstRadio) {
+            selectedProfessionalId = firstRadio.value;
+        }
         updateSummary();
     });
 
-    function selectTime(element, time) {
-        // Remove selection from all time slots
-        document.querySelectorAll('.time-slot').forEach(slot => {
-            slot.classList.remove('selected');
+    function initializeTimeSlots() {
+        // Create default slots
+        createDefaultSlots();
+    }
+
+    function createDefaultSlots() {
+        allSlots = [];
+        const morningStart = 8;
+        const afternoonStart = 14;
+        const afternoonEnd = 17;
+
+        for (let h = morningStart; h < 13; h++) {
+            allSlots.push({
+                start: `${String(h).padStart(2, '0')}:00`,
+                end: `${String(h).padStart(2, '0')}:30`,
+                display: `${String(h).padStart(2, '0')}:00-${String(h).padStart(2, '0')}:30`
+            });
+            allSlots.push({
+                start: `${String(h).padStart(2, '0')}:30`,
+                end: `${String(h + 1).padStart(2, '0')}:00`,
+                display: `${String(h).padStart(2, '0')}:30-${String(h + 1).padStart(2, '0')}:00`
+            });
+        }
+
+        for (let h = afternoonStart; h < afternoonEnd; h++) {
+            allSlots.push({
+                start: `${String(h).padStart(2, '0')}:00`,
+                end: `${String(h).padStart(2, '0')}:30`,
+                display: `${String(h).padStart(2, '0')}:00-${String(h).padStart(2, '0')}:30`
+            });
+            allSlots.push({
+                start: `${String(h).padStart(2, '0')}:30`,
+                end: `${String(h + 1).padStart(2, '0')}:00`,
+                display: `${String(h).padStart(2, '0')}:30-${String(h + 1).padStart(2, '0')}:00`
+            });
+        }
+    }
+
+    function renderTimeSlots() {
+        const morningContainer = document.getElementById('morningSlots');
+        const afternoonContainer = document.getElementById('afternoonSlots');
+
+        morningContainer.innerHTML = '';
+        afternoonContainer.innerHTML = '';
+
+        console.log('🎨 Rendering time slots...');
+        console.log('  Available slots:', availableSlots.length);
+        console.log('  All slots:', allSlots.length);
+
+        allSlots.forEach((slot, index) => {
+            // Check if this slot is available
+            const isAvailable = availableSlots.some(s => s.start === slot.start && s.end === slot.end);
+
+            if (!isAvailable) {
+                console.log(`  ❌ Slot DISABLED: ${slot.start}-${slot.end}`);
+            } else {
+                console.log(`  ✅ Slot ENABLED: ${slot.start}-${slot.end}`);
+            }
+
+            const disabledAttr = !isAvailable ? 'disabled' : '';
+            const disabledClass = !isAvailable ? 'disabled-slot' : '';
+
+            const html = `
+                <div class="time-slot-wrapper ${disabledClass}" data-available="${isAvailable}">
+                    <input type="checkbox" id="slot${index}" name="timeSlots" 
+                           value="${slot.start}-${slot.end}" class="time-slot-checkbox"
+                           ${disabledAttr}
+                           data-slot-available="${isAvailable}">
+                    <label for="slot${index}" class="time-slot-label"
+                           title="${!isAvailable ? 'Slot occupied - not available' : ''}">
+                        ${slot.display}
+                    </label>
+                </div>
+            `;
+
+            const slotStart = parseInt(slot.start.split(':')[0]);
+            if (slotStart < 13) {
+                morningContainer.innerHTML += html;
+            } else {
+                afternoonContainer.innerHTML += html;
+            }
         });
 
-        // Add selection to clicked slot
-        element.classList.add('selected');
-        selectedTime = time;
+        addSlotEventListeners();
+    }
+
+    function addSlotEventListeners() {
+        document.querySelectorAll('input[name="timeSlots"]').forEach(checkbox => {
+            checkbox.onclick = function(e) {
+                if (this.disabled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.checked = false;
+                    return false;
+                }
+            };
+
+            checkbox.onchange = function(e) {
+                if (this.disabled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.checked = false;
+                    return false;
+                }
+                handleSlotSelection();
+            };
+        });
+
+        document.querySelectorAll('.time-slot-label').forEach(label => {
+            label.onclick = function(e) {
+                const checkboxId = this.getAttribute('for');
+                const checkbox = document.getElementById(checkboxId);
+                if (checkbox && checkbox.disabled) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            };
+        });
+    }
+
+    function updateAvailableSlots() {
+        const professionalId = document.querySelector('input[name="professionalId"]:checked')?.value;
+        const date = document.getElementById('appointmentDate').value;
+        const timeSlotsSection = document.getElementById('timeSlotsSection');
+
+        // If no date selected, hide the time slots section completely
+        if (!date) {
+            timeSlotsSection.style.display = 'none';
+            clearSlotSelection();
+            return;
+        }
+
+        // If professional not selected, hide time slots
+        if (!professionalId) {
+            timeSlotsSection.style.display = 'none';
+            clearSlotSelection();
+            return;
+        }
+
+        // Show the time slots section
+        timeSlotsSection.style.display = 'block';
+
+        // First, initialize the slot structure
+        if (allSlots.length === 0) {
+            createDefaultSlots();
+        }
+
+        // Fetch available slots from API
+        const apiUrl = `/mentalhealthhub/appointments/api/available-slots?date=${date}&professionalId=${professionalId}&studentId=${currentUserId}`;
+        console.log(`🔍 Fetching available slots from: ${apiUrl}`);
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log('📡 API Response:', data);
+                console.log('   Slots available from API:', data.slots.length);
+                console.log('   Total slots:', data.allSlots.length);
+
+                // IMPORTANT: Use the slots from the API response (which are pre-filtered for availability)
+                availableSlots = (data.slots || []).map(slot => {
+                    const normalizedStart = slot.start.substring(0, 5);
+                    const normalizedEnd = slot.end.substring(0, 5);
+                    return {
+                        start: normalizedStart,
+                        end: normalizedEnd,
+                        display: slot.display
+                    };
+                });
+
+                console.log('✅ Available slots count from API:', availableSlots.length);
+                console.log('   Available slots:', availableSlots.map(s => s.start + '-' + s.end));
+
+                // Render only showing which ones are available (from API)
+                renderTimeSlots();
+                clearSlotSelection();
+            })
+            .catch(error => {
+                console.error('❌ Error fetching available slots:', error);
+                timeSlotsSection.style.display = 'none';
+            });
+    }
+
+    function handleSlotSelection() {
+        selectedSlots = [];
+        const checkboxes = document.querySelectorAll('input[name="timeSlots"]');
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked && !checkbox.disabled) {
+                selectedSlots.push(checkbox.value);
+            }
+
+            if (checkbox.checked && checkbox.disabled) {
+                checkbox.checked = false;
+            }
+        });
+
+        validateContinuousSlots();
         updateSummary();
+    }
+
+    function validateContinuousSlots() {
+        if (selectedSlots.length === 0) {
+            document.getElementById('validationMessage').style.display = 'none';
+            document.getElementById('durationDisplay').style.display = 'none';
+            return;
+        }
+
+        fetch('/mentalhealthhub/appointments/api/validate-slots', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'slots=' + selectedSlots.map(s => encodeURIComponent(s)).join('&slots=')
+        })
+        .then(response => response.json())
+        .then(data => {
+            const msgDiv = document.getElementById('validationMessage');
+            const durationDiv = document.getElementById('durationDisplay');
+
+            if (data.valid) {
+                msgDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> ' +
+                                  (selectedSlots.length > 1 ? 'Slots are continuous ✓' : 'Slot selected ✓') + '</div>';
+                msgDiv.style.display = 'block';
+                durationDiv.textContent = 'Duration: ' + data.duration;
+                durationDiv.style.display = 'inline-block';
+                document.getElementById('submitBtn').disabled = false;
+            } else {
+                msgDiv.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-circle"></i> ' + data.error + '</div>';
+                msgDiv.style.display = 'block';
+                durationDiv.style.display = 'none';
+                document.getElementById('submitBtn').disabled = true;
+            }
+        })
+        .catch(error => {
+            console.error('Validation error:', error);
+            document.getElementById('validationMessage').innerHTML =
+                '<div class="alert alert-warning"><i class="bi bi-exclamation-circle"></i> Error validating slots</div>';
+            document.getElementById('validationMessage').style.display = 'block';
+        });
+    }
+
+    function clearSlotSelection() {
+        selectedSlots = [];
+        document.querySelectorAll('input[name="timeSlots"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        document.getElementById('validationMessage').style.display = 'none';
+        document.getElementById('durationDisplay').style.display = 'none';
     }
 
     function updateSummary() {
         const summaryContent = document.getElementById('summaryContent');
-
-        if (!selectedDate && !selectedTime && !selectedProfessionalId && !document.getElementById('notes').value) {
-            summaryContent.innerHTML = `
-                <div class="summary-empty">
-                    <i class="bi bi-info-circle"></i> Fill in your appointment details
-                </div>
-            `;
-            return;
-        }
-
         let html = '';
 
-        if (selectedProfessionalId) {
-            html += `
-                <div class="summary-item">
-                    <span class="summary-label"><i class="bi bi-person"></i> With:</span>
-                    <span class="summary-value">${selectedProfessionalName}</span>
-                </div>
-            `;
+        const professionalId = document.querySelector('input[name="professionalId"]:checked')?.value;
+        if (professionalId) {
+            const profName = document.querySelector(`input[name="professionalId"]:checked`)?.closest('.professional-card')?.querySelector('.professional-name')?.textContent;
+            html += `<div class="summary-item">
+                        <i class="bi bi-person"></i>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #666;">With</div>
+                            <div style="font-weight: 600;">${profName}</div>
+                        </div>
+                    </div>`;
         }
 
-        if (selectedDate) {
-            const dateObj = new Date(selectedDate);
+        const date = document.getElementById('appointmentDate').value;
+        if (date) {
+            const dateObj = new Date(date + 'T00:00:00');
             const formattedDate = dateObj.toLocaleDateString('en-US', {
-                weekday: 'short',
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
+                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
             });
-            html += `
-                <div class="summary-item">
-                    <span class="summary-label"><i class="bi bi-calendar"></i> Date:</span>
-                    <span class="summary-value">${formattedDate}</span>
-                </div>
-            `;
+            html += `<div class="summary-item">
+                        <i class="bi bi-calendar"></i>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #666;">Date</div>
+                            <div style="font-weight: 600;">${formattedDate}</div>
+                        </div>
+                    </div>`;
         }
 
-        if (selectedTime) {
-            const timeObj = new Date('2000-01-01 ' + selectedTime);
-            const formattedTime = timeObj.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-            html += `
-                <div class="summary-item">
-                    <span class="summary-label"><i class="bi bi-clock"></i> Time:</span>
-                    <span class="summary-value">${formattedTime}</span>
-                </div>
-            `;
+        if (selectedSlots.length > 0) {
+            const startTime = selectedSlots[0].split('-')[0];
+            const endTime = selectedSlots[selectedSlots.length - 1].split('-')[1];
+            html += `<div class="summary-item">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #666;">Time</div>
+                            <div style="font-weight: 600;">${startTime} - ${endTime}</div>
+                        </div>
+                    </div>`;
         }
 
         const notes = document.getElementById('notes').value;
         if (notes) {
-            html += `
-                <div class="summary-item">
-                    <span class="summary-label"><i class="bi bi-chat"></i> Notes:</span>
-                    <span class="summary-value">${notes.substring(0, 50)}${notes.length > 50 ? '...' : ''}</span>
-                </div>
-            `;
+            html += `<div class="summary-item">
+                        <i class="bi bi-chat"></i>
+                        <div>
+                            <div style="font-size: 0.8rem; color: #666;">Notes</div>
+                            <div style="font-weight: 600;">${notes.substring(0, 40)}${notes.length > 40 ? '...' : ''}</div>
+                        </div>
+                    </div>`;
+        }
+
+        if (!html) {
+            html = '<div class="text-center py-4 text-muted"><i class="bi bi-info-circle" style="font-size: 2rem;"></i><p class="mt-2">Fill in appointment details</p></div>';
         }
 
         summaryContent.innerHTML = html;
     }
 
     function submitAppointment() {
-        if (!selectedProfessionalId) {
-            alert('Please select a professional');
+        const professionalId = document.querySelector('input[name="professionalId"]:checked')?.value;
+        const date = document.getElementById('appointmentDate').value;
+
+        if (!professionalId) {
+            showAlert('Please select a professional', 'error');
             return;
         }
 
-        if (!selectedDate) {
-            alert('Please select a date for your appointment');
+        if (!date) {
+            showAlert('Please select a date', 'error');
             return;
         }
 
-        if (!selectedTime) {
-            alert('Please select a time slot for your appointment');
+        if (selectedSlots.length === 0) {
+            showAlert('Please select at least one time slot', 'error');
             return;
         }
 
-        // Create appointment datetime in ISO format
-        const appointmentDateTime = selectedDate + 'T' + selectedTime + ':00';
+        const startTime = selectedSlots[0].split('-')[0];
+        const endTime = selectedSlots[selectedSlots.length - 1].split('-')[1];
 
-        // Create form data
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/mentalhealthhub/appointments/save';
+        const form = document.getElementById('bookingForm');
 
-        // Add hidden fields
-        const fields = {
-            'professionalId': selectedProfessionalId,
-            'appointmentDate': appointmentDateTime,
-            'notes': document.getElementById('notes').value || ''
-        };
+        // Remove old hidden inputs
+        form.querySelectorAll('input[name="professionalId"], input[name="appointmentDate"], input[name="startTime"], input[name="endTime"], input[name="notes"]').forEach(el => el.remove());
 
-        for (const [key, value] of Object.entries(fields)) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
-        }
+        // Add all required inputs
+        const profIdInput = document.createElement('input');
+        profIdInput.type = 'hidden';
+        profIdInput.name = 'professionalId';
+        profIdInput.value = professionalId;
+        form.appendChild(profIdInput);
 
-        // Add CSRF token if present
-        const csrfToken = document.querySelector('[name="_csrf"]');
-        if (csrfToken) {
-            form.appendChild(csrfToken.cloneNode(true));
-        }
+        const dateInput = document.createElement('input');
+        dateInput.type = 'hidden';
+        dateInput.name = 'appointmentDate';
+        dateInput.value = date;
+        form.appendChild(dateInput);
 
-        // Submit form
-        document.body.appendChild(form);
+        const startInput = document.createElement('input');
+        startInput.type = 'hidden';
+        startInput.name = 'startTime';
+        startInput.value = startTime;
+        form.appendChild(startInput);
+
+        const endInput = document.createElement('input');
+        endInput.type = 'hidden';
+        endInput.name = 'endTime';
+        endInput.value = endTime;
+        form.appendChild(endInput);
+
+        const notesInput = document.createElement('input');
+        notesInput.type = 'hidden';
+        notesInput.name = 'notes';
+        notesInput.value = document.getElementById('notes').value;
+        form.appendChild(notesInput);
+
         form.submit();
     }
 
-    // Initialize summary on page load
-    window.addEventListener('load', function() {
-        updateSummary();
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+        const icon = type === 'error' ? 'exclamation-circle' : 'check-circle';
+        alertContainer.innerHTML = `<div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-${icon}"></i> ${message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                  </div>`;
+        if (type !== 'error') {
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+    }
+
+    // Update slots when professional changes
+    document.addEventListener('change', function(e) {
+        if (e.target.name === 'professionalId') {
+            updateAvailableSlots();
+        }
     });
 </script>
-</body>
-</html>

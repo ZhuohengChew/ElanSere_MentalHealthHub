@@ -27,6 +27,7 @@ CREATE TABLE users (
     last_assessment_date DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME(6),
     UNIQUE INDEX unique_email (email),
     INDEX idx_role (role),
     INDEX idx_active (active)
@@ -39,10 +40,13 @@ CREATE TABLE appointments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     student_id BIGINT NOT NULL,
     professional_id BIGINT NOT NULL,
-    appointment_date DATETIME NOT NULL,
-    status VARCHAR(50),
-    -- Enum values: SCHEDULED, COMPLETED, CANCELLED
+    appointment_date DATE NOT NULL,
+    time_slot_start TIME NOT NULL,
+    time_slot_end TIME NOT NULL,
+    status ENUM('PENDING','APPROVED','REJECTED') DEFAULT NULL,
+    -- Enum values: PENDING, APPROVED, REJECTED
     notes LONGTEXT,
+    report_id BIGINT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -220,14 +224,14 @@ CREATE TABLE reports (
     type VARCHAR(255),
     description LONGTEXT,
     status VARCHAR(50) DEFAULT 'pending',
-    -- Values: pending, in_progress, resolved, closed
+    -- Values: pending, reviewed, scheduled, resolved, closed
     urgency VARCHAR(50),
-    -- Values: low, medium, high, critical
+    -- Values: low, moderate, medium, high, urgent, critical
     submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    resolution_notes LONGTEXT,
-    resolved_at DATETIME,
+    resolution_notes VARCHAR(255),
+    resolved_at DATETIME(6),
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_student_id (student_id),
     INDEX idx_status (status),

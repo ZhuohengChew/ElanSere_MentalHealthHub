@@ -1,9 +1,481 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Appointments</title>
+    <title>My Appointments</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .header-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            color: #333;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .appointment-card {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .appointment-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .appointment-card-header {
+            padding: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .appointment-info {
+            flex-grow: 1;
+        }
+
+        .appointment-person {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .appointment-person i {
+            color: #667eea;
+        }
+
+        .appointment-date-time {
+            color: #666;
+            font-size: 0.95rem;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .appointment-date-time span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .appointment-status {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .appointment-card-body {
+            padding: 20px;
+        }
+
+        .appointment-notes {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 3px solid #667eea;
+        }
+
+        .appointment-notes-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .appointment-notes-content {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-rejections {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            margin-bottom: 30px;
+        }
+
+        .btn-rejections:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-section .btn {
+            padding: 6px 14px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+        }
+
+        .filter-section .btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .time-duration {
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #666;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .header-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .appointment-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .appointment-status {
+                margin-top: 10px;
+            }
+
+            .appointment-actions {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-title">
+            <i class="bi bi-calendar2-check" style="color: #667eea; font-size: 2rem;"></i>
+            <div>
+                <h1 th:text="${title}">My Appointments</h1>
+            </div>
+        </div>
+        <p class="header-subtitle" th:text="${user.role.toString() == 'PROFESSIONAL' ? 'Review and manage your scheduled sessions' : 'View your upcoming appointments'}">
+            Manage your schedule
+        </p>
+    </div>
+
+    <!-- For Students: Show Rejected Appointments Button -->
+    <div th:if="${user.role.toString() == 'STUDENT'}">
+        <button class="btn btn-rejections" onclick="window.location.href='/appointments/rejected'">
+            <i class="bi bi-calendar-x"></i> View Rejected Appointments
+        </button>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <span style="font-weight: 600; color: #333;">Filter by status:</span>
+        <button class="btn btn-outline-secondary filter-btn" data-status="all" onclick="filterAppointments('all')">
+            All
+        </button>
+        <button class="btn btn-outline-warning filter-btn" data-status="PENDING" onclick="filterAppointments('PENDING')">
+            <i class="bi bi-clock"></i> Pending
+        </button>
+        <button class="btn btn-outline-success filter-btn" data-status="APPROVED" onclick="filterAppointments('APPROVED')">
+            <i class="bi bi-check-circle"></i> Approved
+        </button>
+    </div>
+
+    <!-- Appointments List -->
+    <div id="appointmentsContainer">
+        <div th:if="${appointments.isEmpty()}" class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <p>No appointments scheduled</p>
+            <a th:href="@{/appointments/book}" class="btn btn-primary mt-3">
+                <i class="bi bi-calendar-plus"></i> Book an Appointment
+            </a>
+        </div>
+
+        <div th:each="apt : ${appointments}">
+            <div class="appointment-card" th:attr="data-status=${apt.status}">
+                <div class="appointment-card-header">
+                    <div class="appointment-info">
+                        <div class="appointment-person">
+                            <i th:if="${user.role.toString() == 'PROFESSIONAL'}" class="bi bi-person-circle"></i>
+                            <i th:if="${user.role.toString() == 'STUDENT'}" class="bi bi-briefcase"></i>
+                            <span th:if="${user.role.toString() == 'PROFESSIONAL'}" th:text="${apt.student.name}">Student Name</span>
+                            <span th:if="${user.role.toString() == 'STUDENT'}" th:text="${apt.professional.name}">Professional Name</span>
+                        </div>
+                        <div class="appointment-date-time">
+                            <span>
+                                <i class="bi bi-calendar-event"></i>
+                                <span th:text="${#temporals.format(apt.appointmentDate, 'dd MMM yyyy')}">Date</span>
+                            </span>
+                            <span>
+                                <i class="bi bi-clock"></i>
+                                <span th:text="${apt.timeSlotStart}">Start Time</span> - <span th:text="${apt.timeSlotEnd}">End Time</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="appointment-status">
+                        <span class="status-badge" 
+                              th:classappend="${apt.status.toString() == 'PENDING' ? 'status-pending' : (apt.status.toString() == 'APPROVED' ? 'status-approved' : 'status-rejected')}"
+                              th:text="${apt.status}">Status</span>
+                    </div>
+                </div>
+
+                <div class="appointment-card-body">
+                    <!-- Notes -->
+                    <div th:if="${apt.notes != null and apt.notes != ''}" class="appointment-notes">
+                        <div class="appointment-notes-title">
+                            <i class="bi bi-chat-left-text"></i> Notes
+                        </div>
+                        <div class="appointment-notes-content" th:text="${apt.notes}">Notes content</div>
+                    </div>
+
+                    <!-- Time Duration Info -->
+                    <div class="time-duration" th:text="'Duration: ' + ${#temporals.format(apt.timeSlotStart, 'HH:mm')} + ' - ' + ${#temporals.format(apt.timeSlotEnd, 'HH:mm')}">
+                        Duration info
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="appointment-actions mt-3" th:if="${user.role.toString() == 'PROFESSIONAL' and apt.status.toString() == 'PENDING'}">
+                        <button class="btn-action btn-approve" th:onclick="'approveAppointment(' + ${apt.id} + ')'" title="Approve this appointment">
+                            <i class="bi bi-check-circle"></i> Approve
+                        </button>
+                        <button class="btn-action btn-reject" th:onclick="'rejectAppointment(' + ${apt.id} + ')'" title="Reject this appointment">
+                            <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentFilter = 'all';
+
+    function filterAppointments(status) {
+        currentFilter = status;
+        
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Filter appointments
+        const cards = document.querySelectorAll('.appointment-card');
+        cards.forEach(card => {
+            if (status === 'all') {
+                card.style.display = 'block';
+            } else {
+                const cardStatus = card.getAttribute('data-status');
+                card.style.display = cardStatus === status ? 'block' : 'none';
+            }
+        });
+    }
+
+    function approveAppointment(appointmentId) {
+        if (!confirm('Are you sure you want to approve this appointment?')) {
+            return;
+        }
+
+        fetch(`/appointments/api/${appointmentId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Appointment approved successfully');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to approve appointment'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error approving appointment. Please try again.');
+        });
+    }
+
+    function rejectAppointment(appointmentId) {
+        if (!confirm('Are you sure you want to reject this appointment?')) {
+            return;
+        }
+
+        fetch(`/appointments/api/${appointmentId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Appointment rejected');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to reject appointment'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error rejecting appointment. Please try again.');
+        });
+    }
+
+    // Set first button as active on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstBtn = document.querySelector('[data-status="all"]');
+        if (firstBtn) {
+            firstBtn.classList.add('active');
+        }
+    });
+</script>
+</body>
+</html>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -135,6 +607,11 @@
                                     <i class="bi bi-chevron-right"></i>
                                 </button>
                             </div>
+                            <div style="margin-bottom: 10px;">
+                                <button class="btn btn-sm btn-outline-primary w-100" onclick="resetToToday()" title="Go back to today's appointments">
+                                    <i class="bi bi-arrow-clockwise"></i> Reset to Today
+                                </button>
+                            </div>
                             <div class="calendar-grid">
                                 <table class="table table-sm table-bordered" style="margin: 0; border-collapse: collapse;">
                                     <thead>
@@ -183,11 +660,30 @@
 
     <script th:inline="javascript">
         let currentDate = new Date();
-        let selectedDate = new Date();
+        let selectedDate = new Date(); // Initialize to today by default
         let currentUser = null;
         
         // Load appointments data from API instead of Thymeleaf inline (better compatibility)
         let appointmentsData = [];
+        
+        // Function to format date to YYYY-MM-DD for comparison
+        function formatDateForComparison(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Function to initialize after data is loaded
+        function initializeCalendar() {
+            const todayStr = formatDateForComparison(new Date());
+            console.log('Initializing calendar with today date:', todayStr);
+            currentDate = new Date();
+            selectedDate = new Date();
+            renderCalendar();
+            // Auto-select today's date
+            displayAppointmentsForDate(selectedDate);
+        }
         
         // Fetch appointments from API
         console.log('Fetching appointments from API endpoint...');
@@ -209,15 +705,13 @@
                     }
                 });
                 
-                // Initialize the calendar after data is loaded
-                renderCalendar();
-                displayAppointmentsForDate(selectedDate);
+                // Initialize the calendar and display today's appointments after data is loaded
+                initializeCalendar();
             })
             .catch(error => {
                 console.error('✗ Error loading appointments from API:', error);
                 // Initialize calendar even if data load fails
-                renderCalendar();
-                displayAppointmentsForDate(selectedDate);
+                initializeCalendar();
             });
         
         // Fetch current user info from session
@@ -277,9 +771,9 @@
                 td.textContent = i;
                 
                 const date = new Date(year, month, i);
-                const dateStr = date.toDateString();
-                const todayStr = new Date().toDateString();
-                const selectedStr = selectedDate.toDateString();
+                const dateStr = formatDateForComparison(date);
+                const todayStr = formatDateForComparison(new Date());
+                const selectedStr = formatDateForComparison(selectedDate);
                 
                 if (dateStr === todayStr) {
                     td.classList.add('today');
@@ -316,6 +810,14 @@
 
         function selectDate(date) {
             selectedDate = new Date(date);
+            renderCalendar();
+            displayAppointmentsForDate(selectedDate);
+        }
+
+        function resetToToday() {
+            // Reset to today's date
+            selectedDate = new Date();
+            currentDate = new Date();
             renderCalendar();
             displayAppointmentsForDate(selectedDate);
         }
@@ -367,6 +869,20 @@
                 `;
                 return;
             }
+            
+            // Sort appointments by date and time in ascending order
+            appointmentsForDate.sort((a, b) => {
+                // First sort by appointment date
+                const dateA = a.appointmentDate instanceof Date ? a.appointmentDate.getTime() : new Date(a.appointmentDate).getTime();
+                const dateB = b.appointmentDate instanceof Date ? b.appointmentDate.getTime() : new Date(b.appointmentDate).getTime();
+                if (dateA !== dateB) {
+                    return dateA - dateB;
+                }
+                // Then sort by time slot start
+                const timeA = a.timeSlotStart ? new Date('1970-01-01T' + a.timeSlotStart).getTime() : 0;
+                const timeB = b.timeSlotStart ? new Date('1970-01-01T' + b.timeSlotStart).getTime() : 0;
+                return timeA - timeB;
+            });
             
             let html = '';
             appointmentsForDate.forEach(apt => {

@@ -294,6 +294,49 @@
                             </div>
                         </div>
 
+                        <!-- Appointment Details (if scheduled) -->
+                        <div th:if="${report.status == 'scheduled' && appointment != null}" class="mb-4">
+                            <div class="info-label">
+                                <i class="bi bi-calendar-event me-2"></i>Appointment Details
+                            </div>
+                            <div class="card border-success mb-3">
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="info-label">Appointment Date</div>
+                                            <div class="info-value">
+                                                <i class="bi bi-calendar3 me-2" style="color: #16a34a;"></i>
+                                                <strong th:text="${#temporals.format(appointment.appointmentDate, 'MMMM dd, yyyy')}">Date</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-label">Professional</div>
+                                            <div class="info-value">
+                                                <i class="bi bi-person-badge me-2" style="color: #16a34a;"></i>
+                                                <strong><span th:text="${appointment.professional?.name}"></span></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-label">Start Time</div>
+                                            <div class="info-value">
+                                                <i class="bi bi-clock-history me-2" style="color: #16a34a;"></i>
+                                                <strong th:text="${#temporals.format(appointment.timeSlotStart, 'HH:mm')}">Start Time</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-label">End Time</div>
+                                            <div class="info-value">
+                                                <i class="bi bi-clock me-2" style="color: #16a34a;"></i>
+                                                <strong th:text="${#temporals.format(appointment.timeSlotEnd, 'HH:mm')}">End Time</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Resolution Notes (if resolved/closed) -->
                         <div th:if="${report.status == 'resolved' || report.status == 'closed'}" class="mb-4">
                             <div class="info-label">

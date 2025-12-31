@@ -1,20 +1,43 @@
 package com.mentalhealthhub.service;
 
 import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.mentalhealthhub.dto.*;
-import com.mentalhealthhub.model.*;
-import com.mentalhealthhub.repository.*;
+import com.mentalhealthhub.dto.AdminActivityDTO;
+import com.mentalhealthhub.dto.AppointmentAnalyticsDTO;
+import com.mentalhealthhub.dto.ComprehensiveAnalyticsDTO;
+import com.mentalhealthhub.dto.ForumAnalyticsDTO;
+import com.mentalhealthhub.dto.MentalHealthTrendsDTO;
+import com.mentalhealthhub.dto.ModuleAnalyticsDTO;
+import com.mentalhealthhub.dto.ReportAnalyticsDTO;
+import com.mentalhealthhub.dto.SelfCareAnalyticsDTO;
+import com.mentalhealthhub.dto.UserAnalyticsDTO;
+import com.mentalhealthhub.model.AppointmentStatus;
+import com.mentalhealthhub.model.ForumPost;
+import com.mentalhealthhub.model.SelfCareType;
+import com.mentalhealthhub.model.User;
+import com.mentalhealthhub.model.UserRole;
+import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.AssessmentRepository;
+import com.mentalhealthhub.repository.AuditLogRepository;
+import com.mentalhealthhub.repository.EducationalModuleRepository;
+import com.mentalhealthhub.repository.ForumCommentRepository;
+import com.mentalhealthhub.repository.ForumPostRepository;
+import com.mentalhealthhub.repository.ModuleProgressRepository;
+import com.mentalhealthhub.repository.ReportRepository;
+import com.mentalhealthhub.repository.SelfCareRepository;
+import com.mentalhealthhub.repository.UserRepository;
 
 @Service
 @Transactional(readOnly = true)
@@ -123,9 +146,9 @@ public class AnalyticsService {
         AppointmentAnalyticsDTO dto = new AppointmentAnalyticsDTO();
 
         dto.setTotalAppointments(appointmentRepository.countTotalAppointments());
-        dto.setCompletedAppointments(appointmentRepository.countByStatus(AppointmentStatus.COMPLETED));
-        dto.setCancelledAppointments(appointmentRepository.countByStatus(AppointmentStatus.CANCELLED));
-        dto.setScheduledAppointments(appointmentRepository.countByStatus(AppointmentStatus.SCHEDULED));
+        dto.setCompletedAppointments(appointmentRepository.countByStatus(AppointmentStatus.APPROVED));
+        dto.setCancelledAppointments(appointmentRepository.countByStatus(AppointmentStatus.REJECTED));
+        dto.setScheduledAppointments(appointmentRepository.countByStatus(AppointmentStatus.PENDING));
 
         // Skip average per student as the query is broken (GROUP BY with AVG of COUNT)
         // Just set to 0 for now

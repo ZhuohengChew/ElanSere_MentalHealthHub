@@ -219,9 +219,18 @@ public class PageController {
             reportRepository.save(report);
         }
 
+        // Fetch appointment if report status is scheduled
+        Appointment appointment = null;
+        if ("scheduled".equals(report.getStatus())) {
+            appointment = appointmentRepository.findByReportId(report.getId());
+        }
+
         model.addAttribute("user", user);
         model.addAttribute("report", report);
         model.addAttribute("student", report.getStudent());
+        if (appointment != null) {
+            model.addAttribute("appointment", appointment);
+        }
         model.addAttribute("page", "professional/report-detail");
         model.addAttribute("title", "Report Detail");
         return "layout";
@@ -251,8 +260,10 @@ public class PageController {
             Appointment appointment = new Appointment();
             appointment.setStudent(report.getStudent());
             appointment.setProfessional(professional);
-            appointment.setAppointmentDate(appointmentDateTime);
-            appointment.setStatus(AppointmentStatus.SCHEDULED);
+            appointment.setAppointmentDate(appointmentDateTime.toLocalDate());
+            appointment.setTimeSlotStart(appointmentDateTime.toLocalTime());
+            appointment.setTimeSlotEnd(appointmentDateTime.plusHours(1).toLocalTime());
+            appointment.setStatus(AppointmentStatus.PENDING);
             appointment.setNotes(notes);
             appointment.setCreatedAt(LocalDateTime.now());
 

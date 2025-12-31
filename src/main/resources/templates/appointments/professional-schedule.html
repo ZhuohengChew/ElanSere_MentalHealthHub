@@ -1,0 +1,527 @@
+<!-- Professional Schedule View -->
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-2"><i class="bi bi-calendar-check"></i> My Schedule</h1>
+            <p class="text-muted">Manage your telehealth sessions and review appointment requests</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-warning me-2" id="pendingCount">
+                <i class="bi bi-clock"></i> Pending: 0
+            </span>
+            <span class="badge bg-success" id="approvedCount">
+                <i class="bi bi-check-circle"></i> Approved: 0
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Calendar Section (Left) -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body" style="padding: 15px;">
+                    <label style="font-weight: 600; color: #333; margin-bottom: 15px; display: block;">
+                        <i class="bi bi-calendar"></i> Select Date
+                    </label>
+                    <div id="calendarContainer" style="display: block; margin-bottom: 15px;"></div>
+                    <input type="hidden" id="appointmentDateFilter" value="">
+                    <div style="display: flex; gap: 5px; flex-direction: column;">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="resetDateFilter()" title="Show all appointments">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="filterByStatus('PENDING')">
+                            <i class="bi bi-funnel"></i> Pending Only
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="window.location.href='/mentalhealthhub/appointments/rejected'">
+                            <i class="bi bi-calendar-x"></i> View Rejected
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointments List (Right) -->
+        <div class="col-md-8">
+            <!-- Appointments List -->
+            <div class="card">
+                <div class="card-header border-0 pb-3">
+                    <h6 class="mb-0">Your Schedule</h6>
+                </div>
+                <div class="card-body">
+                    <div th:if="${appointments.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ddd;"></i>
+                        <p class="text-muted mt-3">No appointments scheduled yet</p>
+                    </div>
+                    
+                    <div th:unless="${appointments.isEmpty()}" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Date & Time</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="apt : ${appointments}" 
+                                    th:attr="data-date=${#temporals.format(apt.appointmentDate, 'yyyy-MM-dd')}, 
+                                             data-time=${#temporals.format(apt.timeSlotStart, 'HH:mm')}, 
+                                             data-status=${apt.status},
+                                             data-id=${apt.id}"
+                                    th:if="${apt.status.toString() != 'REJECTED'}">
+                                    <td>
+                                        <h6 class="mb-0" th:text="${apt.student.name}">Student Name</h6>
+                                        <small class="text-muted" th:text="${apt.student.email}">email@example.com</small>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#temporals.format(apt.appointmentDate, 'dd MMM yyyy')}">Date</span>
+                                        <br>
+                                        <small class="text-muted" th:text="${apt.timeSlotStart} + ' - ' + ${apt.timeSlotEnd}">Time</small>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#temporals.format(apt.timeSlotStart, 'HH:mm')} + ' - ' + ${#temporals.format(apt.timeSlotEnd, 'HH:mm')}">Duration</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${apt.status.toString() == 'PENDING' ? 'bg-warning' : (apt.status.toString() == 'APPROVED' ? 'bg-success' : 'bg-danger')}" 
+                                              th:text="${apt.status}">Status</span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${apt.notes == null or apt.notes == ''}" class="text-muted">-</span>
+                                        <span th:unless="${apt.notes == null or apt.notes == ''}" 
+                                              th:title="${apt.notes}" 
+                                              class="d-inline-block text-truncate" 
+                                              style="max-width: 150px;" 
+                                              th:text="${apt.notes}">Notes</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" style="gap: 5px;">
+                                            <button th:if="${apt.status.toString() == 'PENDING'}" 
+                                                    class="btn btn-sm btn-success" 
+                                                    th:onclick="'approveAppointment(' + ${apt.id} + ')'"
+                                                    title="Approve this appointment">
+                                                <i class="bi bi-check-circle"></i> Approve
+                                            </button>
+                                            <button th:if="${apt.status.toString() == 'PENDING'}" 
+                                                    class="btn btn-sm btn-danger" 
+                                                    th:onclick="'rejectAppointment(' + ${apt.id} + ')'"
+                                                    title="Reject this appointment">
+                                                <i class="bi bi-x-circle"></i> Reject
+                                            </button>
+                                            <button th:unless="${apt.status.toString() == 'PENDING'}" 
+                                                    class="btn btn-sm btn-outline-secondary" 
+                                                    disabled>
+                                                <i class="bi bi-lock"></i> <span th:text="${apt.status == 'APPROVED' ? 'Approved' : 'Rejected'}"></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allAppointments = [];
+    let currentDate = new Date();
+    let statusFilter = null;
+    
+    // Helper function to get local date string without timezone issues
+    function getLocalDateString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Initialize calendar and counters
+    document.addEventListener('DOMContentLoaded', function() {
+        allAppointments = Array.from(document.querySelectorAll('tbody tr'));
+        updateCounters();
+        renderCalendar();
+        
+        // Auto-select today's date by default and filter to show only today's appointments
+        const today = new Date();
+        const todayStr = getLocalDateString(today);
+        selectDate(todayStr);
+    });
+
+    function updateCounters() {
+        const pendingCount = document.querySelectorAll('tbody tr[data-status="PENDING"]:not([style*="display: none"])').length;
+        const approvedCount = document.querySelectorAll('tbody tr[data-status="APPROVED"]:not([style*="display: none"])').length;
+        
+        document.getElementById('pendingCount').textContent = `⏱️ Pending: ${pendingCount}`;
+        document.getElementById('approvedCount').textContent = `✓ Approved: ${approvedCount}`;
+    }
+
+    function renderCalendar() {
+        const container = document.getElementById('calendarContainer');
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const today = new Date();
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDayOfWeek = firstDay.getDay();
+        
+        let html = `
+            <div class="calendar" style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; background: white; width: 300px;">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <button onclick="previousMonth()" style="background: none; border: none; cursor: pointer; font-size: 18px;">‹</button>
+                    <span style="font-weight: 600; margin: 0 15px; display: inline-block; min-width: 150px;">
+                        ${currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </span>
+                    <button onclick="nextMonth()" style="background: none; border: none; cursor: pointer; font-size: 18px;">›</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;">
+        `;
+        
+        // Day headers
+        const dayHeaders = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        dayHeaders.forEach(day => {
+            html += `<div style="font-weight: 600; font-size: 12px; color: #667eea; padding: 5px;">${day}</div>`;
+        });
+        
+        // Empty cells before first day
+        for (let i = 0; i < startingDayOfWeek; i++) {
+            html += `<div style="padding: 5px;"></div>`;
+        }
+        
+        // Days of month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cellDate = new Date(year, month, day);
+            const dateStr = getLocalDateString(cellDate);
+            const isToday = cellDate.toDateString() === today.toDateString();
+            const isSelected = document.getElementById('appointmentDateFilter').value === dateStr;
+            const hasAppointments = Array.from(document.querySelectorAll('tbody tr:not([style*="display: none"])')).some(row => row.getAttribute('data-date') === dateStr);
+            
+            let cellStyle = 'padding: 8px; cursor: pointer; border-radius: 4px; font-size: 14px; ';
+            let cellClass = '';
+            
+            if (isSelected) {
+                cellStyle += 'background: #667eea; color: white; font-weight: 600;';
+            } else if (isToday) {
+                cellStyle += 'background: #f0f0f0; font-weight: 600; border: 2px solid #667eea;';
+            } else if (hasAppointments) {
+                cellStyle += 'background: #e7f3ff; color: #667eea; font-weight: 500;';
+            } else {
+                cellStyle += 'color: #333;';
+            }
+            
+            html += `
+                <div style="${cellStyle}" onclick="selectDate('${dateStr}')" title="${hasAppointments ? 'Has appointments' : 'No appointments'}">
+                    ${day}
+                </div>
+            `;
+        }
+        
+        html += `
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="clearCalendar()" style="background: #f0f0f0; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    function previousMonth() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    }
+    
+    function nextMonth() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    }
+    
+    function selectDate(dateStr) {
+        document.getElementById('appointmentDateFilter').value = dateStr;
+        filterAppointments();
+        renderCalendar();
+    }
+    
+    function clearCalendar() {
+        document.getElementById('appointmentDateFilter').value = '';
+        filterAppointments();
+        renderCalendar();
+    }
+
+    function filterByStatus(status) {
+        statusFilter = statusFilter === status ? null : status;
+        filterAppointments();
+    }
+
+    function filterAppointments() {
+        const selectedDate = document.getElementById('appointmentDateFilter').value;
+        const rows = document.querySelectorAll('tbody tr');
+        const table = document.querySelector('table');
+        const emptyMessage = document.querySelector('.text-center.py-5');
+        
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const rowDate = row.getAttribute('data-date');
+            const rowStatus = row.getAttribute('data-status');
+            
+            let shouldShow = true;
+            
+            // Filter by date
+            if (selectedDate !== '' && rowDate !== selectedDate) {
+                shouldShow = false;
+            }
+            
+            // Filter by status
+            if (statusFilter && rowStatus !== statusFilter) {
+                shouldShow = false;
+            }
+            
+            if (shouldShow) {
+                row.style.display = 'table-row';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Show/hide empty message
+        if (visibleCount === 0) {
+            if (table) table.style.display = 'none';
+            if (emptyMessage) emptyMessage.style.display = 'block';
+        } else {
+            if (table) table.style.display = 'table';
+            if (emptyMessage) emptyMessage.style.display = 'none';
+        }
+        
+        // Sort visible rows by time (ascending)
+        sortRowsByTime();
+        updateCounters();
+    }
+    
+    function sortRowsByTime() {
+        const tbody = document.querySelector('tbody');
+        if (!tbody) return;
+        
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        rows.sort((a, b) => {
+            // Only compare visible rows
+            const displayA = a.style.display;
+            const displayB = b.style.display;
+            
+            // If either row is hidden, don't reorder
+            if (displayA === 'none' || displayB === 'none') {
+                // Keep original order for hidden rows
+                return 0;
+            }
+            
+            const timeA = a.getAttribute('data-time');
+            const timeB = b.getAttribute('data-time');
+            
+            // Sort by time in ascending order (earliest first)
+            return timeA.localeCompare(timeB);
+        });
+        
+        // Re-insert sorted elements
+        rows.forEach(row => tbody.appendChild(row));
+    }
+    
+    function resetDateFilter() {
+        // Reset to today's date
+        const today = new Date();
+        const todayStr = getLocalDateString(today);
+        document.getElementById('appointmentDateFilter').value = todayStr;
+        currentDate = new Date(today); // Reset the current month view too
+        statusFilter = null;
+        filterAppointments();
+        renderCalendar();
+    }
+
+    function approveAppointment(appointmentId) {
+        if (!confirm('Are you sure you want to approve this appointment?')) {
+            return;
+        }
+
+        fetch(`/mentalhealthhub/appointments/api/${appointmentId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Find and update the row
+                const row = document.querySelector(`tbody tr[data-id="${appointmentId}"]`);
+                if (row) {
+                    row.setAttribute('data-status', 'APPROVED');
+                    
+                    // Update status badge
+                    const statusBadge = row.querySelector('.badge');
+                    statusBadge.textContent = 'APPROVED';
+                    statusBadge.className = 'badge bg-success';
+                    
+                    // Replace action buttons
+                    const actionsTd = row.querySelector('td:last-child');
+                    actionsTd.innerHTML = `
+                        <div class="btn-group" role="group" style="gap: 5px;">
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="bi bi-lock"></i> Approved
+                            </button>
+                        </div>
+                    `;
+                    
+                    updateCounters();
+                    
+                    // Add success message
+                    showNotification('Appointment approved successfully', 'success');
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Failed to approve appointment'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error approving appointment. Please try again.');
+        });
+    }
+
+    function rejectAppointment(appointmentId) {
+        if (!confirm('Are you sure you want to reject this appointment?')) {
+            return;
+        }
+
+        fetch(`/mentalhealthhub/appointments/api/${appointmentId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Find and update the row
+                const row = document.querySelector(`tbody tr[data-id="${appointmentId}"]`);
+                if (row) {
+                    row.setAttribute('data-status', 'REJECTED');
+                    
+                    // Update status badge
+                    const statusBadge = row.querySelector('.badge');
+                    statusBadge.textContent = 'REJECTED';
+                    statusBadge.className = 'badge bg-danger';
+                    
+                    // Replace action buttons
+                    const actionsTd = row.querySelector('td:last-child');
+                    actionsTd.innerHTML = `
+                        <div class="btn-group" role="group" style="gap: 5px;">
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="bi bi-lock"></i> Rejected
+                            </button>
+                        </div>
+                    `;
+                    
+                    updateCounters();
+                    
+                    // Add success message
+                    showNotification('Appointment rejected', 'info');
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Failed to reject appointment'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error rejecting appointment. Please try again.');
+        });
+    }
+
+    function showNotification(message, type) {
+        // Create a simple notification
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'info'} alert-dismissible fade show`;
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '1000';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+</script>
+
+<style>
+    .form-control {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9ff;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+    }
+</style>

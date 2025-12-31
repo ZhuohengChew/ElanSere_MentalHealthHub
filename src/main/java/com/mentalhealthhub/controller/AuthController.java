@@ -1,7 +1,6 @@
 package com.mentalhealthhub.controller;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -230,13 +229,13 @@ public class AuthController {
                 model.addAttribute("remainingModules", remainingModules);
 
                 // 3. Next appointment
-                LocalDateTime now = LocalDateTime.now();
+                LocalDate today = LocalDate.now();
                 List<Appointment> studentAppointments = appointmentRepository.findByStudent(user);
 
                 Appointment nextAppointment = studentAppointments.stream()
                         .filter(a -> a.getAppointmentDate() != null
-                                && a.getAppointmentDate().isAfter(now)
-                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.SCHEDULED))
+                                && a.getAppointmentDate().isAfter(today)
+                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.PENDING || a.getStatus() == AppointmentStatus.APPROVED))
                         .sorted(Comparator.comparing(Appointment::getAppointmentDate))
                         .findFirst()
                         .orElse(null);
@@ -249,7 +248,7 @@ public class AuthController {
                     model.addAttribute("nextAppointmentDate",
                             nextAppointment.getAppointmentDate().format(dateFormatter));
                     model.addAttribute("nextAppointmentTime",
-                            nextAppointment.getAppointmentDate().format(timeFormatter));
+                            nextAppointment.getTimeSlotStart().format(timeFormatter));
                     String professionalName = (nextAppointment.getProfessional() != null
                             && nextAppointment.getProfessional().getName() != null)
                                     ? nextAppointment.getProfessional().getName()
@@ -267,10 +266,10 @@ public class AuthController {
             case PROFESSIONAL:
                 dashboardPage = "dashboard/professional-dashboard";
                 List<Appointment> profAppointments = appointmentRepository.findByProfessional(user);
-                LocalDate today = LocalDate.now();
+                LocalDate todayProf = LocalDate.now();
                 List<Appointment> todayAppointments = profAppointments.stream()
                         .filter(a -> a.getAppointmentDate() != null
-                                && a.getAppointmentDate().toLocalDate().isEqual(today))
+                                && a.getAppointmentDate().isEqual(todayProf))
                         .sorted(Comparator.comparing(Appointment::getAppointmentDate))
                         .collect(Collectors.toList());
 

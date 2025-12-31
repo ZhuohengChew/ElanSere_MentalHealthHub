@@ -1,7 +1,19 @@
 package com.mentalhealthhub.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "appointments")
@@ -19,29 +31,46 @@ public class Appointment {
     private User professional;
 
     @Column(nullable = false)
-    private LocalDateTime appointmentDate;
+    private LocalDate appointmentDate;
+
+    @Column(nullable = false)
+    private LocalTime timeSlotStart;
+
+    @Column(nullable = false)
+    private LocalTime timeSlotEnd;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private AppointmentStatus status;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(nullable = true)
+    private Long reportId;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     public Appointment() {
     }
 
-    public Appointment(Long id, User student, User professional, LocalDateTime appointmentDate,
-            AppointmentStatus status, String notes, LocalDateTime createdAt) {
+    public Appointment(Long id, User student, User professional, LocalDate appointmentDate,
+            LocalTime timeSlotStart, LocalTime timeSlotEnd, AppointmentStatus status, String notes, 
+            LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.student = student;
         this.professional = professional;
         this.appointmentDate = appointmentDate;
+        this.timeSlotStart = timeSlotStart;
+        this.timeSlotEnd = timeSlotEnd;
         this.status = status;
         this.notes = notes;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static Builder builder() {
@@ -72,12 +101,28 @@ public class Appointment {
         this.professional = professional;
     }
 
-    public LocalDateTime getAppointmentDate() {
+    public LocalDate getAppointmentDate() {
         return appointmentDate;
     }
 
-    public void setAppointmentDate(LocalDateTime appointmentDate) {
+    public void setAppointmentDate(LocalDate appointmentDate) {
         this.appointmentDate = appointmentDate;
+    }
+
+    public LocalTime getTimeSlotStart() {
+        return timeSlotStart;
+    }
+
+    public void setTimeSlotStart(LocalTime timeSlotStart) {
+        this.timeSlotStart = timeSlotStart;
+    }
+
+    public LocalTime getTimeSlotEnd() {
+        return timeSlotEnd;
+    }
+
+    public void setTimeSlotEnd(LocalTime timeSlotEnd) {
+        this.timeSlotEnd = timeSlotEnd;
     }
 
     public AppointmentStatus getStatus() {
@@ -104,14 +149,34 @@ public class Appointment {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Long getReportId() {
+        return reportId;
+    }
+
+    public void setReportId(Long reportId) {
+        this.reportId = reportId;
+    }
+
     public static class Builder {
         private Long id;
         private User student;
         private User professional;
-        private LocalDateTime appointmentDate;
+        private LocalDate appointmentDate;
+        private LocalTime timeSlotStart;
+        private LocalTime timeSlotEnd;
         private AppointmentStatus status;
         private String notes;
+        private Long reportId;
         private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
 
         public Builder id(Long id) {
             this.id = id;
@@ -128,8 +193,18 @@ public class Appointment {
             return this;
         }
 
-        public Builder appointmentDate(LocalDateTime appointmentDate) {
+        public Builder appointmentDate(LocalDate appointmentDate) {
             this.appointmentDate = appointmentDate;
+            return this;
+        }
+
+        public Builder timeSlotStart(LocalTime timeSlotStart) {
+            this.timeSlotStart = timeSlotStart;
+            return this;
+        }
+
+        public Builder timeSlotEnd(LocalTime timeSlotEnd) {
+            this.timeSlotEnd = timeSlotEnd;
             return this;
         }
 
@@ -143,13 +218,26 @@ public class Appointment {
             return this;
         }
 
+        public Builder reportId(Long reportId) {
+            this.reportId = reportId;
+            return this;
+        }
+
         public Builder createdAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
 
+        public Builder updatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
         public Appointment build() {
-            return new Appointment(id, student, professional, appointmentDate, status, notes, createdAt);
+            Appointment appointment = new Appointment(id, student, professional, appointmentDate, timeSlotStart, 
+                timeSlotEnd, status, notes, createdAt, updatedAt);
+            appointment.setReportId(reportId);
+            return appointment;
         }
     }
 }

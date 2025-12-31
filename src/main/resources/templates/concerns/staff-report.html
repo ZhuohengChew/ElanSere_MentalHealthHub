@@ -258,8 +258,13 @@
                             <div class="card-body">
                                 <!-- Search Input -->
                                 <div class="mb-3">
-                                    <label class="form-label fw-medium">Search by Student ID or Name</label>
-                                    <input type="text" id="studentSearch" class="form-control" placeholder="Enter student ID or name..." />
+                                    <label class="form-label fw-medium">Search by Student ID</label>
+                                    <div class="input-group">
+                                        <input type="text" id="studentSearch" class="form-control" placeholder="Enter student ID..." oninput="performSearch();" onchange="performSearch();" onkeyup="performSearch();" />
+                                        <button class="btn btn-outline-secondary" type="button" onclick="performSearch();">
+                                            <i class="bi bi-search"></i> Search
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Student List -->
@@ -298,27 +303,27 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-3">
-                                    <div class="urgency-option urgency-low rounded-3 p-3" onclick="selectUrgency('low', this)">
+                                    <div class="urgency-option urgency-low rounded-3 p-3" onclick="selectUrgency(event, 'low', this)">
                                         <div class="d-flex align-items-center gap-2">
-                                            <input type="radio" name="urgency" value="low" class="form-check-input" required>
+                                            <input type="radio" name="urgency" value="low" class="form-check-input" onchange="validateForm();" required>
                                             <div class="flex-fill">
                                                 <p class="fw-medium mb-1">🟢 Low - Can be addressed within a week</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="urgency-option urgency-moderate rounded-3 p-3" onclick="selectUrgency('moderate', this)">
+                                    <div class="urgency-option urgency-moderate rounded-3 p-3" onclick="selectUrgency(event, 'moderate', this)">
                                         <div class="d-flex align-items-center gap-2">
-                                            <input type="radio" name="urgency" value="moderate" class="form-check-input">
+                                            <input type="radio" name="urgency" value="moderate" class="form-check-input" onchange="validateForm();">
                                             <div class="flex-fill">
                                                 <p class="fw-medium mb-1">🟡 Moderate - Should be addressed within 2-3 days</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="urgency-option urgency-high rounded-3 p-3" onclick="selectUrgency('high', this)">
+                                    <div class="urgency-option urgency-high rounded-3 p-3" onclick="selectUrgency(event, 'high', this)">
                                         <div class="d-flex align-items-center gap-2">
-                                            <input type="radio" name="urgency" value="high" class="form-check-input">
+                                            <input type="radio" name="urgency" value="high" class="form-check-input" onchange="validateForm();">
                                             <div class="flex-fill">
                                                 <p class="fw-medium mb-1">🔴 High - Needs immediate attention (within 24 hours)</p>
                                             </div>
@@ -343,48 +348,48 @@
                             </div>
                             <div class="card-body">
                                 <div class="d-grid gap-2">
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Anxiety" class="form-check-input">
                                         <span class="ms-2">😰 Anxiety - Excessive worry or panic attacks</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Depression" class="form-check-input">
                                         <span class="ms-2">😔 Depression - Persistent low mood or loss of interest</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Stress" class="form-check-input">
                                         <span class="ms-2">😓 Stress - Feeling overwhelmed or under pressure</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Sleep Issues" class="form-check-input">
                                         <span class="ms-2">😴 Sleep Issues - Insomnia or irregular sleep patterns</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Suicidal Thoughts" class="form-check-input">
                                         <span class="ms-2">⚠️ Suicidal Thoughts - Thoughts of harming oneself</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Substance Abuse" class="form-check-input">
                                         <span class="ms-2">🚫 Substance Abuse - Use of drugs or alcohol</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Self-Harm" class="form-check-input">
                                         <span class="ms-2">🔪 Self-Harm - Deliberate self-injury</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Eating Disorders" class="form-check-input">
                                         <span class="ms-2">🍽️ Eating Disorders - Unhealthy eating patterns</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Relationship Issues" class="form-check-input">
                                         <span class="ms-2">💔 Relationship Issues - Conflicts or breakups</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
                                         <input type="checkbox" name="concerns" value="Academic Pressure" class="form-check-input">
                                         <span class="ms-2">📚 Academic Pressure - Struggles with schoolwork</span>
                                     </label>
-                                    <label class="concern-checkbox rounded-3 p-3">
-                                        <input type="checkbox" name="concerns" value="Other" class="form-check-input">
+                                    <label class="concern-checkbox rounded-3 p-3" onclick="toggleCheckbox(event, this)">
+                                        <input type="checkbox" name="concerns" value="Other" class="form-check-input" onchange="validateForm();">
                                         <span class="ms-2">❓ Other - Something else not listed</span>
                                     </label>
                                 </div>
@@ -407,6 +412,7 @@
                             <div class="card-body">
                                 <textarea id="description" name="description" class="form-control" rows="6" 
                                     placeholder="Describe the concern in detail. Include any relevant background information, observed behaviors, or specific incidents that prompted this report..."
+                                    onchange="validateForm();" oninput="validateForm();" onkeyup="validateForm();"
                                     required></textarea>
                                 <small class="text-muted mt-2 d-block">Minimum 10 characters required</small>
                             </div>
@@ -435,6 +441,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             fetchStudents();
             setupEventListeners();
+            
+            // Check if studentId is passed in URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentIdParam = urlParams.get('studentId');
+            if (studentIdParam) {
+                // Wait a moment for students to load, then pre-select the student
+                setTimeout(() => {
+                    const student = allStudents.find(s => s.id == studentIdParam);
+                    if (student) {
+                        selectStudent(student.id, student.name, student.email);
+                    }
+                }, 500);
+            }
         });
 
         function fetchStudents() {
@@ -442,8 +461,10 @@
             fetch('/mentalhealthhub/api/students')
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Students fetched:', data);
                     allStudents.length = 0;
                     allStudents.push(...data);
+                    console.log('allStudents array:', allStudents);
                     // Display all students initially
                     displayAllStudents();
                 })
@@ -454,27 +475,64 @@
         }
 
         function setupEventListeners() {
-            // Student search
-            document.getElementById('studentSearch').addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                if (query.length === 0) {
-                    displayAllStudents();
-                    return;
-                }
-                filterStudents(query);
-            });
+            // Student search - Real-time filtering
+            const studentSearchInput = document.getElementById('studentSearch');
+            console.log('setupEventListeners called, studentSearchInput:', studentSearchInput);
+            
+            if (studentSearchInput) {
+                const handleSearch = function() {
+                    const query = this.value.toLowerCase().trim();
+                    console.log('Search input event triggered, query:', query);
+                    
+                    if (query.length === 0) {
+                        displayAllStudents();
+                        return;
+                    }
+                    filterStudents(query);
+                };
+                
+                studentSearchInput.addEventListener('input', handleSearch);
+                studentSearchInput.addEventListener('change', handleSearch);
+                studentSearchInput.addEventListener('keyup', handleSearch);
+                console.log('Event listeners attached to search input');
+            } else {
+                console.error('studentSearchInput not found!');
+            }
 
-            // Form validation
-            document.getElementById('description').addEventListener('input', function() {
-                validateForm();
-            });
+            // Form validation for description - attach to BOTH input and change events
+            const descriptionInput = document.getElementById('description');
+            if (descriptionInput) {
+                // Use capturing phase to ensure we catch all changes
+                descriptionInput.addEventListener('input', validateForm, true);
+                descriptionInput.addEventListener('change', validateForm, true);
+                descriptionInput.addEventListener('keyup', validateForm, true);
+                descriptionInput.addEventListener('paste', function() { 
+                    setTimeout(validateForm, 0); 
+                }, true);
+            }
 
-            // Checkbox selection
-            document.querySelectorAll('.concern-checkbox input').forEach(checkbox => {
+            // Checkbox selection with validation - ensure change is triggered
+            document.querySelectorAll('.concern-checkbox input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     this.closest('.concern-checkbox').classList.toggle('selected', this.checked);
+                    validateForm();
                 });
             });
+
+            // Radio button selection with validation for urgency
+            document.querySelectorAll('input[name="urgency"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    validateForm();
+                });
+            });
+            
+            // Also trigger validation when urgency options are clicked
+            document.querySelectorAll('.urgency-option').forEach(option => {
+                option.addEventListener('click', validateForm);
+            });
+            
+            // Initial form validation on page load
+            validateForm();
         }
 
         function displayAllStudents() {
@@ -499,16 +557,28 @@
         }
 
         function filterStudents(query) {
-            const filtered = allStudents.filter(student => 
-                student.id.toString().includes(query) || 
-                student.name.toLowerCase().includes(query) ||
-                (student.email && student.email.toLowerCase().includes(query))
-            );
+            if (!query || query.length === 0) {
+                displayAllStudents();
+                return;
+            }
+            
+            const queryLower = query.toLowerCase().trim();
+            console.log('Filtering with query:', queryLower);
+            console.log('allStudents:', allStudents);
+            
+            const filtered = allStudents.filter(student => {
+                const idStr = student.id.toString().toLowerCase();
+                const matches = idStr.includes(queryLower);
+                console.log(`Checking student ID ${student.id}: "${idStr}" includes "${queryLower}"? ${matches}`);
+                return matches;
+            });
 
+            console.log('Filtered results:', filtered);
+            
             const listDiv = document.getElementById('studentList');
             
             if (filtered.length === 0) {
-                listDiv.innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">No students found</p></div>';
+                listDiv.innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">No students found with ID: ' + query + '</p></div>';
                 return;
             }
 
@@ -523,6 +593,22 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('studentSearch');
+            if (searchInput) {
+                const query = searchInput.value.toLowerCase().trim();
+                console.log('performSearch called with query:', query);
+                
+                if (query.length === 0) {
+                    displayAllStudents();
+                } else {
+                    filterStudents(query);
+                }
+            } else {
+                console.error('Search input not found');
+            }
         }
 
         function selectStudent(studentId, studentName, studentEmail) {
@@ -552,19 +638,36 @@
             document.getElementById('studentList').innerHTML = '<div class="text-muted text-center py-4"><i class="bi bi-inbox" style="font-size: 2rem; color: #d1d5db;"></i><p class="mt-2">No students available</p></div>';
         }
 
-        function selectUrgency(level, element) {
+        function selectUrgency(event, level, element) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             document.querySelectorAll('.urgency-option').forEach(opt => opt.classList.remove('selected'));
             element.classList.add('selected');
             element.querySelector('input[type="radio"]').checked = true;
             validateForm();
         }
 
+        function toggleCheckbox(event, labelElement) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const checkbox = labelElement.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            labelElement.classList.toggle('selected', checkbox.checked);
+            validateForm();
+        }
+
         function validateForm() {
             const hasStudent = document.getElementById('selectedStudentId').value !== '';
             const hasUrgency = document.querySelector('input[name="urgency"]:checked') !== null;
+            const hasConcerns = document.querySelector('input[name="concerns"]:checked') !== null;
             const hasDescription = document.getElementById('description').value.trim().length >= 10;
             
-            document.getElementById('submitBtn').disabled = !(hasStudent && hasUrgency && hasDescription);
+            const isValid = hasStudent && hasUrgency && hasConcerns && hasDescription;
+            document.getElementById('submitBtn').disabled = !isValid;
         }
 
         function handleSubmit(event) {

@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.mentalhealthhub.model.Appointment;
 import com.mentalhealthhub.model.Report;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
+import com.mentalhealthhub.repository.AppointmentRepository;
 import com.mentalhealthhub.repository.ReportRepository;
 import com.mentalhealthhub.repository.UserRepository;
 import com.mentalhealthhub.service.ReportService;
@@ -36,6 +38,9 @@ public class ConcernController {
 
     @Autowired
     private ReportRepository reportRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -249,8 +254,17 @@ public class ConcernController {
             return "redirect:/concerns/list";
         }
 
+        // Fetch appointment if report status is scheduled
+        Appointment appointment = null;
+        if ("scheduled".equals(report.getStatus())) {
+            appointment = appointmentRepository.findByReportIdWithProfessional(report.getId());
+        }
+
         model.addAttribute("user", user);
         model.addAttribute("report", report);
+        if (appointment != null) {
+            model.addAttribute("appointment", appointment);
+        }
         model.addAttribute("page", "concerns/report-detail");
         model.addAttribute("title", "Report Details");
         model.addAttribute("activePage", "concerns");
@@ -583,15 +597,35 @@ public class ConcernController {
             return "redirect:/404";
         }
 
-        // Update report status to "reviewed" when staff views it
+        // Update report status to "reviewed" when staff views it (only if not already scheduled or higher status)
         if (report.getStatus() == null || report.getStatus().isEmpty() || report.getStatus().equals("pending")) {
-            report.setStatus("reviewed");
-            reportRepository.save(report);
+            if (!report.getStatus().equals("scheduled")) {
+                report.setStatus("reviewed");
+                reportRepository.save(report);
+            }
         }
+
+        // Fetch appointment if report status is scheduled
+        Appointment appointment = null;
+        System.out.println("\n=== DEBUG: viewStaffReportDetail ===");
+        System.out.println("Report ID: " + report.getId());
+        System.out.println("Report Status: " + report.getStatus());
+        if ("scheduled".equals(report.getStatus())) {
+            appointment = appointmentRepository.findByReportIdWithProfessional(report.getId());
+            System.out.println("Appointment found: " + (appointment != null ? appointment.getId() : "null"));
+            if (appointment != null) {
+                System.out.println("Appointment Date: " + appointment.getAppointmentDate());
+                System.out.println("Appointment Time: " + appointment.getTimeSlotStart() + " - " + appointment.getTimeSlotEnd());
+            }
+        }
+        System.out.println("===================================\n");
 
         model.addAttribute("user", user);
         model.addAttribute("report", report);
         model.addAttribute("student", report.getStudent());
+        if (appointment != null) {
+            model.addAttribute("appointment", appointment);
+        }
         model.addAttribute("page", "professional/report-detail");
         model.addAttribute("title", "Report Detail");
         return "layout";

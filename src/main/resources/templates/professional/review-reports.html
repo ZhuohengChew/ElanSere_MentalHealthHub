@@ -195,7 +195,7 @@
                 <div class="mb-3">
                     <label for="sortSelect" class="form-label">Sort by:</label>
                     <select id="sortSelect" class="form-select d-inline-block" style="width: auto;" onchange="sortReports(this.value)">
-                        <option value="newest">Newest to Oldest</option>
+                        <option value="newest" selected>Newest to Oldest</option>
                         <option value="oldest">Oldest to Newest</option>
                         <option value="urgent">Urgent to Low</option>
                         <option value="low">Low to Urgent</option>
@@ -213,7 +213,6 @@
                             <div th:each="report : ${reports}" th:classappend=" ${report.urgency == 'urgent'} ? 'urgent-replace' : ''" th:attr="data-submitted-time=${#temporals.formatISO(report.submittedAt)},data-urgency-value=${report.urgency}">
                                 <div class="col-12">
                                     <div class="card report-card" th:classappend=" ${report.urgency} == 'urgent' ? ' urgent' : ( ${report.urgency} == 'high' ? ' high' : ( ${report.urgency} == 'medium' ? ' medium' : ' low' ) )" th:onclick="|window.location.href='/mentalhealthhub/professional/reports/' + ${report.id}|" style="cursor: pointer;">
-                                        ">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div class="flex-grow-1">
@@ -597,36 +596,38 @@
         };
 
         function sortReports(sortType) {
-            const activePane = document.querySelector('.tab-pane.show.active');
-            if (!activePane) return;
-
-            const container = activePane.querySelector('.row.g-4');
-            if (!container) return;
-
-            // Get all report rows (the divs with data attributes)
-            const reportRows = Array.from(container.querySelectorAll('[data-submitted-time]'));
+            // Get all tab panes
+            const tabPanes = document.querySelectorAll('.tab-pane');
             
-            reportRows.sort((a, b) => {
-                const timeA = new Date(a.getAttribute('data-submitted-time'));
-                const timeB = new Date(b.getAttribute('data-submitted-time'));
-                const urgencyA = urgencyOrder[a.getAttribute('data-urgency-value')] || 0;
-                const urgencyB = urgencyOrder[b.getAttribute('data-urgency-value')] || 0;
+            tabPanes.forEach(pane => {
+                const container = pane.querySelector('.row.g-4');
+                if (!container) return;
 
-                if (sortType === 'newest') {
-                    return timeB - timeA; // Newest first
-                } else if (sortType === 'oldest') {
-                    return timeA - timeB; // Oldest first
-                } else if (sortType === 'urgent') {
-                    return urgencyB - urgencyA; // Urgent first
-                } else if (sortType === 'low') {
-                    return urgencyA - urgencyB; // Low first
-                }
-                return 0;
-            });
+                // Get all report rows (the divs with data attributes) in this tab
+                const reportRows = Array.from(container.querySelectorAll('[data-submitted-time]'));
+                
+                reportRows.sort((a, b) => {
+                    const timeA = new Date(a.getAttribute('data-submitted-time'));
+                    const timeB = new Date(b.getAttribute('data-submitted-time'));
+                    const urgencyA = urgencyOrder[a.getAttribute('data-urgency-value')] || 0;
+                    const urgencyB = urgencyOrder[b.getAttribute('data-urgency-value')] || 0;
 
-            // Re-insert sorted elements
-            reportRows.forEach(row => {
-                container.appendChild(row);
+                    if (sortType === 'newest') {
+                        return timeB - timeA; // Newest first
+                    } else if (sortType === 'oldest') {
+                        return timeA - timeB; // Oldest first
+                    } else if (sortType === 'urgent') {
+                        return urgencyB - urgencyA; // Urgent first
+                    } else if (sortType === 'low') {
+                        return urgencyA - urgencyB; // Low first
+                    }
+                    return 0;
+                });
+
+                // Re-insert sorted elements
+                reportRows.forEach(row => {
+                    container.appendChild(row);
+                });
             });
         }
 
@@ -634,7 +635,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
-                sortReports(sortSelect.value);
+                // Apply default sort (newest to oldest)
+                sortReports('newest');
             }
         });
 
@@ -642,6 +644,7 @@
         document.addEventListener('shown.bs.tab', function() {
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
+                // Apply the currently selected sort option to the new tab
                 sortReports(sortSelect.value);
             }
         });

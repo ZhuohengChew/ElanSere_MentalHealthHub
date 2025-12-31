@@ -1,13 +1,13 @@
-<!-- Student Appointments List -->
+<!-- Professional Rejected Appointments View -->
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="mb-2"><i class="bi bi-calendar-check"></i> My Appointments</h1>
-            <p class="text-muted">View and manage your telehealth sessions with mental health professionals</p>
+            <h1 class="mb-2"><i class="bi bi-calendar-x"></i> Rejected Appointments</h1>
+            <p class="text-muted">Review appointments you have rejected</p>
         </div>
         <div class="col-md-4 text-end">
-            <a th:href="@{/appointments/book}" class="btn btn-primary">
-                <i class="bi bi-calendar-plus"></i> Book New Appointment
+            <a th:href="@{/appointments/my-schedule}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Schedule
             </a>
         </div>
     </div>
@@ -23,12 +23,6 @@
                     <div id="calendarContainer" style="display: block; margin-bottom: 15px;"></div>
                     <input type="hidden" id="appointmentDateFilter" value="">
                     <div style="display: flex; gap: 5px;">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="resetDateFilter()" title="Show all appointments" style="flex: 1;">
-                            <i class="bi bi-arrow-clockwise"></i> Reset
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="window.location.href='/mentalhealthhub/appointments/rejected'" style="flex: 1;">
-                            <i class="bi bi-calendar-x"></i> Rejected
-                        </button>
                     </div>
                 </div>
             </div>
@@ -39,20 +33,20 @@
             <!-- Appointments List -->
             <div class="card">
                 <div class="card-header border-0 pb-3">
-                    <h6 class="mb-0">Your Scheduled Appointments</h6>
+                    <h6 class="mb-0">Rejected Appointments</h6>
                 </div>
                 <div class="card-body">
-                    <div th:if="${appointments.isEmpty()}" class="text-center py-5">
+                    <div th:if="${rejectedAppointments.isEmpty()}" class="text-center py-5">
                         <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ddd;"></i>
-                        <p class="text-muted mt-3">No appointments scheduled yet</p>
-                        <a th:href="@{/appointments/book}" class="btn btn-primary btn-sm">Schedule Now</a>
+                        <p class="text-muted mt-3">No rejected appointments</p>
+                        <a th:href="@{/appointments/my-schedule}" class="btn btn-primary btn-sm">Back to Schedule</a>
                     </div>
                     
-                    <div th:unless="${appointments.isEmpty()}" class="table-responsive">
+                    <div th:unless="${rejectedAppointments.isEmpty()}" class="table-responsive">
                         <table class="table table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Professional</th>
+                                    <th>Student</th>
                                     <th>Date & Time</th>
                                     <th>Duration</th>
                                     <th>Status</th>
@@ -60,10 +54,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="apt : ${appointments}" th:attr="data-date=${#temporals.format(apt.appointmentDate, 'yyyy-MM-dd')}, data-time=${#temporals.format(apt.timeSlotStart, 'HH:mm')}, data-status=${apt.status}">
+                                <tr th:each="apt : ${rejectedAppointments}" 
+                                    th:attr="data-date=${#temporals.format(apt.appointmentDate, 'yyyy-MM-dd')}, 
+                                             data-time=${#temporals.format(apt.timeSlotStart, 'HH:mm')}">
                                     <td>
-                                        <h6 class="mb-0" th:text="${apt.professional.name}">Professional Name</h6>
-                                        <small class="text-muted" th:text="${apt.professional.email}">email@example.com</small>
+                                        <h6 class="mb-0" th:text="${apt.student.name}">Student Name</h6>
+                                        <small class="text-muted" th:text="${apt.student.email}">email@example.com</small>
                                     </td>
                                     <td>
                                         <span th:text="${#temporals.format(apt.appointmentDate, 'dd MMM yyyy')}">Date</span>
@@ -74,12 +70,15 @@
                                         <span th:text="${#temporals.format(apt.timeSlotStart, 'HH:mm')} + ' - ' + ${#temporals.format(apt.timeSlotEnd, 'HH:mm')}">Duration</span>
                                     </td>
                                     <td>
-                                        <span class="badge" th:classappend="${apt.status.toString() == 'PENDING' ? 'bg-warning' : (apt.status.toString() == 'APPROVED' ? 'bg-success' : 'bg-danger')}" 
-                                              th:text="${apt.status}">Status</span>
+                                        <span class="badge bg-danger" th:text="${apt.status}">REJECTED</span>
                                     </td>
                                     <td>
                                         <span th:if="${apt.notes == null or apt.notes == ''}" class="text-muted">-</span>
-                                        <span th:unless="${apt.notes == null or apt.notes == ''}" title="" th:title="${apt.notes}" class="d-inline-block text-truncate" style="max-width: 200px;" th:text="${apt.notes}">Notes</span>
+                                        <span th:unless="${apt.notes == null or apt.notes == ''}" 
+                                              th:title="${apt.notes}" 
+                                              class="d-inline-block text-truncate" 
+                                              style="max-width: 150px;" 
+                                              th:text="${apt.notes}">Notes</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -103,13 +102,9 @@
         return `${year}-${month}-${day}`;
     }
     
-    // Initialize calendar and date filter
+    // Initialize calendar
     document.addEventListener('DOMContentLoaded', function() {
         allAppointments = Array.from(document.querySelectorAll('tbody tr'));
-        // Auto-select today's date
-        const today = new Date();
-        const todayStr = getLocalDateString(today);
-        selectDate(todayStr);
         renderCalendar();
     });
 
@@ -153,23 +148,22 @@
             const dateStr = getLocalDateString(cellDate);
             const isToday = cellDate.toDateString() === today.toDateString();
             const isSelected = document.getElementById('appointmentDateFilter').value === dateStr;
-            const hasAppointments = Array.from(document.querySelectorAll('tbody tr')).some(row => row.getAttribute('data-date') === dateStr);
+            const hasAppointments = Array.from(document.querySelectorAll('tbody tr:not([style*="display: none"])')).some(row => row.getAttribute('data-date') === dateStr);
             
             let cellStyle = 'padding: 8px; cursor: pointer; border-radius: 4px; font-size: 14px; ';
-            let cellClass = '';
             
             if (isSelected) {
-                cellStyle += 'background: #667eea; color: white; font-weight: 600;';
+                cellStyle += 'background: #dc3545; color: white; font-weight: 600;';
             } else if (isToday) {
-                cellStyle += 'background: #f0f0f0; font-weight: 600; border: 2px solid #667eea;';
+                cellStyle += 'background: #f0f0f0; font-weight: 600; border: 2px solid #dc3545;';
             } else if (hasAppointments) {
-                cellStyle += 'background: #e7f3ff; color: #667eea; font-weight: 500;';
+                cellStyle += 'background: #ffe0e0; color: #dc3545; font-weight: 500;';
             } else {
                 cellStyle += 'color: #333;';
             }
             
             html += `
-                <div style="${cellStyle}" onclick="selectDate('${dateStr}')" title="${hasAppointments ? 'Has appointments' : 'No appointments'}">
+                <div style="${cellStyle}" onclick="selectDate('${dateStr}')" title="${hasAppointments ? 'Has rejected appointments' : 'No appointments'}">
                     ${day}
                 </div>
             `;
@@ -200,11 +194,17 @@
     
     function selectDate(dateStr) {
         document.getElementById('appointmentDateFilter').value = dateStr;
-        filterAppointmentsByDate(dateStr);
+        filterAppointments();
         renderCalendar();
     }
+    
+    function clearCalendar() {
+        // Clear also resets to today
+        resetDateFilter();
+    }
 
-    function filterAppointmentsByDate(selectedDate) {
+    function filterAppointments() {
+        const selectedDate = document.getElementById('appointmentDateFilter').value;
         const rows = document.querySelectorAll('tbody tr');
         const table = document.querySelector('table');
         const emptyMessage = document.querySelector('.text-center.py-5');
@@ -262,13 +262,8 @@
         const todayStr = getLocalDateString(today);
         document.getElementById('appointmentDateFilter').value = todayStr;
         currentDate = new Date(today); // Reset the current month view too
-        filterAppointmentsByDate(todayStr);
+        filterAppointments();
         renderCalendar();
-    }
-
-    function clearCalendar() {
-        // Clear also resets to today
-        resetDateFilter();
     }
 </script>
 
@@ -299,13 +294,3 @@
         color: white;
     }
 </style>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>

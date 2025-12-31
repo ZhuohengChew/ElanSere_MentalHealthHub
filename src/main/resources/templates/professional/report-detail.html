@@ -194,6 +194,7 @@
                             <span class="badge badge-custom bg-secondary text-white" th:text="${report.status}">Status</span>
                         </div>
                     </div>
+                    
                 </div>
 
                 <!-- Concern Details -->
@@ -204,6 +205,37 @@
                     <div class="concern-box">
                         <p th:text="${report.description}">No description provided.</p>
                     </div>
+
+                    <!-- Scheduled Appointment Info -->
+                    <div class="row" id="scheduledAppointmentInfo" th:if="${report.status == 'scheduled' && appointment != null}">
+                        <div class="col-12 mb-3">
+                            <div class="alert alert-success" role="alert">
+                                <i class="bi bi-check-circle"></i> <strong>Appointment Scheduled</strong>
+                                <br>
+                                <small id="appointmentDetails">
+                                    <strong>Date:</strong> <span th:text="${#temporals.format(appointment.appointmentDate, 'yyyy-MM-dd')}"></span><br>
+                                    <strong>Start Time:</strong> <span th:text="${appointment.timeSlotStart}"></span><br>
+                                    <strong>End Time:</strong> <span th:text="${appointment.timeSlotEnd}"></span><br>
+                                    <strong>Status:</strong> <span th:text="${appointment.status}"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resolution Details -->
+                <div th:if="${report.status == 'resolved' || report.status == 'closed'}" class="info-section">
+                    <h5 class="mb-3">
+                        <i class="bi bi-check-circle me-2"></i>Resolution Details
+                    </h5>
+                    <div class="concern-box" th:if="${report.resolutionNotes}">
+                        <h6 style="color: #9B7EDE; margin-bottom: 1rem;">Resolution Notes</h6>
+                        <p th:text="${report.resolutionNotes}">No notes provided</p>
+                    </div>
+                    <small class="text-muted d-block mt-2" th:if="${report.resolvedAt}">
+                        <i class="bi bi-check-lg me-2"></i>
+                        <span>Resolved on: <strong th:text="${#temporals.format(report.resolvedAt, 'MMM dd, yyyy HH:mm')}">Date</strong></span>
+                    </small>
                 </div>
             </div>
 
@@ -292,14 +324,11 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="button-group">
-                    <button type="button" class="btn-back" onclick="history.back()">
-                        <i class="bi bi-x"></i> Cancel
-                    </button>
                     <a th:if="${student != null}" th:href="@{/professional/students/{id}(id=${student.id})}" class="btn-book" style="display: flex; align-items: center; justify-content: center; text-decoration: none; gap: 0.75rem; font-weight: 600; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(155, 126, 222, 0.2); transition: all 0.3s ease;">
                         <i class="bi bi-person-circle" style="font-size: 1.25rem;"></i> View Patient Detail
                     </a>
-                    <!-- Schedule Appointment button - only for professionals -->
-                    <button type="button" class="btn-book" data-bs-toggle="modal" data-bs-target="#appointmentModal" th:if="${user.role.name() == 'PROFESSIONAL'}">
+                    <!-- Schedule Appointment button - only for professionals and when report is not scheduled or resolved -->
+                    <button type="button" class="btn-book" data-bs-toggle="modal" data-bs-target="#appointmentModal" th:if="${user.role.name() == 'PROFESSIONAL' && report.status != 'scheduled' && report.status != 'resolved'}">
                         <i class="bi bi-calendar-plus"></i> Schedule Appointment
                     </button>
                     <!-- Mark as Resolved button - only for professionals -->
@@ -313,26 +342,39 @@
 
     <!-- Appointment Modal -->
     <div class="modal fade" id="appointmentModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Schedule Appointment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" th:action="@{/professional/appointments/book}">
+                <form id="appointmentForm" method="POST" th:action="@{/appointments/book}">
                     <div class="modal-body">
-                        <p class="text-muted mb-4">Choose a date and time for the appointment with <strong th:text="${student != null ? student.name : 'Student'}">Student</strong></p>
+                        <p class="text-muted mb-4">Choose a date and continuous time slots for the appointment with <strong th:text="${student != null ? student.name : 'Student'}">Student</strong></p>
                         
                         <input type="hidden" name="reportId" th:value="${report.id}">
+                        <input type="hidden" name="studentId" th:value="${student != null ? student.id : ''}">
+                        <input type="hidden" name="appointmentTime" id="appointmentTime">
+                        <input type="hidden" name="appointmentDuration" id="appointmentDuration">
 
                         <div class="mb-3">
-                            <label class="form-label">Date</label>
-                            <input type="date" class="form-control" name="appointmentDate" required>
+                            <label class="form-label">Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" required>
+                            <small class="text-muted">Select a date for the appointment</small>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Time</label>
-                            <input type="time" class="form-control" name="appointmentTime" required>
+                            <label class="form-label">Available Time Slots <span class="text-danger">*</span></label>
+                            <div id="timeSlotsContainer" class="row g-2">
+                                <div class="col-12">
+                                    <p class="text-muted" id="noSlotsMessage">Select a date to see available time slots</p>
+                                </div>
+                            </div>
+                            <small class="text-danger d-none" id="timeSlotError">Please select continuous time slots</small>
+                        </div>
+
+                        <div class="alert alert-info d-none" id="slotSelectionInfo" role="alert">
+                            <small><strong>Selected:</strong> <span id="selectedSlotsDisplay">No slots selected</span></small>
                         </div>
 
                         <div class="mb-3">
@@ -350,6 +392,233 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let currentProfessionalId = null;
+        let allAvailableSlots = [];
+        let selectedSlots = [];
+
+        // Fetch professional info from session
+        fetch('/mentalhealthhub/appointments/api/current-user')
+            .then(response => response.json())
+            .then(data => {
+                currentProfessionalId = data.id;
+            })
+            .catch(error => console.error('Error loading professional info:', error));
+
+        // Appointment details are now rendered server-side by Thymeleaf
+        // No need to fetch via API anymore
+
+        // Handle appointment date change
+        document.getElementById('appointmentDate')?.addEventListener('change', function() {
+            selectedSlots = [];
+            if (this.value) {
+                loadAvailableTimeSlots(this.value);
+            }
+        });
+
+        // Load available time slots for selected date
+        function loadAvailableTimeSlots(date) {
+            const studentId = document.querySelector('input[name="studentId"]').value;
+            const container = document.getElementById('timeSlotsContainer');
+            const noSlotsMessage = document.getElementById('noSlotsMessage');
+            
+            if (!currentProfessionalId) {
+                container.innerHTML = '<div class="col-12"><p class="text-muted">Loading professional info...</p></div>';
+                setTimeout(() => loadAvailableTimeSlots(date), 500);
+                return;
+            }
+            
+            container.innerHTML = '<div class="col-12"><p class="text-muted">Loading available slots...</p></div>';
+            
+            // Fetch available slots for the professional on the selected date
+            fetch(`/mentalhealthhub/appointments/api/available-slots?studentId=${studentId}&date=${date}&professionalId=${currentProfessionalId}`)
+                .then(response => response.json())
+                .then(data => {
+                    allAvailableSlots = [];
+                    if (data.slots) {
+                        allAvailableSlots = data.slots.map(s => s.display);
+                    }
+                    
+                    if (!allAvailableSlots || allAvailableSlots.length === 0) {
+                        container.innerHTML = '<div class="col-12"><p class="text-muted text-center py-3">No available time slots for this date</p></div>';
+                        return;
+                    }
+                    
+                    // Sort time slots by time
+                    allAvailableSlots.sort((a, b) => {
+                        const timeA = a.split('-')[0].trim();
+                        const timeB = b.split('-')[0].trim();
+                        return timeA.localeCompare(timeB);
+                    });
+                    
+                    let html = '';
+                    allAvailableSlots.forEach((slot, index) => {
+                        const timeRange = slot.split('-');
+                        const startTime = timeRange[0].trim();
+                        // Filter out lunch break (13:00 - 14:00)
+                        if (startTime === '13:00' || startTime === '1:00 PM') {
+                            return; // Skip lunch break slot
+                        }
+                        const slotId = `slot_${startTime.replace(':', '_')}`;
+                        html += `
+                            <div class="col-md-6">
+                                <input type="checkbox" class="btn-check time-slot-checkbox" data-index="${index}" id="${slotId}" value="${startTime}" onchange="handleSlotSelection(${index}, '${startTime}')">
+                                <label class="btn btn-outline-primary w-100" for="${slotId}" style="cursor: pointer;">
+                                    <i class="bi bi-clock"></i> ${slot}
+                                </label>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                    noSlotsMessage.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error loading time slots:', error);
+                    container.innerHTML = '<div class="col-12"><p class="text-danger text-center py-3">Error loading available slots</p></div>';
+                });
+        }
+
+        // Handle slot selection with continuous validation
+        function handleSlotSelection(index, startTime) {
+            const checkbox = document.querySelector(`input[id="slot_${startTime.replace(':', '_')}"]`);
+            
+            if (checkbox.checked) {
+                selectedSlots.push(index);
+            } else {
+                selectedSlots = selectedSlots.filter(idx => idx !== index);
+            }
+            
+            // Validate that selected slots are time-continuous (no gaps in actual times)
+            if (selectedSlots.length > 1) {
+                selectedSlots.sort((a, b) => a - b);
+                
+                // Check if the actual times are continuous (end time of one slot = start time of next)
+                let isContinuous = true;
+                for (let i = 0; i < selectedSlots.length - 1; i++) {
+                    const currentSlotIndex = selectedSlots[i];
+                    const nextSlotIndex = selectedSlots[i + 1];
+                    
+                    // Get the end time of current slot
+                    const currentSlotText = allAvailableSlots[currentSlotIndex];
+                    const currentEndTime = currentSlotText.split('-')[1].trim();
+                    
+                    // Get the start time of next slot
+                    const nextSlotText = allAvailableSlots[nextSlotIndex];
+                    const nextStartTime = nextSlotText.split('-')[0].trim();
+                    
+                    // Check if end time of current equals start time of next
+                    if (currentEndTime !== nextStartTime) {
+                        isContinuous = false;
+                        console.log(`Gap detected: ${currentEndTime} != ${nextStartTime}`);
+                        break;
+                    }
+                }
+                
+                if (!isContinuous) {
+                    // Uncheck the slot
+                    checkbox.checked = false;
+                    selectedSlots = selectedSlots.filter(idx => idx !== index);
+                    alert('Please select continuous time slots without gaps. Times must be back-to-back (e.g., 11:00-11:30 and 11:30-12:00 are continuous).');
+                    return;
+                }
+            }
+            
+            updateSlotDisplay();
+        }
+
+        // Update the display of selected slots
+        function updateSlotDisplay() {
+            if (selectedSlots.length === 0) {
+                document.getElementById('slotSelectionInfo').classList.add('d-none');
+                document.getElementById('appointmentTime').value = '';
+                document.getElementById('appointmentDuration').value = '';
+                return;
+            }
+            
+            selectedSlots.sort((a, b) => a - b);
+            const startSlotIndex = selectedSlots[0];
+            const endSlotIndex = selectedSlots[selectedSlots.length - 1];
+            
+            const startTime = allAvailableSlots[startSlotIndex].split('-')[0].trim();
+            const endTime = allAvailableSlots[endSlotIndex].split('-')[1].trim();
+            
+            const selectedDisplay = startTime + ' - ' + endTime;
+            
+            document.getElementById('selectedSlotsDisplay').textContent = selectedDisplay;
+            document.getElementById('slotSelectionInfo').classList.remove('d-none');
+            document.getElementById('appointmentTime').value = startTime;
+            document.getElementById('appointmentDuration').value = selectedSlots.length;
+        }
+
+        // Handle form submission
+        document.getElementById('appointmentForm')?.addEventListener('submit', function(e) {
+            const timeSlot = document.getElementById('appointmentTime').value;
+            if (!timeSlot || selectedSlots.length === 0) {
+                e.preventDefault();
+                document.getElementById('timeSlotError').classList.remove('d-none');
+                return;
+            }
+            document.getElementById('timeSlotError').classList.add('d-none');
+            
+            // Get report ID and update status after appointment is created
+            const reportId = document.querySelector('input[name="reportId"]').value;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.getElementById('appointmentTime').value;
+            
+            // Store values for post-submission handling
+            this.dataset.reportId = reportId;
+            this.dataset.appointmentDate = appointmentDate;
+            this.dataset.appointmentTime = appointmentTime;
+            
+            // Schedule the status update to happen after the redirect
+            // Save to sessionStorage so we can retrieve it after redirect
+            if (reportId) {
+                sessionStorage.setItem('appointmentFormSubmitted_reportId', reportId);
+                sessionStorage.setItem('appointmentFormSubmitted_time', new Date().getTime());
+            }
+        });
+
+        // Check if we just redirected from appointment booking and need to update status
+        window.addEventListener('load', function() {
+            const reportId = sessionStorage.getItem('appointmentFormSubmitted_reportId');
+            const submitTime = sessionStorage.getItem('appointmentFormSubmitted_time');
+            
+            if (reportId && submitTime) {
+                const timeDiff = new Date().getTime() - parseInt(submitTime);
+                // If less than 5 seconds, we just redirected
+                if (timeDiff < 5000) {
+                    // Update report status to 'scheduled'
+                    fetch(`/mentalhealthhub/concerns/api/${reportId}/status?status=scheduled`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Report status updated to scheduled:', data);
+                        // Refresh the page to show updated status
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        console.error('Error updating report status:', error);
+                        // Still refresh to show the new appointment
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    });
+                    
+                    // Clear the session storage
+                    sessionStorage.removeItem('appointmentFormSubmitted_reportId');
+                    sessionStorage.removeItem('appointmentFormSubmitted_time');
+                }
+            }
+        });
+    </script>
 
     <!-- Resolve Modal -->
     <div class="modal fade" id="resolveModal" tabindex="-1">
