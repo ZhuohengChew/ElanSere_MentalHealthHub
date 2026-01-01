@@ -539,6 +539,20 @@ public class AnalyticsService {
             // Combined engagement
             double engagement = (0.5d * moduleScore) + (0.3d * forumScore) + (0.2d * selfCareScore);
             double rounded = Math.round(engagement * 100.0d) / 100.0d;
+            // Debug logging to help track identical-rate issue
+            if (logger.isDebugEnabled()) {
+                logger.debug(String.format("Engagement calc for userId=%d: moduleScore=%.2f, posts=%d, postNorm=%.2f, comments=%d, commentNorm=%.2f, forumScore=%.2f, selfCare=%d, selfCareNorm=%.2f, engagement=%.2f", 
+                        userId,
+                        moduleScore,
+                        posts,
+                        postNorm,
+                        comments,
+                        commentNorm,
+                        forumScore,
+                        scCount,
+                        selfCareScore,
+                        rounded));
+            }
             result.put(userId, rounded);
         }
 
@@ -565,5 +579,12 @@ public class AnalyticsService {
         // sort descending by rate
         list.sort((a, b) -> Double.compare(b.getRate(), a.getRate()));
         return list;
+    }
+
+    // Public helper to get engagement for a single user (uses the same calculation as the bulk method)
+    public Double getEngagementForUser(Long userId) {
+        if (userId == null) return null;
+        Map<Long, Double> map = calculateEngagementRates();
+        return map.getOrDefault(userId, 0.0);
     }
 }
