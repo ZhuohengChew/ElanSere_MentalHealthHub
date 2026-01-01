@@ -367,12 +367,15 @@ public class PageController {
             return "redirect:/login";
         }
 
-        // Get student by ID (would normally come from UserRepository)
-        // For now, we'll assume the student is accessible
-        // In production, verify access control
+        // Get student by ID and load their assessments from DB
+        User student = userRepository.findById(studentId).orElse(null);
+        if (student == null || student.getRole() != UserRole.STUDENT) {
+            return "redirect:/patients";
+        }
 
-        List<Assessment> assessments = assessmentService.getUserAssessments(null);
+        List<Assessment> assessments = assessmentService.getUserAssessments(student);
 
+        model.addAttribute("student", student);
         model.addAttribute("studentId", studentId);
         model.addAttribute("assessments", assessments);
         model.addAttribute("page", "professional/student-health-records");
@@ -414,9 +417,8 @@ public class PageController {
             return "redirect:/patients";
         }
 
-        List<Assessment> assessments = assessmentRepository.findAll().stream()
-                .filter(a -> a.getUser() != null && a.getUser().getId().equals(id))
-                .toList();
+        // Load assessments for the student directly from repository/service
+        List<Assessment> assessments = assessmentService.getUserAssessments(student);
 
         model.addAttribute("student", student);
         model.addAttribute("assessments", assessments);

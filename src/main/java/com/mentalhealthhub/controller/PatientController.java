@@ -47,8 +47,8 @@ public class PatientController {
             .collect(Collectors.toList());
 
         // Get all appointments for this professional to show statistics (only relevant for professionals)
-        List<Appointment> appointments = user.getRole() == UserRole.PROFESSIONAL 
-            ? appointmentRepository.findByProfessional(user) 
+        List<Appointment> appointments = user.getRole() == UserRole.PROFESSIONAL
+            ? appointmentRepository.findByProfessional(user)
             : new java.util.ArrayList<>();
 
         // Create a map of student ID to appointment count for easy lookup in template
@@ -60,7 +60,17 @@ public class PatientController {
             appointmentCounts.put(student.getId(), count);
         }
 
-        model.addAttribute("patients", allStudents);
+        // For professionals, show only students who have appointments with them (their patients)
+        List<User> patientsList;
+        if (user.getRole() == UserRole.PROFESSIONAL) {
+            patientsList = allStudents.stream()
+                .filter(s -> appointmentCounts.getOrDefault(s.getId(), 0L) > 0L)
+                .collect(Collectors.toList());
+        } else {
+            patientsList = allStudents;
+        }
+
+        model.addAttribute("patients", patientsList);
         model.addAttribute("appointmentCounts", appointmentCounts);
         model.addAttribute("user", user);
         

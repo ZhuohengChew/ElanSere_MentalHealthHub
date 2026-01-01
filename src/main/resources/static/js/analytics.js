@@ -45,10 +45,56 @@ async function loadAnalytics() {
         populateForumAnalytics(data.forumAnalytics);
         populateReportAnalytics(data.reportAnalytics);
         populateAdminActivity(data.adminActivity);
+        // Engagement rates (map of userId -> rate)
+        // Prefer the named list from server; fall back to raw map for compatibility
+        populateEngagementRates(data.engagementList || data.engagementRates);
         
     } catch (error) {
         console.error('Error loading analytics:', error);
         showError('Failed to load analytics data');
+    }
+}
+
+// ==================== ENGAGEMENT RATES ====================
+function populateEngagementRates(map) {
+    try {
+        const table = document.getElementById('engagementTable');
+        if (!table) return;
+
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+
+        // Support new list format: array of {userId,userName,rate}
+        if (Array.isArray(map) && map.length > 0) {
+            map.slice(0, 10).forEach((e, idx) => {
+                const tr = document.createElement('tr');
+                const rankTd = document.createElement('td'); rankTd.textContent = (idx + 1);
+                const nameTd = document.createElement('td'); nameTd.textContent = e.userName || ('User ' + e.userId);
+                const rateTd = document.createElement('td'); rateTd.textContent = (Number(e.rate).toFixed(2)) + '%';
+                tr.appendChild(rankTd); tr.appendChild(nameTd); tr.appendChild(rateTd);
+                tbody.appendChild(tr);
+            });
+            return;
+        }
+
+        // Fallback for old map format
+        if (!map || Object.keys(map).length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3">No data</td></tr>';
+            return;
+        }
+
+        const entries = Object.keys(map).map(k => ({ userId: k, rate: map[k] }));
+        entries.sort((a, b) => b.rate - a.rate);
+        entries.slice(0, 10).forEach((e, idx) => {
+            const tr = document.createElement('tr');
+            const rankTd = document.createElement('td'); rankTd.textContent = (idx + 1);
+            const nameTd = document.createElement('td'); nameTd.textContent = 'User ' + e.userId;
+            const rateTd = document.createElement('td'); rateTd.textContent = (Number(e.rate).toFixed(2)) + '%';
+            tr.appendChild(rankTd); tr.appendChild(nameTd); tr.appendChild(rateTd);
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error('Error populating engagement rates', err);
     }
 }
 
@@ -124,7 +170,7 @@ async function populateMentalHealthTrends(data) {
     // Populate stat cards
     updateStatCard('avgStressLevel', (data.averageStressLevel || 0).toFixed(1));
     updateStatCard('avgAnxietyLevel', (data.averageAnxietyLevel || 0).toFixed(1));
-    updateStatCard('avgWellbeing', (data.averageWellbeingScore || 0).toFixed(1));
+    updateStatCard('avgWellbeing', (data.averageWellbeingScore || 0).toFixed(2));
     
     // Mental Health Distribution Chart (Bar)
     if (document.getElementById('mentalHealthDistributionChart')) {

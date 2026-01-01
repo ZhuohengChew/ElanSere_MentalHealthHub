@@ -454,7 +454,116 @@ public class AnalyticsService {
             logger.error("Error loading admin activity", e);
         }
 
+        try {
+            logger.info("Calculating engagement rates...");
+            Map<Long, Double> map = calculateEngagementRates();
+            dto.setEngagementRates(map);
+            dto.setEngagementList(calculateEngagementList(map));
+            logger.info("Engagement rates calculated successfully");
+        } catch (Exception e) {
+            logger.error("Error calculating engagement rates", e);
+        }
+
         logger.info("Comprehensive analytics load completed");
         return dto;
+    }
+
+    // Calculate engagement rates per student using weights:
+    // Module 50%, Forum 30% (posts 60% & comments 40%), Self-Care 20%
+    private Map<Long, Double> calculateEngagementRates() {
+        List<com.mentalhealthhub.model.User> students = userRepository.findByRole(com.mentalhealthhub.model.UserRole.STUDENT);
+        Map<Long, Double> result = new HashMap<>();
+        if (students == null || students.isEmpty()) return result;
+
+        // Prepare forum post and comment counts and maxima
+        List<Object[]> postCounts = forumPostRepository.getUserParticipation();
+        Map<Long, Long> postMap = new HashMap<>();
+        long maxPosts = 0L;
+        for (Object[] row : postCounts) {
+            Long userId = ((Number) row[0]).longValue();
+            Long cnt = ((Number) row[1]).longValue();
+            postMap.put(userId, cnt);
+            if (cnt > maxPosts) maxPosts = cnt;
+        }
+
+        List<Object[]> commentCounts = forumCommentRepository.getUserCommentCounts();
+        Map<Long, Long> commentMap = new HashMap<>();
+        long maxComments = 0L;
+        for (Object[] row : commentCounts) {
+            Long userId = ((Number) row[0]).longValue();
+            Long cnt = ((Number) row[1]).longValue();
+            commentMap.put(userId, cnt);
+            if (cnt > maxComments) maxComments = cnt;
+        }
+
+        // Self-care counts
+        List<Object[]> selfCareCounts = selfCareRepository.getUserSelfCareCounts();
+        Map<Long, Long> selfCareMap = new HashMap<>();
+        long maxSelfCare = 0L;
+        for (Object[] row : selfCareCounts) {
+            Long userId = ((Number) row[0]).longValue();
+            Long cnt = ((Number) row[1]).longValue();
+            selfCareMap.put(userId, cnt);
+            if (cnt > maxSelfCare) maxSelfCare = cnt;
+        }
+
+        for (com.mentalhealthhub.model.User u : students) {
+            Long userId = u.getId();
+
+            // Module score: average progress percentage for user (0-100)
+            List<com.mentalhealthhub.model.ModuleProgress> progresses = moduleProgressRepository.findByUser(u);
+            double moduleScore = 0.0;
+            if (progresses != null && !progresses.isEmpty()) {
+                double sum = 0.0;
+                int count = 0;
+                for (com.mentalhealthhub.model.ModuleProgress mp : progresses) {
+                    if (mp.getProgressPercentage() != null) {
+                        sum += mp.getProgressPercentage();
+                        count++;
+                    }
+                }
+                if (count > 0) moduleScore = sum / count;
+            }
+
+            // Forum score: normalized posts/comments
+            long posts = postMap.getOrDefault(userId, 0L);
+            long comments = commentMap.getOrDefault(userId, 0L);
+            double postNorm = maxPosts > 0 ? (posts * 100.0d / (double) maxPosts) : 0.0d;
+            double commentNorm = maxComments > 0 ? (comments * 100.0d / (double) maxComments) : 0.0d;
+            double forumScore = (0.6d * postNorm) + (0.4d * commentNorm);
+
+            // Self-care score: normalized count
+            long scCount = selfCareMap.getOrDefault(userId, 0L);
+            double selfCareScore = maxSelfCare > 0 ? (scCount * 100.0d / (double) maxSelfCare) : 0.0d;
+
+            // Combined engagement
+            double engagement = (0.5d * moduleScore) + (0.3d * forumScore) + (0.2d * selfCareScore);
+            double rounded = Math.round(engagement * 100.0d) / 100.0d;
+            result.put(userId, rounded);
+        }
+
+        return result;
+    }
+
+    private java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> calculateEngagementList(Map<Long, Double> map) {
+        java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> list = new java.util.ArrayList<>();
+        if (map == null || map.isEmpty()) return list;
+
+        for (Map.Entry<Long, Double> e : map.entrySet()) {
+            Long userId = e.getKey();
+            Double rate = e.getValue();
+            String name = "Unknown";
+            try {
+                java.util.Optional<com.mentalhealthhub.model.User> uopt = userRepository.findById(userId);
+                if (uopt.isPresent()) name = uopt.get().getName();
+            } catch (Exception ex) {
+                logger.warn("Could not load user name for id " + userId, ex);
+            }
+            list.add(new com.mentalhealthhub.dto.EngagementRateDTO(userId, name, rate));
+        }
+
+        // sort descending by rate
+        list.sort((a, b) -> Double.compare(b.getRate(), a.getRate()));
+        return list;
     }
 }

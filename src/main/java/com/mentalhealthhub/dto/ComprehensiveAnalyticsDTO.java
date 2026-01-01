@@ -9,6 +9,8 @@ public class ComprehensiveAnalyticsDTO {
     private ForumAnalyticsDTO forumAnalytics;
     private ReportAnalyticsDTO reportAnalytics;
     private AdminActivityDTO adminActivity;
+    private java.util.Map<Long, Double> engagementRates;
+    private java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> engagementList;
 
     public ComprehensiveAnalyticsDTO() {}
 
@@ -75,5 +77,21 @@ public class ComprehensiveAnalyticsDTO {
 
     public void setAdminActivity(AdminActivityDTO adminActivity) {
         this.adminActivity = adminActivity;
+    }
+
+    public java.util.Map<Long, Double> getEngagementRates() {
+        return engagementRates;
+    }
+
+    public void setEngagementRates(java.util.Map<Long, Double> engagementRates) {
+        this.engagementRates = engagementRates;
+    }
+
+    public java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> getEngagementList() {
+        return engagementList;
+    }
+
+    public void setEngagementList(java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> engagementList) {
+        this.engagementList = engagementList;
     }
 }

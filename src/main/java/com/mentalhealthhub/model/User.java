@@ -32,7 +32,9 @@ public class User {
     // Mental health assessment scores (from self-assessment)
     private Integer stressLevel;      // 0-100
     private Integer anxietyLevel;     // 0-100
-    private Integer wellbeingScore;   // 0-100
+    private Integer wellbeingScore;   // legacy 0-100 (stored in DB)
+    @Transient
+    private Double wellbeingPercentage; // computed 0.00-100.00, not persisted
     private LocalDateTime lastAssessmentDate;
     
     @Column(name = "created_at")
@@ -80,6 +82,14 @@ public class User {
 
     public void setWellbeingScore(Integer wellbeingScore) {
         this.wellbeingScore = wellbeingScore;
+    }
+
+    public Double getWellbeingPercentage() {
+        return wellbeingPercentage;
+    }
+
+    public void setWellbeingPercentage(Double wellbeingPercentage) {
+        this.wellbeingPercentage = wellbeingPercentage;
     }
 
     public LocalDateTime getLastAssessmentDate() {
