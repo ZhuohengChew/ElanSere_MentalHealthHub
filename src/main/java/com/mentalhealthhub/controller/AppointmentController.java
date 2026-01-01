@@ -409,6 +409,21 @@ public class AppointmentController {
         );
     }
 
+    // AJAX: Get appointment by ID
+    @GetMapping("/{appointmentId}")
+    @ResponseBody
+    public ResponseEntity<?> getAppointmentById(@PathVariable Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId).orElse(null);
+        if (appointment != null) {
+            return ResponseEntity.ok(Map.of(
+                "id", appointment.getId(),
+                "meetingLink", appointment.getMeetingLink() != null ? appointment.getMeetingLink() : ""
+            ));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // AJAX: Get appointment by report ID
     @GetMapping("/api/by-report/{reportId}")
     @ResponseBody
