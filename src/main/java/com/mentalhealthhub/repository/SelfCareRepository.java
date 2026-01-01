@@ -23,10 +23,10 @@ public interface SelfCareRepository extends JpaRepository<SelfCare, Long> {
     List<SelfCare> findByUserAndTypeOrderByActivityDateDesc(User user, SelfCareType type);
 
     // Analytics queries
-    @Query("SELECT COUNT(sc) FROM SelfCare sc WHERE sc.type = :type")
+    @Query(value = "SELECT COUNT(*) FROM self_care WHERE type = :type", nativeQuery = true)
     Long countByType(@Param("type") String type);
 
-    @Query("SELECT COUNT(sc) FROM SelfCare sc WHERE sc.mood = :mood")
+    @Query(value = "SELECT COUNT(*) FROM self_care WHERE mood = :mood", nativeQuery = true)
     Long countByMood(@Param("mood") String mood);
 
     @Query("SELECT COUNT(sc) FROM SelfCare sc WHERE sc.activityDate > :date")
