@@ -46,6 +46,9 @@ public class Appointment {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String meetingLink;
+
     @Column(nullable = true)
     private Long reportId;
 
@@ -149,6 +152,14 @@ public class Appointment {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getMeetingLink() {
+        return meetingLink;
+    }
+
+    public void setMeetingLink(String meetingLink) {
+        this.meetingLink = meetingLink;
     }
 
     public LocalDateTime getCreatedAt() {

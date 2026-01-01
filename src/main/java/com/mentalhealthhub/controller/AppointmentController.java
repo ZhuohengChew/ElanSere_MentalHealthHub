@@ -730,4 +730,40 @@ public class AppointmentController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-}
+
+    /**
+     * Professional assigns meeting link to appointment
+     */
+    @PostMapping("/{appointmentId}/meeting-link")
+    @ResponseBody
+    public ResponseEntity<?> assignMeetingLink(
+            @PathVariable Long appointmentId,
+            @org.springframework.web.bind.annotation.RequestBody Map<String, String> request,
+            HttpSession session) {
+        try {
+            User professional = (User) session.getAttribute("user");
+            if (professional == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+            }
+
+            Appointment appointment = appointmentRepository.findById(appointmentId)
+                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+            // Verify professional owns this appointment
+            if (!appointment.getProfessional().getId().equals(professional.getId())) {
+                return ResponseEntity.status(403).body(Map.of("error", "Not authorized"));
+            }
+
+            String meetingLink = request.get("meetingLink");
+            if (meetingLink == null || meetingLink.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Meeting link cannot be empty"));
+            }
+
+            appointment.setMeetingLink(meetingLink);
+            appointmentRepository.save(appointment);
+
+            return ResponseEntity.ok(Map.of("success", true, "message", "Meeting link saved successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }}
