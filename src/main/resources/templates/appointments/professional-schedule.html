@@ -129,10 +129,12 @@
                                                     <button class="btn btn-sm btn-primary" disabled title="Link hasn't been assigned yet">
                                                         <i class="bi bi-camera-video"></i> Join Meeting
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#meetingLinkModal" th:onclick="'setAppointmentIdForModal(' + ${apt.id} + ')'" title="Assign a Google Meet link">
-                                                        <i class="bi bi-link-45deg"></i> Assign Link
-                                                    </button>
                                                 </th:block>
+                                                <!-- Always show Assign/Edit Link button -->
+                                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#meetingLinkModal" th:onclick="'setAppointmentIdForModal(' + ${apt.id} + ')'" th:title="${apt.meetingLink != null and apt.meetingLink != '' ? 'Edit the Google Meet link' : 'Assign a Google Meet link'}">
+                                                    <i th:class="${apt.meetingLink != null and apt.meetingLink != '' ? 'bi bi-pencil-square' : 'bi bi-link-45deg'}"></i>
+                                                    <span th:text="${apt.meetingLink != null and apt.meetingLink != '' ? 'Edit Link' : 'Assign Link'}">Assign Link</span>
+                                                </button>
                                             </th:block>
 
                                             <button th:if="${apt.status.toString() == 'STUDENT_PROPOSED'}" 
@@ -500,7 +502,20 @@
     // Handle meeting link modal
     function setAppointmentIdForModal(appointmentId) {
         document.getElementById('appointmentIdInput').value = appointmentId;
-        document.getElementById('meetingLinkInput').value = '';
+        // Try to fetch the current meeting link from the API
+        fetch(`/mentalhealthhub/appointments/${appointmentId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.meetingLink) {
+                    document.getElementById('meetingLinkInput').value = data.meetingLink;
+                } else {
+                    document.getElementById('meetingLinkInput').value = '';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching appointment:', error);
+                document.getElementById('meetingLinkInput').value = '';
+            });
     }
 
     // Handle meeting link form submission - attach on DOMContentLoaded
@@ -535,14 +550,29 @@
                     return response.json();
                 })
                 .then(data => {
-                    alert('Meeting link saved successfully!');
+                    showNotification('Meeting link saved successfully!', 'success');
+                    
                     // Close modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById('meetingLinkModal'));
                     if (modal) {
                         modal.hide();
                     }
-                    // Reload page to show updated meeting link
-                    location.reload();
+                    
+                    // Update the row's action buttons dynamically without reloading
+                    const row = document.querySelector(`tbody tr[data-id="${appointmentId}"]`);
+                    if (row) {
+                        const actionsTd = row.querySelector('td:last-child');
+                        actionsTd.innerHTML = `
+                            <div class="btn-group" role="group" style="gap: 5px;">
+                                <a href="${meetingLink}" target="_blank" class="btn btn-sm btn-primary" title="Join the Google Meet">
+                                    <i class="bi bi-camera-video"></i> Join Meeting
+                                </a>
+                                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#meetingLinkModal" onclick="setAppointmentIdForModal(${appointmentId})" title="Edit the Google Meet link">
+                                    <i class="bi bi-pencil-square"></i> Edit Link
+                                </button>
+                            </div>
+                        `;
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
