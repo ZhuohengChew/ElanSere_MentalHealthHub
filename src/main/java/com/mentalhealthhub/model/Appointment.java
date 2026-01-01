@@ -49,6 +49,16 @@ public class Appointment {
     @Column(nullable = true)
     private Long reportId;
 
+    // Student suggestion fields
+    @Column(nullable = true)
+    private LocalDate suggestedAppointmentDate;
+
+    @Column(nullable = true)
+    private LocalTime suggestedTimeSlotStart;
+
+    @Column(nullable = true)
+    private LocalTime suggestedTimeSlotEnd;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -163,6 +173,30 @@ public class Appointment {
 
     public void setReportId(Long reportId) {
         this.reportId = reportId;
+    }
+
+    public LocalDate getSuggestedAppointmentDate() {
+        return suggestedAppointmentDate;
+    }
+
+    public void setSuggestedAppointmentDate(LocalDate suggestedAppointmentDate) {
+        this.suggestedAppointmentDate = suggestedAppointmentDate;
+    }
+
+    public LocalTime getSuggestedTimeSlotStart() {
+        return suggestedTimeSlotStart;
+    }
+
+    public void setSuggestedTimeSlotStart(LocalTime suggestedTimeSlotStart) {
+        this.suggestedTimeSlotStart = suggestedTimeSlotStart;
+    }
+
+    public LocalTime getSuggestedTimeSlotEnd() {
+        return suggestedTimeSlotEnd;
+    }
+
+    public void setSuggestedTimeSlotEnd(LocalTime suggestedTimeSlotEnd) {
+        this.suggestedTimeSlotEnd = suggestedTimeSlotEnd;
     }
 
     public static class Builder {

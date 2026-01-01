@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 
 import com.mentalhealthhub.model.Appointment;
 import com.mentalhealthhub.model.AppointmentStatus;
+import com.mentalhealthhub.model.Report;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.repository.AppointmentRepository;
+import com.mentalhealthhub.repository.ReportRepository;
 import com.mentalhealthhub.util.TimeSlotUtil;
 
 @Service
@@ -24,6 +26,9 @@ public class AppointmentService {
     
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
     
     /**
      * Gets all available time slots for a specific date and professional
@@ -265,5 +270,174 @@ public class AppointmentService {
         );
         
         return studentSlots;
+    }
+
+    // ==================== Student Appointment Actions ====================
+    /**
+     * Student approves a pending appointment from professional
+     * Only available when status is PENDING and reportId is not null (professional-created)
+     */
+    public void studentApproveAppointment(Long appointmentId, User student) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        // Verify student owns this appointment
+        if (!appointment.getStudent().getId().equals(student.getId())) {
+            throw new RuntimeException("Unauthorized: Student can only approve their own appointments");
+        }
+        
+        // Can only approve PENDING appointments from professional
+        if (appointment.getStatus() != AppointmentStatus.PENDING || appointment.getReportId() == null) {
+            throw new RuntimeException("Can only approve pending appointments from professional");
+        }
+        
+        appointment.setStatus(AppointmentStatus.APPROVED);
+        appointment.setUpdatedAt(LocalDateTime.now());
+        appointmentRepository.save(appointment);
+    }
+
+    /**
+     * Student rejects pending appointment and proposes alternative date/time
+     * Only available when status is PENDING and reportId is not null (professional-created)
+     */
+    public void studentRejectAndProposeSuggestion(Long appointmentId, User student,
+                                                   LocalDate suggestedDate, LocalTime suggestedStart, LocalTime suggestedEnd) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        // Verify student owns this appointment
+        if (!appointment.getStudent().getId().equals(student.getId())) {
+            throw new RuntimeException("Unauthorized: Student can only reject their own appointments");
+        }
+        
+        // Can only reject PENDING appointments from professional
+        if (appointment.getStatus() != AppointmentStatus.PENDING || appointment.getReportId() == null) {
+            throw new RuntimeException("Can only reject pending appointments from professional");
+        }
+        
+        // Validate suggested timeslot is available for the professional
+        List<Appointment> conflicts = appointmentRepository.findByAppointmentDateAndProfessionalIdAndStatus(
+            suggestedDate, 
+            appointment.getProfessional().getId(), 
+            AppointmentStatus.PENDING
+        );
+        
+        List<Appointment> approvedConflicts = appointmentRepository.findByAppointmentDateAndProfessionalIdAndStatus(
+            suggestedDate,
+            appointment.getProfessional().getId(),
+            AppointmentStatus.APPROVED
+        );
+        
+        conflicts.addAll(approvedConflicts);
+        
+        // Check for overlaps (exclude self if updating same appointment)
+        for (Appointment conflict : conflicts) {
+            if (!conflict.getId().equals(appointmentId)) {
+                if (timeOverlaps(suggestedStart, suggestedEnd, conflict.getTimeSlotStart(), conflict.getTimeSlotEnd())) {
+                    throw new RuntimeException("Suggested time slot is not available for the professional");
+                }
+            }
+        }
+        
+        // Set suggested fields
+        appointment.setSuggestedAppointmentDate(suggestedDate);
+        appointment.setSuggestedTimeSlotStart(suggestedStart);
+        appointment.setSuggestedTimeSlotEnd(suggestedEnd);
+        
+        // Change status to indicate student has proposed alternative
+        appointment.setStatus(AppointmentStatus.STUDENT_PROPOSED);
+        appointment.setUpdatedAt(LocalDateTime.now());
+        appointmentRepository.save(appointment);
+        
+        // Update report status back to "reviewed" (no longer scheduled)
+        if (appointment.getReportId() != null) {
+            Report report = reportRepository.findById(appointment.getReportId()).orElse(null);
+            if (report != null) {
+                report.setStatus("reviewed");
+                reportRepository.save(report);
+            }
+        }
+    }
+
+    /**
+     * Professional schedules appointment from student's suggestion
+     * Moves suggested date/time to actual appointment date/time
+     * Sets status back to PENDING for student to respond again
+     */
+    public void professionalScheduleFromSuggestion(Long appointmentId, User professional) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        
+        // Verify professional owns this appointment
+        if (!appointment.getProfessional().getId().equals(professional.getId())) {
+            throw new RuntimeException("Unauthorized: Professional can only schedule their own appointments");
+        }
+        
+        // Can only schedule from STUDENT_PROPOSED status
+        if (appointment.getStatus() != AppointmentStatus.STUDENT_PROPOSED) {
+            throw new RuntimeException("Can only schedule from student proposed appointments");
+        }
+        
+        // Verify suggestion exists
+        if (appointment.getSuggestedAppointmentDate() == null || 
+            appointment.getSuggestedTimeSlotStart() == null ||
+            appointment.getSuggestedTimeSlotEnd() == null) {
+            throw new RuntimeException("No suggestion found for this appointment");
+        }
+        
+        // Validate suggested slot is still available
+        List<Appointment> conflicts = appointmentRepository.findByAppointmentDateAndProfessionalIdAndStatus(
+            appointment.getSuggestedAppointmentDate(),
+            professional.getId(),
+            AppointmentStatus.PENDING
+        );
+        
+        List<Appointment> approvedConflicts = appointmentRepository.findByAppointmentDateAndProfessionalIdAndStatus(
+            appointment.getSuggestedAppointmentDate(),
+            professional.getId(),
+            AppointmentStatus.APPROVED
+        );
+        
+        conflicts.addAll(approvedConflicts);
+        
+        for (Appointment conflict : conflicts) {
+            if (!conflict.getId().equals(appointmentId)) {
+                if (timeOverlaps(appointment.getSuggestedTimeSlotStart(), appointment.getSuggestedTimeSlotEnd(),
+                                conflict.getTimeSlotStart(), conflict.getTimeSlotEnd())) {
+                    throw new RuntimeException("Suggested time slot is no longer available. Please reject and propose a different time.");
+                }
+            }
+        }
+        
+        // Move suggested → actual
+        appointment.setAppointmentDate(appointment.getSuggestedAppointmentDate());
+        appointment.setTimeSlotStart(appointment.getSuggestedTimeSlotStart());
+        appointment.setTimeSlotEnd(appointment.getSuggestedTimeSlotEnd());
+        
+        // Clear suggested fields
+        appointment.setSuggestedAppointmentDate(null);
+        appointment.setSuggestedTimeSlotStart(null);
+        appointment.setSuggestedTimeSlotEnd(null);
+        
+        // Set to APPROVED when professional accepts the suggestion
+        appointment.setStatus(AppointmentStatus.APPROVED);
+        appointment.setUpdatedAt(LocalDateTime.now());
+        appointmentRepository.save(appointment);
+        
+        // Update report status back to "scheduled"
+        if (appointment.getReportId() != null) {
+            Report report = reportRepository.findById(appointment.getReportId()).orElse(null);
+            if (report != null) {
+                report.setStatus("scheduled");
+                reportRepository.save(report);
+            }
+        }
+    }
+
+    /**
+     * Helper method to check if two time slots overlap
+     */
+    private boolean timeOverlaps(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
+        return start1.isBefore(end2) && end1.isAfter(start2);
     }
 }

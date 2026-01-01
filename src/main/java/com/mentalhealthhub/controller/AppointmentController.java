@@ -3,6 +3,7 @@ package com.mentalhealthhub.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,7 +76,7 @@ public class AppointmentController {
 
         List<TimeSlotUtil.TimeSlot> allSlots = TimeSlotUtil.generateAllTimeSlots();
         
-        // Format minimum date as today
+        // Format minimum date as today - past time slots will be filtered out by JavaScript if today is selected
         LocalDate today = LocalDate.now();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String minDate = today.format(dateFormatter);
@@ -147,6 +148,12 @@ public class AppointmentController {
             templatePage = "appointments/rejected";
         }
 
+        // Sort by most recent updated date first
+        rejectedAppointments.sort((a, b) -> {
+            if (a.getUpdatedAt() == null || b.getUpdatedAt() == null) return 0;
+            return b.getUpdatedAt().compareTo(a.getUpdatedAt());
+        });
+
         model.addAttribute("rejectedAppointments", rejectedAppointments);
         model.addAttribute("user", user);
         model.addAttribute("page", templatePage);
@@ -217,12 +224,41 @@ public class AppointmentController {
         // Get available slots for the professional
         List<TimeSlotUtil.TimeSlot> availableSlots = appointmentService.getAvailableTimeSlots(date, professional);
         
+        // Filter out past time slots if the selected date is today
+        LocalDate today = LocalDate.now();
+        if (date.equals(today)) {
+            LocalTime now = LocalTime.now();
+            availableSlots = availableSlots.stream()
+                .filter(slot -> slot.getStartTime().isAfter(now))
+                .collect(Collectors.toList());
+        }
+        
         // Filter out slots where the student already has an appointment on this date
         List<TimeSlotUtil.TimeSlot> studentAppointments = appointmentService.getStudentAppointmentsForDate(student, date);
         
         availableSlots = availableSlots.stream()
             .filter(slot -> !hasConflict(slot, studentAppointments))
             .collect(Collectors.toList());
+        
+        // Filter out slots where the student has a STUDENT_PROPOSED suggestion (pending counter-offer)
+        List<Appointment> studentProposals = appointmentRepository.findByStudentAndStatus(student, AppointmentStatus.STUDENT_PROPOSED);
+        for (Appointment proposal : studentProposals) {
+            if (proposal.getSuggestedAppointmentDate() != null && 
+                proposal.getSuggestedTimeSlotStart() != null &&
+                proposal.getSuggestedTimeSlotEnd() != null &&
+                proposal.getSuggestedAppointmentDate().equals(date)) {
+                LocalTime suggestedStart = proposal.getSuggestedTimeSlotStart();
+                LocalTime suggestedEnd = proposal.getSuggestedTimeSlotEnd();
+                availableSlots = availableSlots.stream()
+                    .filter(slot -> {
+                        // Check if slot overlaps with suggested time
+                        boolean overlaps = slot.getStartTime().isBefore(suggestedEnd) && 
+                                          slot.getEndTime().isAfter(suggestedStart);
+                        return !overlaps;
+                    })
+                    .collect(Collectors.toList());
+            }
+        }
         
         List<Map<String, String>> slots = availableSlots.stream()
             .map(slot -> Map.of(
@@ -465,14 +501,38 @@ public class AppointmentController {
             int durationMinutes = (appointmentDuration != null && appointmentDuration > 0) ? appointmentDuration * 30 : 30;
             LocalTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
-            // Create appointment with APPROVED status since professional is directly assigning it
-            Appointment appointment = appointmentService.createAppointment(student, user, appointmentDate, 
-                                                slotStart, slotEnd, notes, AppointmentStatus.APPROVED);
+            // Check if there's already a STUDENT_PROPOSED appointment with this reportId
+            // If so, update it instead of creating a new one
+            Appointment existingProposal = appointmentRepository.findByReportIdAndStatus(reportId, AppointmentStatus.STUDENT_PROPOSED);
             
-            // Set the report ID if provided
-            if (reportId != null && reportId > 0) {
-                appointment.setReportId(reportId);
+            Appointment appointment;
+            if (existingProposal != null) {
+                // Update the existing student proposal with professional's response times
+                // Professional is responding to student's counter-proposal
+                appointment = existingProposal;
+                appointment.setAppointmentDate(appointmentDate);
+                appointment.setTimeSlotStart(slotStart);
+                appointment.setTimeSlotEnd(slotEnd);
+                appointment.setStatus(AppointmentStatus.PENDING);
+                // Clear the suggested times since we're now using the main appointment fields
+                appointment.setSuggestedAppointmentDate(null);
+                appointment.setSuggestedTimeSlotStart(null);
+                appointment.setSuggestedTimeSlotEnd(null);
+                if (notes != null) {
+                    appointment.setNotes(notes);
+                }
                 appointmentRepository.save(appointment);
+            } else {
+                // Create appointment with PENDING status when professional proposes from report
+                // Student will then approve or reject with suggestion
+                appointment = appointmentService.createAppointment(student, user, appointmentDate, 
+                                                    slotStart, slotEnd, notes, AppointmentStatus.PENDING);
+                
+                // Set the report ID to link to this report
+                if (reportId != null && reportId > 0) {
+                    appointment.setReportId(reportId);
+                    appointmentRepository.save(appointment);
+                }
             }
 
             // Update report status to 'scheduled' via API
@@ -485,5 +545,189 @@ public class AppointmentController {
         }
 
         return "redirect:/professional/reports/" + reportId;
+    }
+
+    // ==================== Student Appointment Actions ====================
+
+    /**
+     * Student approves a pending appointment from professional
+     */
+    @PostMapping("/{appointmentId}/student-approve")
+    @ResponseBody
+    public ResponseEntity<?> studentApproveAppointment(
+            @PathVariable Long appointmentId,
+            HttpSession session) {
+        try {
+            User student = (User) session.getAttribute("user");
+            if (student == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+            }
+
+            appointmentService.studentApproveAppointment(appointmentId, student);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Appointment approved successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Student rejects appointment and proposes alternative date/time
+     */
+    @PostMapping("/{appointmentId}/student-reject-suggest")
+    @ResponseBody
+    public ResponseEntity<?> studentRejectAndProposeSuggestion(
+            @PathVariable Long appointmentId,
+            @RequestParam(required = false) String suggestedDate,
+            @RequestParam(required = false) String suggestedStartTime,
+            @RequestParam(required = false) String suggestedEndTime,
+            HttpSession session) {
+        try {
+            User student = (User) session.getAttribute("user");
+            if (student == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+            }
+
+            LocalDate date = LocalDate.parse(suggestedDate);
+            LocalTime startTime = LocalTime.parse(suggestedStartTime);
+            LocalTime endTime = LocalTime.parse(suggestedEndTime);
+
+            appointmentService.studentRejectAndProposeSuggestion(appointmentId, student, date, startTime, endTime);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Suggestion submitted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Get available time slots for a professional on a given date
+     * Used by student when suggesting alternative times
+     */
+    @GetMapping("/{appointmentId}/available-slots")
+    @ResponseBody
+    public ResponseEntity<?> getAvailableSlots(
+            @PathVariable Long appointmentId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            HttpSession session) {
+        try {
+            User student = (User) session.getAttribute("user");
+            if (student == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+            }
+
+            Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new Exception("Appointment not found"));
+
+            if (!appointment.getStudent().getId().equals(student.getId())) {
+                return ResponseEntity.status(403).body(Map.of("error", "Unauthorized"));
+            }
+
+            List<TimeSlotUtil.TimeSlot> availableSlots = appointmentService.getAvailableTimeSlots(date, appointment.getProfessional());
+            
+            // Filter out past time slots if the selected date is today
+            LocalDate today = LocalDate.now();
+            if (date.equals(today)) {
+                LocalTime now = LocalTime.now();
+                availableSlots = availableSlots.stream()
+                    .filter(slot -> slot.getStartTime().isAfter(now))
+                    .collect(Collectors.toList());
+            }
+            
+            // Filter out slots where the professional has other appointments
+            List<Appointment> professionalAppointments = appointmentRepository.findByAppointmentDateAndProfessionalAndStatus(
+                date, appointment.getProfessional(), AppointmentStatus.APPROVED);
+            List<Appointment> pendingAppointments = appointmentRepository.findByAppointmentDateAndProfessionalAndStatus(
+                date, appointment.getProfessional(), AppointmentStatus.PENDING);
+            
+            List<Appointment> allConflicts = new ArrayList<>(professionalAppointments);
+            allConflicts.addAll(pendingAppointments);
+            
+            for (Appointment conflict : allConflicts) {
+                // Skip the current appointment being evaluated
+                if (!conflict.getId().equals(appointmentId)) {
+                    LocalTime conflictStart = conflict.getTimeSlotStart();
+                    LocalTime conflictEnd = conflict.getTimeSlotEnd();
+                    availableSlots = availableSlots.stream()
+                        .filter(slot -> {
+                            // Check if slot overlaps with conflict
+                            boolean overlaps = slot.getStartTime().isBefore(conflictEnd) && 
+                                              slot.getEndTime().isAfter(conflictStart);
+                            return !overlaps;
+                        })
+                        .collect(Collectors.toList());
+                }
+            }
+            
+            // Filter out professional's suggested times (when they propose a different appointment)
+            // If the professional has suggested times for this appointment, student cannot select those
+            if (appointment.getSuggestedTimeSlotStart() != null && appointment.getSuggestedTimeSlotEnd() != null) {
+                LocalTime suggestedStart = appointment.getSuggestedTimeSlotStart();
+                LocalTime suggestedEnd = appointment.getSuggestedTimeSlotEnd();
+                availableSlots = availableSlots.stream()
+                    .filter(slot -> {
+                        // Check if slot overlaps with professional's suggested times
+                        boolean overlaps = slot.getStartTime().isBefore(suggestedEnd) && 
+                                          slot.getEndTime().isAfter(suggestedStart);
+                        return !overlaps;
+                    })
+                    .collect(Collectors.toList());
+            }
+            
+            // Also filter out student's own suggested times from OTHER appointments with the same professional
+            List<Appointment> studentOtherSuggestions = appointmentRepository.findByStudentAndStatus(student, AppointmentStatus.STUDENT_PROPOSED);
+            for (Appointment otherSuggestion : studentOtherSuggestions) {
+                // Skip the current appointment being evaluated
+                if (!otherSuggestion.getId().equals(appointmentId)) {
+                    if (otherSuggestion.getSuggestedAppointmentDate() != null && 
+                        otherSuggestion.getSuggestedAppointmentDate().equals(date) &&
+                        otherSuggestion.getSuggestedTimeSlotStart() != null && 
+                        otherSuggestion.getSuggestedTimeSlotEnd() != null) {
+                        
+                        LocalTime otherSuggestedStart = otherSuggestion.getSuggestedTimeSlotStart();
+                        LocalTime otherSuggestedEnd = otherSuggestion.getSuggestedTimeSlotEnd();
+                        availableSlots = availableSlots.stream()
+                            .filter(slot -> {
+                                // Check if slot overlaps with other appointment's suggested times
+                                boolean overlaps = slot.getStartTime().isBefore(otherSuggestedEnd) && 
+                                                  slot.getEndTime().isAfter(otherSuggestedStart);
+                                return !overlaps;
+                            })
+                            .collect(Collectors.toList());
+                    }
+                }
+            }
+            
+            // Convert to JSON-friendly format
+            var slotsList = availableSlots.stream()
+                .map(slot -> Map.of(
+                    "startTime", slot.getStartTime().toString(),
+                    "endTime", slot.getEndTime().toString()
+                ))
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(slotsList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Professional schedules appointment from student's suggestion
+     */
+    @PostMapping("/{appointmentId}/professional-schedule-suggestion")
+    @ResponseBody
+    public ResponseEntity<?> professionalScheduleFromSuggestion(
+            @PathVariable Long appointmentId,
+            HttpSession session) {
+        try {
+            User professional = (User) session.getAttribute("user");
+            if (professional == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Not authenticated"));
+            }
+
+            appointmentService.professionalScheduleFromSuggestion(appointmentId, professional);
+            return ResponseEntity.ok(Map.of("success", true, "message", "Appointment scheduled from student suggestion"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

@@ -371,9 +371,9 @@
                 } else if (sortType === 'oldest') {
                     return timeA - timeB; // Oldest first
                 } else if (sortType === 'urgent') {
-                    return urgencyA - urgencyB; // Urgent first (higher urgency values first)
+                    return urgencyB - urgencyA; // Urgent first (higher urgency values first)
                 } else if (sortType === 'low') {
-                    return urgencyB - urgencyA; // Low first (lower urgency values first)
+                    return urgencyA - urgencyB; // Low first (lower urgency values first)
                 }
                 return 0;
             });

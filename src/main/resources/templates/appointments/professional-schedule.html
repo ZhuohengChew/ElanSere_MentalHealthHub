@@ -99,22 +99,28 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group" style="gap: 5px;">
-                                            <button th:if="${apt.status.toString() == 'PENDING'}" 
-                                                    class="btn btn-sm btn-success" 
-                                                    th:onclick="'approveAppointment(' + ${apt.id} + ')'"
-                                                    title="Approve this appointment">
-                                                <i class="bi bi-check-circle"></i> Approve
-                                            </button>
-                                            <button th:if="${apt.status.toString() == 'PENDING'}" 
-                                                    class="btn btn-sm btn-danger" 
-                                                    th:onclick="'rejectAppointment(' + ${apt.id} + ')'"
-                                                    title="Reject this appointment">
-                                                <i class="bi bi-x-circle"></i> Reject
-                                            </button>
-                                            <button th:unless="${apt.status.toString() == 'PENDING'}" 
+                                            <!-- Check if this appointment was created by professional (has reportId) -->
+                                            <th:block th:if="${apt.reportId != null && apt.status.toString() == 'PENDING'}">
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-hourglass-split"></i> Waiting for student response
+                                                </span>
+                                            </th:block>
+                                            <th:block th:if="${apt.reportId == null && apt.status.toString() == 'PENDING'}">
+                                                <button class="btn btn-sm btn-success" 
+                                                        th:onclick="'approveAppointment(' + ${apt.id} + ')'"
+                                                        title="Approve this appointment">
+                                                    <i class="bi bi-check-circle"></i> Approve
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" 
+                                                        th:onclick="'rejectAppointment(' + ${apt.id} + ')'"
+                                                        title="Reject this appointment">
+                                                    <i class="bi bi-x-circle"></i> Reject
+                                                </button>
+                                            </th:block>
+                                            <button th:if="${apt.status.toString() != 'PENDING'}" 
                                                     class="btn btn-sm btn-outline-secondary" 
                                                     disabled>
-                                                <i class="bi bi-lock"></i> <span th:text="${apt.status == 'APPROVED' ? 'Approved' : 'Rejected'}"></span>
+                                                <i class="bi bi-lock"></i> <span th:text="${apt.status == 'APPROVED' ? 'Approved' : (apt.status == 'STUDENT_PROPOSED' ? 'Student Suggested' : 'Rejected')}"></span>
                                             </button>
                                         </div>
                                     </td>

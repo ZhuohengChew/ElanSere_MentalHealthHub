@@ -206,6 +206,58 @@
                     </div>
                 </div>
 
+                <!-- Appointment Details (if scheduled) -->
+                <div th:if="${report.status == 'scheduled' && appointment != null}" class="info-section">
+                    <h5 class="mb-3">
+                        <i class="bi bi-calendar-event me-2"></i>Appointment Details
+                    </h5>
+                    <div class="concern-box" style="border-left-color: #28a745; background: rgba(40, 167, 69, 0.05);">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">Appointment Date</label>
+                                <p class="fw-medium" th:text="${#temporals.format(appointment.appointmentDate, 'MMMM dd, yyyy')}">Date</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">Professional</label>
+                                <p class="fw-medium" th:text="${appointment.professional?.name}">Professional</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">Start Time</label>
+                                <p class="fw-medium" th:text="${#temporals.format(appointment.timeSlotStart, 'HH:mm')}">Start Time</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">End Time</label>
+                                <p class="fw-medium" th:text="${#temporals.format(appointment.timeSlotEnd, 'HH:mm')}">End Time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student's Counter-Proposal (if reviewed and suggestion exists) -->
+                <div th:if="${report.status == 'reviewed' && suggestedAppointment != null && suggestedAppointment.suggestedAppointmentDate != null}" class="info-section">
+                    <h5 class="mb-3">
+                        <i class="bi bi-hand-thumbs-up me-2"></i>Student's Suggested Time
+                    </h5>
+                    <div class="concern-box" style="border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
+                        <div class="alert alert-info mb-3" role="alert" style="margin-bottom: 1rem;">
+                            <i class="bi bi-info-circle me-2"></i>
+                            The student has suggested a different time for the appointment. Please review and respond.
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">Suggested Date</label>
+                                <p class="fw-medium" th:text="${#temporals.format(suggestedAppointment.suggestedAppointmentDate, 'MMMM dd, yyyy')}">Date</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">Time Range</label>
+                                <p class="fw-medium"><span th:text="${#temporals.format(suggestedAppointment.suggestedTimeSlotStart, 'HH:mm')}">Start</span> - <span th:text="${#temporals.format(suggestedAppointment.suggestedTimeSlotEnd, 'HH:mm')}">End</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Resolution Details -->
                 <div th:if="${report.status == 'resolved' || report.status == 'closed'}" class="info-section">
                     <h5 class="mb-3">

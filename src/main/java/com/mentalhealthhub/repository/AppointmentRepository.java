@@ -24,6 +24,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // Find appointments by report ID with eager loading of professional
     @Query("SELECT a FROM Appointment a LEFT JOIN FETCH a.professional WHERE a.reportId = :reportId")
     Appointment findByReportIdWithProfessional(@Param("reportId") Long reportId);
+    
+    // Find student-proposed appointments by report ID
+    @Query("SELECT a FROM Appointment a WHERE a.reportId = :reportId AND a.status = :status")
+    Appointment findByReportIdAndStatus(@Param("reportId") Long reportId, @Param("status") AppointmentStatus status);
 
     List<Appointment> findByStudentOrProfessional(User student, User professional);
 

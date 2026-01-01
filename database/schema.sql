@@ -43,10 +43,13 @@ CREATE TABLE appointments (
     appointment_date DATE NOT NULL,
     time_slot_start TIME NOT NULL,
     time_slot_end TIME NOT NULL,
-    status ENUM('PENDING','APPROVED','REJECTED') DEFAULT NULL,
-    -- Enum values: PENDING, APPROVED, REJECTED
+    status ENUM('PENDING','APPROVED','REJECTED','STUDENT_PROPOSED') DEFAULT NULL,
+    -- Enum values: PENDING, APPROVED, REJECTED, STUDENT_PROPOSED
     notes LONGTEXT,
     report_id BIGINT,
+    suggested_appointment_date DATE,
+    suggested_time_slot_start TIME,
+    suggested_time_slot_end TIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,

@@ -213,17 +213,66 @@ public class PageController {
             return "redirect:/404";
         }
 
-        // Update report status to "reviewed" when professional views it
-        if (report.getStatus() == null || report.getStatus().isEmpty() || report.getStatus().equals("pending")) {
+        // Auto-update status to "reviewed" when professional views a pending report
+        if ("pending".equals(report.getStatus())) {
             report.setStatus("reviewed");
             reportRepository.save(report);
+            System.out.println("Status auto-updated from 'pending' to 'reviewed'");
         }
 
         // Fetch appointment if report status is scheduled
         Appointment appointment = null;
+        Appointment suggestedAppointment = null;
+        
+        System.out.println("\n========================================");
+        System.out.println("=== DEBUG: Professional View Report Detail ===");
+        System.out.println("========================================");
+        System.out.println("User: " + (user != null ? user.getName() + " (" + user.getId() + ")" : "null"));
+        System.out.println("Report ID: " + report.getId());
+        System.out.println("Report Type: " + report.getType());
+        System.out.println("Report Status: " + report.getStatus());
+        System.out.println("Report Urgency: " + report.getUrgency());
+        System.out.println("Student: " + (report.getStudent() != null ? report.getStudent().getName() : "null"));
+        System.out.println("Description: " + (report.getDescription() != null ? report.getDescription().substring(0, Math.min(50, report.getDescription().length())) + "..." : "null"));
+        System.out.println("--------");
+        
         if ("scheduled".equals(report.getStatus())) {
             appointment = appointmentRepository.findByReportId(report.getId());
+            System.out.println("Status is SCHEDULED");
+            if (appointment != null) {
+                System.out.println("  Appointment ID: " + appointment.getId());
+                System.out.println("  Appointment Date: " + appointment.getAppointmentDate());
+                System.out.println("  Time Slot: " + appointment.getTimeSlotStart() + " - " + appointment.getTimeSlotEnd());
+                System.out.println("  Appointment Status: " + appointment.getStatus());
+            } else {
+                System.out.println("  WARNING: No appointment found for scheduled report!");
+            }
+        } else if ("reviewed".equals(report.getStatus())) {
+            System.out.println("Status is REVIEWED");
+            System.out.println("  Searching for STUDENT_PROPOSED appointments...");
+            suggestedAppointment = appointmentRepository.findByReportIdAndStatus(report.getId(), AppointmentStatus.STUDENT_PROPOSED);
+            if (suggestedAppointment != null) {
+                System.out.println("  Student Proposed Appointment ID: " + suggestedAppointment.getId());
+                System.out.println("  Original Proposed Date: " + suggestedAppointment.getAppointmentDate());
+                System.out.println("  Student's Counter-Proposal Date: " + suggestedAppointment.getSuggestedAppointmentDate());
+                System.out.println("  Student's Counter-Proposal Time: " + suggestedAppointment.getSuggestedTimeSlotStart() + " - " + suggestedAppointment.getSuggestedTimeSlotEnd());
+            } else {
+                System.out.println("  No student counter-proposal found");
+            }
+        } else if ("pending".equals(report.getStatus())) {
+            System.out.println("Status is PENDING - Professional can schedule appointment");
+        } else if ("in_progress".equals(report.getStatus())) {
+            System.out.println("Status is IN_PROGRESS");
+        } else if ("resolved".equals(report.getStatus())) {
+            System.out.println("Status is RESOLVED");
+            System.out.println("  Resolution Notes: " + (report.getResolutionNotes() != null ? report.getResolutionNotes().substring(0, Math.min(50, report.getResolutionNotes().length())) + "..." : "null"));
+            System.out.println("  Resolved At: " + report.getResolvedAt());
+        } else if ("closed".equals(report.getStatus())) {
+            System.out.println("Status is CLOSED");
+        } else {
+            System.out.println("Status is UNKNOWN: " + report.getStatus());
         }
+        System.out.println("========================================\n");
 
         model.addAttribute("user", user);
         model.addAttribute("report", report);
@@ -231,6 +280,7 @@ public class PageController {
         if (appointment != null) {
             model.addAttribute("appointment", appointment);
         }
+        model.addAttribute("suggestedAppointment", suggestedAppointment);
         model.addAttribute("page", "professional/report-detail");
         model.addAttribute("title", "Report Detail");
         return "layout";

@@ -337,6 +337,37 @@
                             </div>
                         </div>
 
+                        <!-- Student's Counter-Proposal (if reviewed and suggestion exists) -->
+                        <div th:if="${report.status == 'reviewed' && suggestedAppointment != null && suggestedAppointment.suggestedAppointmentDate != null}" class="mb-4">
+                            <div class="info-label">
+                                <i class="bi bi-hand-thumbs-up me-2"></i>Your Suggested Time
+                            </div>
+                            <div class="card border-info mb-3" style="border-color: #3b82f6;">
+                                <div class="card-body">
+                                    <div class="alert alert-info mb-3" role="alert">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        You have suggested a different time. The professional will review and respond to your suggestion.
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="info-label">Suggested Date</div>
+                                            <div class="info-value">
+                                                <i class="bi bi-calendar3 me-2" style="color: #3b82f6;"></i>
+                                                <strong th:text="${#temporals.format(suggestedAppointment.suggestedAppointmentDate, 'MMMM dd, yyyy')}">Date</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-label">Time Range</div>
+                                            <div class="info-value">
+                                                <i class="bi bi-clock-history me-2" style="color: #3b82f6;"></i>
+                                                <strong><span th:text="${#temporals.format(suggestedAppointment.suggestedTimeSlotStart, 'HH:mm')}">Start</span> - <span th:text="${#temporals.format(suggestedAppointment.suggestedTimeSlotEnd, 'HH:mm')}">End</span></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Resolution Notes (if resolved/closed) -->
                         <div th:if="${report.status == 'resolved' || report.status == 'closed'}" class="mb-4">
                             <div class="info-label">

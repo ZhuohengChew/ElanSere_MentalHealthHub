@@ -54,9 +54,11 @@
                                 <tr>
                                     <th>Professional</th>
                                     <th>Date & Time</th>
+                                    <th>Report ID</th>
                                     <th>Duration</th>
                                     <th>Status</th>
                                     <th>Notes</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,15 +73,30 @@
                                         <small class="text-muted" th:text="${apt.timeSlotStart} + ' - ' + ${apt.timeSlotEnd}">Time</small>
                                     </td>
                                     <td>
+                                        <span th:if="${apt.reportId != null}" th:text="'#' + ${apt.reportId}">Report ID</span>
+                                        <span th:unless="${apt.reportId != null}" class="text-muted">-</span>
+                                    </td>
+                                    <td>
                                         <span th:text="${#temporals.format(apt.timeSlotStart, 'HH:mm')} + ' - ' + ${#temporals.format(apt.timeSlotEnd, 'HH:mm')}">Duration</span>
                                     </td>
                                     <td>
-                                        <span class="badge" th:classappend="${apt.status.toString() == 'PENDING' ? 'bg-warning' : (apt.status.toString() == 'APPROVED' ? 'bg-success' : 'bg-danger')}" 
+                                        <span class="badge" th:classappend="${apt.status.toString() == 'PENDING' ? 'bg-warning' : (apt.status.toString() == 'APPROVED' ? 'bg-success' : (apt.status.toString() == 'STUDENT_PROPOSED' ? 'bg-info' : 'bg-danger'))}" 
                                               th:text="${apt.status}">Status</span>
                                     </td>
                                     <td>
                                         <span th:if="${apt.notes == null or apt.notes == ''}" class="text-muted">-</span>
                                         <span th:unless="${apt.notes == null or apt.notes == ''}" title="" th:title="${apt.notes}" class="d-inline-block text-truncate" style="max-width: 200px;" th:text="${apt.notes}">Notes</span>
+                                    </td>
+                                    <td>
+                                        <!-- Show approve/reject buttons only for PENDING appointments with reportId (professional-created) -->
+                                        <th:block th:if="${apt.status.toString() == 'PENDING' && apt.reportId != null}">
+                                            <button class="btn btn-sm btn-success me-2" th:onclick="'studentApproveAppointment(' + ${apt.id} + ')'">
+                                                <i class="bi bi-check-circle"></i> Approve
+                                            </button>
+                                            <button class="btn btn-sm btn-warning" th:onclick="'openRejectDialog(' + ${apt.id} + ')'">
+                                                <i class="bi bi-x-circle"></i> Suggest Time
+                                            </button>
+                                        </th:block>
                                     </td>
                                 </tr>
                             </tbody>
@@ -111,6 +128,9 @@
         const todayStr = getLocalDateString(today);
         selectDate(todayStr);
         renderCalendar();
+        
+        // Set minimum date to today for suggestion input (past timeslots will be filtered)
+        document.getElementById('suggestedDateInput').min = todayStr;
     });
 
     function renderCalendar() {
@@ -270,6 +290,267 @@
         // Clear also resets to today
         resetDateFilter();
     }
+
+    // ==================== Student Appointment Actions ====================
+    /**
+     * Student approves a pending appointment from professional
+     */
+    function studentApproveAppointment(appointmentId) {
+        if (confirm('Are you sure you want to approve this appointment?')) {
+            fetch(`/mentalhealthhub/appointments/${appointmentId}/student-approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.content || ''
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Appointment approved successfully!');
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to approve appointment: ' + error.message);
+            });
+        }
+    }
+
+    /**
+     * Open dialog to select new date/time and reject appointment
+     */
+    function openRejectDialog(appointmentId) {
+        const dialog = document.getElementById('rejectAppointmentModal');
+        dialog.setAttribute('data-appointment-id', appointmentId);
+        
+        // Initialize calendar for date selection
+        const modal = new bootstrap.Modal(dialog);
+        modal.show();
+        
+        // Reset form
+        document.getElementById('rejectForm').reset();
+        document.getElementById('selectedSuggestedDate').value = '';
+        document.getElementById('suggestedTimeSlots').innerHTML = '';
+    }
+
+    let suggestedTimeSlotData = [];
+    let selectedSuggestedSlots = [];
+
+    /**
+     * Load available time slots for selected date
+     */
+    function loadSuggestedTimeSlots() {
+        const date = document.getElementById('suggestedDateInput').value;
+        const appointmentId = document.getElementById('rejectAppointmentModal').getAttribute('data-appointment-id');
+        
+        if (!date) {
+            document.getElementById('suggestedTimeSlots').innerHTML = '<p class="text-muted">Please select a date</p>';
+            return;
+        }
+        
+        fetch(`/mentalhealthhub/appointments/${appointmentId}/available-slots?date=${date}`)
+            .then(response => response.json())
+            .then(slots => {
+                // Filter out past time slots if date is today
+                const today = new Date();
+                const selectedDate = new Date(date + 'T00:00:00');
+                const isToday = today.toDateString() === selectedDate.toDateString();
+                
+                if (isToday) {
+                    const currentHour = today.getHours();
+                    const currentMinutes = today.getMinutes();
+                    
+                    slots = slots.filter(slot => {
+                        const [hours, minutes] = slot.startTime.split(':');
+                        return parseInt(hours) > currentHour || (parseInt(hours) === currentHour && parseInt(minutes) > currentMinutes);
+                    });
+                }
+                
+                suggestedTimeSlotData = slots;
+                selectedSuggestedSlots = [];
+                
+                let html = '';
+                if (slots.length === 0) {
+                    html = '<p class="text-muted">No available time slots for this date</p>';
+                } else {
+                    html = '<div class="time-slots" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">';
+                    slots.forEach((slot, index) => {
+                        const displayTime = slot.startTime + ' - ' + slot.endTime;
+                        const slotId = `suggested_slot_${index}`;
+                        html += `
+                            <input type="checkbox" class="btn-check suggested-time-slot-checkbox" id="${slotId}" 
+                                   data-index="${index}" data-start="${slot.startTime}" data-end="${slot.endTime}"
+                                   onchange="handleSuggestedSlotSelection(${index})">
+                            <label class="btn btn-outline-primary w-100" for="${slotId}" style="cursor: pointer;">
+                                ${displayTime}
+                            </label>
+                        `;
+                    });
+                    html += '</div>';
+                    html += '<small class="text-danger d-none mt-2" id="suggestedSlotError">Please select continuous time slots without gaps</small>';
+                    html += '<div class="alert alert-info d-none mt-3" id="suggestedSlotInfo" role="alert"><small><strong>Selected:</strong> <span id="suggestedSlotsDisplay">No slots selected</span></small></div>';
+                }
+                document.getElementById('suggestedTimeSlots').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading time slots:', error);
+                document.getElementById('suggestedTimeSlots').innerHTML = '<p class="text-danger">Error loading time slots</p>';
+            });
+    }
+
+    /**
+     * Handle suggested slot selection with continuous validation
+     */
+    function handleSuggestedSlotSelection(index) {
+        const checkbox = document.querySelector(`.suggested-time-slot-checkbox[data-index="${index}"]`);
+        
+        if (checkbox.checked) {
+            selectedSuggestedSlots.push(index);
+        } else {
+            selectedSuggestedSlots = selectedSuggestedSlots.filter(idx => idx !== index);
+        }
+        
+        // Validate that selected slots are continuous (no gaps in actual times)
+        if (selectedSuggestedSlots.length > 1) {
+            selectedSuggestedSlots.sort((a, b) => a - b);
+            
+            // Check if the actual times are continuous (end time of one slot = start time of next)
+            let isContinuous = true;
+            for (let i = 0; i < selectedSuggestedSlots.length - 1; i++) {
+                const currentSlotIndex = selectedSuggestedSlots[i];
+                const nextSlotIndex = selectedSuggestedSlots[i + 1];
+                
+                const currentSlot = suggestedTimeSlotData[currentSlotIndex];
+                const nextSlot = suggestedTimeSlotData[nextSlotIndex];
+                
+                // Check if end time of current equals start time of next
+                if (currentSlot.endTime !== nextSlot.startTime) {
+                    isContinuous = false;
+                    console.log(`Gap detected: ${currentSlot.endTime} != ${nextSlot.startTime}`);
+                    break;
+                }
+            }
+            
+            if (!isContinuous) {
+                // Uncheck the slot
+                checkbox.checked = false;
+                selectedSuggestedSlots = selectedSuggestedSlots.filter(idx => idx !== index);
+                document.getElementById('suggestedSlotError').classList.remove('d-none');
+                setTimeout(() => {
+                    document.getElementById('suggestedSlotError').classList.add('d-none');
+                }, 3000);
+                return;
+            }
+        }
+        
+        updateSuggestedSlotDisplay();
+    }
+
+    /**
+     * Update the display of selected suggested slots
+     */
+    function updateSuggestedSlotDisplay() {
+        if (selectedSuggestedSlots.length === 0) {
+            document.getElementById('suggestedSlotInfo').classList.add('d-none');
+            document.getElementById('selectedSuggestedDate').value = '';
+            document.getElementById('selectedSuggestedStartTime').value = '';
+            document.getElementById('selectedSuggestedEndTime').value = '';
+            return;
+        }
+        
+        selectedSuggestedSlots.sort((a, b) => a - b);
+        const startSlotIndex = selectedSuggestedSlots[0];
+        const endSlotIndex = selectedSuggestedSlots[selectedSuggestedSlots.length - 1];
+        
+        const startTime = suggestedTimeSlotData[startSlotIndex].startTime;
+        const endTime = suggestedTimeSlotData[endSlotIndex].endTime;
+        
+        const selectedDisplay = startTime + ' - ' + endTime;
+        
+        document.getElementById('suggestedSlotsDisplay').textContent = selectedDisplay;
+        document.getElementById('suggestedSlotInfo').classList.remove('d-none');
+        
+        const date = document.getElementById('suggestedDateInput').value;
+        document.getElementById('selectedSuggestedDate').value = date;
+        document.getElementById('selectedSuggestedStartTime').value = startTime;
+        document.getElementById('selectedSuggestedEndTime').value = endTime;
+    }
+
+
+    /**
+     * Submit reject and suggest
+     */
+    function submitRejectAndSuggest() {
+        const appointmentId = document.getElementById('rejectAppointmentModal').getAttribute('data-appointment-id');
+        const date = document.getElementById('selectedSuggestedDate').value;
+        const startTime = document.getElementById('selectedSuggestedStartTime').value;
+        const endTime = document.getElementById('selectedSuggestedEndTime').value;
+        
+        if (!date || !startTime || !endTime) {
+            alert('Please select a date and time slot');
+            return;
+        }
+        
+        // Validate continuous slots before submission
+        if (selectedSuggestedSlots.length > 1) {
+            const sortedSlots = [...selectedSuggestedSlots].sort((a, b) => a - b);
+            let isContinuous = true;
+            
+            for (let i = 0; i < sortedSlots.length - 1; i++) {
+                const currentSlotIndex = sortedSlots[i];
+                const nextSlotIndex = sortedSlots[i + 1];
+                
+                const currentSlot = suggestedTimeSlotData[currentSlotIndex];
+                const nextSlot = suggestedTimeSlotData[nextSlotIndex];
+                
+                if (currentSlot.endTime !== nextSlot.startTime) {
+                    isContinuous = false;
+                    break;
+                }
+            }
+            
+            if (!isContinuous) {
+                document.getElementById('suggestedSlotError').classList.remove('d-none');
+                document.getElementById('suggestedSlotError').innerHTML = 'Please select continuous time slots without gaps';
+                setTimeout(() => {
+                    document.getElementById('suggestedSlotError').classList.add('d-none');
+                }, 4000);
+                return;
+            }
+        }
+        
+        const url = new URL(`/mentalhealthhub/appointments/${appointmentId}/student-reject-suggest`, window.location.origin);
+        url.searchParams.append('suggestedDate', date);
+        url.searchParams.append('suggestedStartTime', startTime);
+        url.searchParams.append('suggestedEndTime', endTime);
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.content || ''
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('Appointment rejection with suggestion submitted successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('rejectAppointmentModal')).hide();
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to submit rejection: ' + error.message);
+        });
+    }
 </script>
 
 <style>
@@ -298,13 +579,50 @@
         border-color: #667eea;
         color: white;
     }
+
+    .time-slot-btn.active {
+        background-color: #667eea !important;
+        color: white !important;
+        border-color: #667eea !important;
+    }
 </style>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+<!-- Modal for Rejecting and Suggesting Alternative Time -->
+<div class="modal fade" id="rejectAppointmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-event"></i> Suggest Alternative Appointment Time
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm">
+                    <div class="mb-4">
+                        <label class="form-label fw-600">Select New Date</label>
+                        <input type="date" id="suggestedDateInput" class="form-control" 
+                               onchange="loadSuggestedTimeSlots()" required>
                     </div>
-                </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-600">Select Time Slot</label>
+                        <div id="suggestedTimeSlots" class="text-muted">
+                            <p>Please select a date first</p>
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields to store selection -->
+                    <input type="hidden" id="selectedSuggestedDate">
+                    <input type="hidden" id="selectedSuggestedStartTime">
+                    <input type="hidden" id="selectedSuggestedEndTime">
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitRejectAndSuggest()">
+                    <i class="bi bi-check-circle"></i> Submit Suggestion
+                </button>
             </div>
         </div>
     </div>

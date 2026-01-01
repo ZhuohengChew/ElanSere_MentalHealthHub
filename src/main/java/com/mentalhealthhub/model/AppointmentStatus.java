@@ -3,6 +3,7 @@ package com.mentalhealthhub.model;
 public enum AppointmentStatus {
     PENDING,
     APPROVED,
-    REJECTED
+    REJECTED,
+    STUDENT_PROPOSED
 }
 

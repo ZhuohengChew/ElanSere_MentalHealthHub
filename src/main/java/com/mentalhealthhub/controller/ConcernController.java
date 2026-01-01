@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.mentalhealthhub.model.Appointment;
+import com.mentalhealthhub.model.AppointmentStatus;
 import com.mentalhealthhub.model.Report;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
@@ -259,11 +260,24 @@ public class ConcernController {
         if ("scheduled".equals(report.getStatus())) {
             appointment = appointmentRepository.findByReportIdWithProfessional(report.getId());
         }
+        
+        // Fetch student's pending suggestion if status is reviewed
+        Appointment suggestedAppointment = null;
+        if ("reviewed".equals(report.getStatus())) {
+            User student = report.getStudent();
+            List<Appointment> suggestions = appointmentRepository.findByStudentAndStatus(student, AppointmentStatus.STUDENT_PROPOSED);
+            if (!suggestions.isEmpty()) {
+                suggestedAppointment = suggestions.get(0); // Get first pending suggestion
+            }
+        }
 
         model.addAttribute("user", user);
         model.addAttribute("report", report);
         if (appointment != null) {
             model.addAttribute("appointment", appointment);
+        }
+        if (suggestedAppointment != null) {
+            model.addAttribute("suggestedAppointment", suggestedAppointment);
         }
         model.addAttribute("page", "concerns/report-detail");
         model.addAttribute("title", "Report Details");
@@ -597,13 +611,8 @@ public class ConcernController {
             return "redirect:/404";
         }
 
-        // Update report status to "reviewed" when staff views it (only if not already scheduled or higher status)
-        if (report.getStatus() == null || report.getStatus().isEmpty() || report.getStatus().equals("pending")) {
-            if (!report.getStatus().equals("scheduled")) {
-                report.setStatus("reviewed");
-                reportRepository.save(report);
-            }
-        }
+        // Do NOT auto-update status when staff views report
+        // Staff should manually change status as needed
 
         // Fetch appointment if report status is scheduled
         Appointment appointment = null;
@@ -618,6 +627,16 @@ public class ConcernController {
                 System.out.println("Appointment Time: " + appointment.getTimeSlotStart() + " - " + appointment.getTimeSlotEnd());
             }
         }
+        
+        // Fetch student's pending suggestion if status is reviewed
+        Appointment suggestedAppointment = null;
+        if ("reviewed".equals(report.getStatus())) {
+            User student = report.getStudent();
+            List<Appointment> suggestions = appointmentRepository.findByStudentAndStatus(student, AppointmentStatus.STUDENT_PROPOSED);
+            if (!suggestions.isEmpty()) {
+                suggestedAppointment = suggestions.get(0); // Get first pending suggestion
+            }
+        }
         System.out.println("===================================\n");
 
         model.addAttribute("user", user);
@@ -626,7 +645,10 @@ public class ConcernController {
         if (appointment != null) {
             model.addAttribute("appointment", appointment);
         }
-        model.addAttribute("page", "professional/report-detail");
+        if (suggestedAppointment != null) {
+            model.addAttribute("suggestedAppointment", suggestedAppointment);
+        }
+        model.addAttribute("page", "concerns/staff-report-detail");
         model.addAttribute("title", "Report Detail");
         return "layout";
     }
