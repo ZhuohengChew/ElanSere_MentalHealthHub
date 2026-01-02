@@ -448,22 +448,8 @@
                 // Find and update the row
                 const row = document.querySelector(`tbody tr[data-id="${appointmentId}"]`);
                 if (row) {
-                    row.setAttribute('data-status', 'REJECTED');
-                    
-                    // Update status badge
-                    const statusBadge = row.querySelector('.badge');
-                    statusBadge.textContent = 'REJECTED';
-                    statusBadge.className = 'badge bg-danger';
-                    
-                    // Replace action buttons
-                    const actionsTd = row.querySelector('td:last-child');
-                    actionsTd.innerHTML = `
-                        <div class="btn-group" role="group" style="gap: 5px;">
-                            <button class="btn btn-sm btn-outline-secondary" disabled>
-                                <i class="bi bi-lock"></i> Rejected
-                            </button>
-                        </div>
-                    `;
+                    // Remove the row immediately instead of showing locked state
+                    row.style.display = 'none';
                     
                     updateCounters();
                     
