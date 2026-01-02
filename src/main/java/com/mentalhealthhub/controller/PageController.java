@@ -21,7 +21,10 @@ import com.mentalhealthhub.repository.AssessmentRepository;
 import com.mentalhealthhub.repository.ReportRepository;
 import com.mentalhealthhub.repository.UserRepository;
 import com.mentalhealthhub.service.AssessmentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mentalhealthhub.service.UserService;
+import com.mentalhealthhub.service.AnalyticsService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -34,16 +37,18 @@ public class PageController {
     private final UserRepository userRepository;
     private final AssessmentRepository assessmentRepository;
     private final UserService userService;
+    private final AnalyticsService analyticsService;
 
     public PageController(ReportRepository reportRepository, AppointmentRepository appointmentRepository,
             AssessmentService assessmentService, UserRepository userRepository,
-            AssessmentRepository assessmentRepository, UserService userService) {
+            AssessmentRepository assessmentRepository, UserService userService, AnalyticsService analyticsService) {
         this.reportRepository = reportRepository;
         this.appointmentRepository = appointmentRepository;
         this.assessmentService = assessmentService;
         this.userRepository = userRepository;
         this.assessmentRepository = assessmentRepository;
         this.userService = userService;
+        this.analyticsService = analyticsService;
     }
 
     @GetMapping("/settings")
@@ -367,12 +372,15 @@ public class PageController {
             return "redirect:/login";
         }
 
-        // Get student by ID (would normally come from UserRepository)
-        // For now, we'll assume the student is accessible
-        // In production, verify access control
+        // Get student by ID and load their assessments from DB
+        User student = userRepository.findById(studentId).orElse(null);
+        if (student == null || student.getRole() != UserRole.STUDENT) {
+            return "redirect:/patients";
+        }
 
-        List<Assessment> assessments = assessmentService.getUserAssessments(null);
+        List<Assessment> assessments = assessmentService.getUserAssessments(student);
 
+        model.addAttribute("student", student);
         model.addAttribute("studentId", studentId);
         model.addAttribute("assessments", assessments);
         model.addAttribute("page", "professional/student-health-records");
@@ -414,14 +422,97 @@ public class PageController {
             return "redirect:/patients";
         }
 
-        List<Assessment> assessments = assessmentRepository.findAll().stream()
-                .filter(a -> a.getUser() != null && a.getUser().getId().equals(id))
-                .toList();
+        // Load assessments for the student directly from repository/service
+        List<Assessment> assessments = assessmentService.getUserAssessments(student);
+
+        // Build trend data from real assessments (oldest -> newest)
+        java.util.List<String> labels = new java.util.ArrayList<>();
+        java.util.List<Double> stressSeries = new java.util.ArrayList<>();
+        java.util.List<Double> anxietySeries = new java.util.ArrayList<>();
+        java.util.List<Double> depressionSeries = new java.util.ArrayList<>();
+        java.util.List<Double> wellbeingSeries = new java.util.ArrayList<>();
+
+        java.time.format.DateTimeFormatter df = java.time.format.DateTimeFormatter.ofPattern("dd MMM");
+        if (assessments != null && !assessments.isEmpty()) {
+            // assessments from service are newest-first; iterate reverse for chronological order
+            for (int i = assessments.size() - 1; i >= 0; i--) {
+                Assessment a = assessments.get(i);
+                String label = a.getCompletedAt() != null ? a.getCompletedAt().format(df) : "-";
+                labels.add(label);
+
+                int q1 = a.getQ1Score() != null ? a.getQ1Score() : 0;
+                int q2 = a.getQ2Score() != null ? a.getQ2Score() : 0;
+                int q3 = a.getQ3Score() != null ? a.getQ3Score() : 0;
+                int q4 = a.getQ4Score() != null ? a.getQ4Score() : 0;
+                int q6 = a.getQ6Score() != null ? a.getQ6Score() : 0;
+                int q7 = a.getQ7Score() != null ? a.getQ7Score() : 0;
+                int q8 = a.getQ8Score() != null ? a.getQ8Score() : 0;
+
+                double stress = ((q1 + q2) * 100.0) / 8.0; // 0..100
+                double anxiety = ((q3 * 2) * 100.0) / 8.0; // 0..100
+                double depression = ((q4 + q6 + q7 + q8) * 100.0) / 16.0; // 0..100
+                double wellbeing = ((32.0 - (a.getTotalScore() != null ? a.getTotalScore() : 0)) / 32.0) * 100.0;
+                wellbeing = Math.round(wellbeing * 100.0) / 100.0;
+
+                stressSeries.add(Math.round(stress * 100.0) / 100.0);
+                anxietySeries.add(Math.round(anxiety * 100.0) / 100.0);
+                depressionSeries.add(Math.round(depression * 100.0) / 100.0);
+                wellbeingSeries.add(wellbeing);
+            }
+        }
+
+        // Compute current trend by comparing latest and previous assessment wellbeing
+        String currentTrend = "No assessments";
+        if (assessments != null && !assessments.isEmpty()) {
+            if (assessments.size() >= 2) {
+                Assessment latest = assessments.get(0);
+                Assessment prev = assessments.get(1);
+                double latestW = ((32.0 - (latest.getTotalScore() != null ? latest.getTotalScore() : 0)) / 32.0) * 100.0;
+                double prevW = ((32.0 - (prev.getTotalScore() != null ? prev.getTotalScore() : 0)) / 32.0) * 100.0;
+                latestW = Math.round(latestW * 100.0) / 100.0;
+                prevW = Math.round(prevW * 100.0) / 100.0;
+                if (latestW > prevW) {
+                    currentTrend = "Improving";
+                } else if (latestW < prevW) {
+                    currentTrend = "Declining";
+                } else {
+                    currentTrend = "Stable";
+                }
+            } else {
+                currentTrend = "No previous assessment";
+            }
+        }
+
+        // Serialize trend data as JSON for the template JS
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode root = mapper.createObjectNode();
+            root.putPOJO("labels", labels);
+            root.putPOJO("stress", stressSeries);
+            root.putPOJO("anxiety", anxietySeries);
+            root.putPOJO("depression", depressionSeries);
+            root.putPOJO("wellbeing", wellbeingSeries);
+            String trendJson = mapper.writeValueAsString(root);
+            java.util.Map<String, Object> trendMap = mapper.convertValue(root, java.util.Map.class);
+
+            model.addAttribute("trendDataJson", trendJson);
+            model.addAttribute("trendData", trendMap);
+        } catch (Exception e) {
+            model.addAttribute("trendDataJson", "null");
+        }
 
         model.addAttribute("student", student);
         model.addAttribute("assessments", assessments);
         model.addAttribute("totalAssessments", assessments.size());
+        model.addAttribute("currentTrend", currentTrend);
         model.addAttribute("user", user);
+        // Load per-student engagement rate for display
+        try {
+            Double engagement = analyticsService.getEngagementForUser(student.getId());
+            model.addAttribute("engagementRate", engagement);
+        } catch (Exception e) {
+            model.addAttribute("engagementRate", null);
+        }
         model.addAttribute("page", "professional/student-profile");
         model.addAttribute("title", "Student Profile");
 

@@ -65,7 +65,7 @@
                 <div class="card-body text-center">
                     <i class="bi bi-graph-up" style="font-size: 2rem; color: #28a745;"></i>
                     <h6 class="mt-2 text-muted">Current Trend</h6>
-                    <h3 class="mb-0" style="color: #28a745;">Improving</h3>
+                    <h3 class="mb-0" style="color: #28a745;" th:text="${currentTrend}">Improving</h3>
                     <small class="text-muted">Over last month</small>
                 </div>
             </div>
@@ -85,7 +85,7 @@
                 <div class="card-body text-center">
                     <i class="bi bi-activity" style="font-size: 2rem; color: #ffc107;"></i>
                     <h6 class="mt-2 text-muted">Engagement Rate</h6>
-                    <h3 class="mb-0">85%</h3>
+                    <h3 class="mb-0" th:text="${engagementRate != null ? engagementRate + '%' : 'N/A'}">85%</h3>
                     <small class="text-muted">Active 2 hours ago</small>
                 </div>
             </div>
@@ -215,17 +215,24 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Placeholder trend data - can be populated from server if needed
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const trendData = [[${trendData}]];
         const ctx = document.getElementById('trendChart').getContext('2d');
+        const labels = trendData && trendData.labels ? trendData.labels : [];
+        const stress = trendData && trendData.stress ? trendData.stress : [];
+        const anxiety = trendData && trendData.anxiety ? trendData.anxiety : [];
+        const depression = trendData && trendData.depression ? trendData.depression : [];
+        const wellbeing = trendData && trendData.wellbeing ? trendData.wellbeing : [];
+
         const trendChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Oct 1', 'Oct 8', 'Oct 15', 'Oct 22', 'Oct 29', 'Nov 5'],
+                labels: labels,
                 datasets: [
                     {
                         label: 'Stress Level',
-                        data: [65, 62, 60, 55, 50, 45],
+                        data: stress,
                         borderColor: '#ffc107',
                         backgroundColor: 'rgba(255, 193, 7, 0.1)',
                         tension: 0.4,
@@ -233,7 +240,7 @@
                     },
                     {
                         label: 'Anxiety Level',
-                        data: [40, 38, 35, 32, 30, 30],
+                        data: anxiety,
                         borderColor: '#17a2b8',
                         backgroundColor: 'rgba(23, 162, 184, 0.1)',
                         tension: 0.4,
@@ -241,7 +248,7 @@
                     },
                     {
                         label: 'Depression Indicators',
-                        data: [35, 32, 28, 25, 25, 25],
+                        data: depression,
                         borderColor: '#dc3545',
                         backgroundColor: 'rgba(220, 53, 69, 0.1)',
                         tension: 0.4,
@@ -249,7 +256,7 @@
                     },
                     {
                         label: 'Overall Wellbeing',
-                        data: [65, 68, 70, 73, 75, 75],
+                        data: wellbeing,
                         borderColor: '#28a745',
                         backgroundColor: 'rgba(40, 167, 69, 0.1)',
                         tension: 0.4,
@@ -281,6 +288,7 @@
                 }
             }
         });
+        /*]]>*/
     </script>
 
     <style>

@@ -23,10 +23,10 @@ public interface SelfCareRepository extends JpaRepository<SelfCare, Long> {
     List<SelfCare> findByUserAndTypeOrderByActivityDateDesc(User user, SelfCareType type);
 
     // Analytics queries
-    @Query("SELECT COUNT(sc) FROM SelfCare sc WHERE sc.type = :type")
+    @Query(value = "SELECT COUNT(*) FROM self_care WHERE type = :type", nativeQuery = true)
     Long countByType(@Param("type") String type);
 
-    @Query("SELECT COUNT(sc) FROM SelfCare sc WHERE sc.mood = :mood")
+    @Query(value = "SELECT COUNT(*) FROM self_care WHERE mood = :mood", nativeQuery = true)
     Long countByMood(@Param("mood") String mood);
 
     @Query("SELECT COUNT(sc) FROM SelfCare sc WHERE sc.activityDate > :date")
@@ -40,5 +40,11 @@ public interface SelfCareRepository extends JpaRepository<SelfCare, Long> {
 
     @Query("SELECT FUNCTION('DATE_FORMAT', sc.activityDate, '%Y-%m') as month, COUNT(sc) FROM SelfCare sc GROUP BY FUNCTION('DATE_FORMAT', sc.activityDate, '%Y-%m') ORDER BY month DESC")
     Map<String, Long> getMonthlyActivityTrend();
+
+    // Per-user self-care counts for analytics (userId, count) ordered desc
+    @Query("SELECT sc.user.id as userId, COUNT(sc) as count FROM SelfCare sc GROUP BY sc.user.id ORDER BY count DESC")
+    List<Object[]> getUserSelfCareCounts();
+
+    Long countByUser(User user);
 }
 

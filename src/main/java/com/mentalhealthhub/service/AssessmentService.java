@@ -130,12 +130,18 @@ public class AssessmentService {
                 (answers.get(1) != null ? answers.get(1) : 0); // Q1 + Q2
         int anxietyScore = (answers.get(2) != null ? answers.get(2) : 0) * 2; // Q3 * 2
         // Wellbeing score is inverted: higher total symptoms = lower wellbeing
-        // Range: 0-32 symptoms → 32-0 wellbeing (0=worst, 32=best)
-        int wellbeingScore = 32 - totalScore;
+        // Range: 0-32 symptoms → 32-0 wellbeing, then normalize to percentage 0-100
+        int rawWellbeing = 32 - totalScore; // 0..32
+        double wellbeingPercent = (rawWellbeing / 32.0) * 100.0;
+        // Round to 2 decimal places
+        double wellbeingRounded = Math.round(wellbeingPercent * 100.0) / 100.0;
 
         user.setStressLevel((stressScore * 100) / 8); // Convert to 0-100
         user.setAnxietyLevel((anxietyScore * 100) / 8); // Convert to 0-100
-        user.setWellbeingScore(wellbeingScore);
+        // Store integer legacy field as rounded percent (DB column is integer)
+        user.setWellbeingScore((int) Math.round(wellbeingRounded));
+        // Also set transient precise percentage with two decimals
+        user.setWellbeingPercentage(wellbeingRounded);
         user.setLastAssessmentDate(java.time.LocalDateTime.now());
 
         userRepository.save(user);
