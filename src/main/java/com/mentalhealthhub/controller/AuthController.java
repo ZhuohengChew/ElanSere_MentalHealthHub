@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,43 +35,26 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final AppointmentRepository appointmentRepository;
-    private final ReportRepository reportRepository;
-    private final UserService userService;
-    private final SelfCareRepository selfCareRepository;
-    private final EducationalModuleRepository educationalModuleRepository;
-    private final ModuleProgressRepository moduleProgressRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    /**
-     * Constructor-based dependency injection.
-     * Spring IoC container will automatically inject all required dependencies
-     * when creating an instance of AuthController.
-     * 
-     * @param userRepository              Repository for user data access
-     * @param appointmentRepository       Repository for appointment data access
-     * @param reportRepository            Repository for report data access
-     * @param userService                 Service for user-related business logic
-     * @param selfCareRepository          Repository for self-care data access
-     * @param educationalModuleRepository Repository for educational module data
-     *                                    access
-     * @param moduleProgressRepository    Repository for module progress data access
-     */
-    public AuthController(UserRepository userRepository,
-            AppointmentRepository appointmentRepository,
-            ReportRepository reportRepository,
-            UserService userService,
-            SelfCareRepository selfCareRepository,
-            EducationalModuleRepository educationalModuleRepository,
-            ModuleProgressRepository moduleProgressRepository) {
-        this.userRepository = userRepository;
-        this.appointmentRepository = appointmentRepository;
-        this.reportRepository = reportRepository;
-        this.userService = userService;
-        this.selfCareRepository = selfCareRepository;
-        this.educationalModuleRepository = educationalModuleRepository;
-        this.moduleProgressRepository = moduleProgressRepository;
-    }
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SelfCareRepository selfCareRepository;
+
+    @Autowired
+    private EducationalModuleRepository educationalModuleRepository;
+
+    @Autowired
+    private ModuleProgressRepository moduleProgressRepository;
 
     @GetMapping("/")
     public String index() {
@@ -251,8 +235,7 @@ public class AuthController {
                 Appointment nextAppointment = studentAppointments.stream()
                         .filter(a -> a.getAppointmentDate() != null
                                 && a.getAppointmentDate().isAfter(today)
-                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.PENDING
-                                        || a.getStatus() == AppointmentStatus.APPROVED))
+                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.PENDING || a.getStatus() == AppointmentStatus.APPROVED))
                         .sorted(Comparator.comparing(Appointment::getAppointmentDate))
                         .findFirst()
                         .orElse(null);

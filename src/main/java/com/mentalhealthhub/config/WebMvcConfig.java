@@ -1,5 +1,6 @@
 package com.mentalhealthhub.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -11,18 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final ReportAuthorizationInterceptor reportAuthorizationInterceptor;
-
-    /**
-     * Constructor-based dependency injection.
-     * Spring IoC container will automatically inject the required dependencies
-     * when creating an instance of WebMvcConfig.
-     * 
-     * @param reportAuthorizationInterceptor Interceptor for report authorization
-     */
-    public WebMvcConfig(ReportAuthorizationInterceptor reportAuthorizationInterceptor) {
-        this.reportAuthorizationInterceptor = reportAuthorizationInterceptor;
-    }
+    @Autowired
+    private ReportAuthorizationInterceptor reportAuthorizationInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

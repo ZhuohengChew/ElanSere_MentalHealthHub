@@ -8,8 +8,8 @@ import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.ContentRepository;
 import com.mentalhealthhub.repository.EducationalModuleRepository;
-import com.mentalhealthhub.repository.ModuleProgressRepository;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,26 +24,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/admin/content")
 public class ContentController {
 
-    private final ContentRepository contentRepository;
-    private final EducationalModuleRepository moduleRepository;
-    private final ModuleProgressRepository progressRepository;
+    @Autowired
+    private ContentRepository contentRepository;
 
-    /**
-     * Constructor-based dependency injection.
-     * Spring IoC container will automatically inject the required dependencies
-     * when creating an instance of ContentController.
-     * 
-     * @param contentRepository  Repository for content data access
-     * @param moduleRepository   Repository for educational module data access
-     * @param progressRepository Repository for module progress data access
-     */
-    public ContentController(ContentRepository contentRepository,
-            EducationalModuleRepository moduleRepository,
-            ModuleProgressRepository progressRepository) {
-        this.contentRepository = contentRepository;
-        this.moduleRepository = moduleRepository;
-        this.progressRepository = progressRepository;
-    }
+    @Autowired
+    private EducationalModuleRepository moduleRepository;
 
     @GetMapping
     public String listContent(HttpSession session, Model model,
@@ -231,6 +216,9 @@ public class ContentController {
         redirectAttributes.addFlashAttribute("success", "Module updated successfully!");
         return "redirect:/admin/content";
     }
+
+    @Autowired
+    private com.mentalhealthhub.repository.ModuleProgressRepository progressRepository;
 
     @PostMapping("/module/delete/{id}")
     @org.springframework.transaction.annotation.Transactional

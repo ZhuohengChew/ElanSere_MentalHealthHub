@@ -3,6 +3,8 @@ package com.mentalhealthhub.service;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,21 +13,10 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
 
-    /**
-     * Constructor-based dependency injection.
-     * Spring IoC container will automatically inject the required dependencies
-     * when creating an instance of UserService.
-     * 
-     * @param userRepository  Repository for user data access
-     * @param passwordEncoder Password encoder bean for hashing passwords
-     */
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /**
      * Register a new user with hashed password

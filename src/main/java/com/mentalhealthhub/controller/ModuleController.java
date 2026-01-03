@@ -9,6 +9,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,21 +27,11 @@ import java.util.Optional;
 @RequestMapping("/modules")
 public class ModuleController {
 
-    private final EducationalModuleRepository moduleRepository;
-    private final ModuleProgressRepository progressRepository;
+    @Autowired
+    private EducationalModuleRepository moduleRepository;
 
-    /**
-     * Constructor-based dependency injection.
-     * Spring IoC container will automatically inject the required dependencies
-     * when creating an instance of ModuleController.
-     * 
-     * @param moduleRepository   Repository for educational module data access
-     * @param progressRepository Repository for module progress data access
-     */
-    public ModuleController(EducationalModuleRepository moduleRepository, ModuleProgressRepository progressRepository) {
-        this.moduleRepository = moduleRepository;
-        this.progressRepository = progressRepository;
-    }
+    @Autowired
+    private ModuleProgressRepository progressRepository;
 
     @GetMapping
     public String listModules(HttpSession session, Model model,

@@ -6,6 +6,7 @@ import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.repository.ForumCommentRepository;
 import com.mentalhealthhub.repository.ForumPostRepository;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,21 +19,11 @@ import java.util.List;
 @RequestMapping("/forum")
 public class ForumController {
 
-    private final ForumPostRepository forumPostRepository;
-    private final ForumCommentRepository commentRepository;
+    @Autowired
+    private ForumPostRepository forumPostRepository;
 
-    /**
-     * Constructor-based dependency injection.
-     * Spring IoC container will automatically inject the required dependencies
-     * when creating an instance of ForumController.
-     * 
-     * @param forumPostRepository Repository for forum post data access
-     * @param commentRepository   Repository for forum comment data access
-     */
-    public ForumController(ForumPostRepository forumPostRepository, ForumCommentRepository commentRepository) {
-        this.forumPostRepository = forumPostRepository;
-        this.commentRepository = commentRepository;
-    }
+    @Autowired
+    private ForumCommentRepository commentRepository;
 
     @GetMapping
     public String listPosts(Model model, HttpSession session,
