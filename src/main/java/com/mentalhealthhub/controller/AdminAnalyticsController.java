@@ -4,7 +4,6 @@ import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +13,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminAnalyticsController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject the required dependencies
+     * when creating an instance of AdminAnalyticsController.
+     * 
+     * @param userRepository Repository for user data access
+     */
+    public AdminAnalyticsController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/analytics")
     public String analytics(HttpSession session, Model model) {

@@ -3,7 +3,6 @@ package com.mentalhealthhub.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +17,7 @@ import com.mentalhealthhub.dto.AssessmentResultDTO;
 import com.mentalhealthhub.model.Assessment;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
+import com.mentalhealthhub.repository.AssessmentRepository;
 import com.mentalhealthhub.service.AssessmentService;
 
 import jakarta.servlet.http.HttpSession;
@@ -26,11 +26,21 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/assessments")
 public class AssessmentController {
 
-    @Autowired
-    private AssessmentService assessmentService;
+    private final AssessmentService assessmentService;
+    private final AssessmentRepository assessmentRepository;
 
-    @Autowired
-    private com.mentalhealthhub.repository.AssessmentRepository assessmentRepository;
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject the required dependencies
+     * when creating an instance of AssessmentController.
+     * 
+     * @param assessmentService    Service for assessment-related business logic
+     * @param assessmentRepository Repository for assessment data access
+     */
+    public AssessmentController(AssessmentService assessmentService, AssessmentRepository assessmentRepository) {
+        this.assessmentService = assessmentService;
+        this.assessmentRepository = assessmentRepository;
+    }
 
     @GetMapping
     public String listAssessments(Model model, HttpSession session) {
@@ -181,9 +191,9 @@ public class AssessmentController {
         // 2. User is a PROFESSIONAL (can view any student's assessment)
         // 3. User is ADMIN or STAFF
         if (!assessment.getUser().getId().equals(user.getId()) &&
-            user.getRole() != UserRole.PROFESSIONAL &&
-            user.getRole() != UserRole.ADMIN &&
-            user.getRole() != UserRole.STAFF) {
+                user.getRole() != UserRole.PROFESSIONAL &&
+                user.getRole() != UserRole.ADMIN &&
+                user.getRole() != UserRole.STAFF) {
             return "redirect:/assessments";
         }
 

@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,35 +44,55 @@ public class AnalyticsService {
 
     private static final Logger logger = LoggerFactory.getLogger(AnalyticsService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final AssessmentRepository assessmentRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final ModuleProgressRepository moduleProgressRepository;
+    private final SelfCareRepository selfCareRepository;
+    private final ForumPostRepository forumPostRepository;
+    private final ForumCommentRepository forumCommentRepository;
+    private final ReportRepository reportRepository;
+    private final AuditLogRepository auditLogRepository;
+    private final EducationalModuleRepository educationalModuleRepository;
 
-    @Autowired
-    private AssessmentRepository assessmentRepository;
-
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private ModuleProgressRepository moduleProgressRepository;
-
-    @Autowired
-    private SelfCareRepository selfCareRepository;
-
-    @Autowired
-    private ForumPostRepository forumPostRepository;
-
-    @Autowired
-    private ForumCommentRepository forumCommentRepository;
-
-    @Autowired
-    private ReportRepository reportRepository;
-
-    @Autowired
-    private AuditLogRepository auditLogRepository;
-
-    @Autowired
-    private EducationalModuleRepository educationalModuleRepository;
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject all required dependencies
+     * when creating an instance of AnalyticsService.
+     * 
+     * @param userRepository              Repository for user data access
+     * @param assessmentRepository        Repository for assessment data access
+     * @param appointmentRepository       Repository for appointment data access
+     * @param moduleProgressRepository    Repository for module progress data access
+     * @param selfCareRepository          Repository for self-care data access
+     * @param forumPostRepository         Repository for forum post data access
+     * @param forumCommentRepository      Repository for forum comment data access
+     * @param reportRepository            Repository for report data access
+     * @param auditLogRepository          Repository for audit log data access
+     * @param educationalModuleRepository Repository for educational module data
+     *                                    access
+     */
+    public AnalyticsService(UserRepository userRepository,
+            AssessmentRepository assessmentRepository,
+            AppointmentRepository appointmentRepository,
+            ModuleProgressRepository moduleProgressRepository,
+            SelfCareRepository selfCareRepository,
+            ForumPostRepository forumPostRepository,
+            ForumCommentRepository forumCommentRepository,
+            ReportRepository reportRepository,
+            AuditLogRepository auditLogRepository,
+            EducationalModuleRepository educationalModuleRepository) {
+        this.userRepository = userRepository;
+        this.assessmentRepository = assessmentRepository;
+        this.appointmentRepository = appointmentRepository;
+        this.moduleProgressRepository = moduleProgressRepository;
+        this.selfCareRepository = selfCareRepository;
+        this.forumPostRepository = forumPostRepository;
+        this.forumCommentRepository = forumCommentRepository;
+        this.reportRepository = reportRepository;
+        this.auditLogRepository = auditLogRepository;
+        this.educationalModuleRepository = educationalModuleRepository;
+    }
 
     // ==================== User Analytics ====================
     public UserAnalyticsDTO getUserAnalytics() {
@@ -123,8 +142,7 @@ public class AnalyticsService {
         List<MentalHealthTrendsDTO.MonthlyTrendDTO> trends = trendData.stream()
                 .map(row -> new MentalHealthTrendsDTO.MonthlyTrendDTO(
                         row[0].toString(),
-                        row[1] != null ? ((Number) row[1]).doubleValue() : 0.0
-                ))
+                        row[1] != null ? ((Number) row[1]).doubleValue() : 0.0))
                 .collect(Collectors.toList());
         dto.setTrendData(trends);
 
@@ -133,8 +151,7 @@ public class AnalyticsService {
         List<MentalHealthTrendsDTO.MonthlyCompletionDTO> monthlyComps = completions.stream()
                 .map(row -> new MentalHealthTrendsDTO.MonthlyCompletionDTO(
                         row[0].toString(),
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setMonthlyCompletions(monthlyComps);
 
@@ -178,8 +195,7 @@ public class AnalyticsService {
             List<AppointmentAnalyticsDTO.MonthlyAppointmentDTO> monthlyAppointments = monthlyData.stream()
                     .map(row -> new AppointmentAnalyticsDTO.MonthlyAppointmentDTO(
                             row[0].toString(),
-                            ((Number) row[1]).longValue()
-                    ))
+                            ((Number) row[1]).longValue()))
                     .collect(Collectors.toList());
             dto.setMonthlyData(monthlyAppointments);
         } catch (Exception e) {
@@ -205,8 +221,7 @@ public class AnalyticsService {
         List<ModuleAnalyticsDTO.ModuleAccessDTO> moduleAccess = accessedModules.stream()
                 .map(row -> new ModuleAnalyticsDTO.ModuleAccessDTO(
                         row[0].toString(),
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setMostAccessedModules(moduleAccess);
 
@@ -215,8 +230,7 @@ public class AnalyticsService {
         List<ModuleAnalyticsDTO.MonthlyCompletionDTO> monthlyComps = monthlyCompletions.stream()
                 .map(row -> new ModuleAnalyticsDTO.MonthlyCompletionDTO(
                         row[0].toString(),
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setMonthlyCompletions(monthlyComps);
 
@@ -245,7 +259,7 @@ public class AnalyticsService {
         try {
             // Mood distribution - only count if data exists
             Map<String, Long> moods = new HashMap<>();
-            String[] moodTypes = {"great", "good", "okay", "low", "struggling"};
+            String[] moodTypes = { "great", "good", "okay", "low", "struggling" };
             for (String mood : moodTypes) {
                 Long count = selfCareRepository.countByMood(mood);
                 if (count != null && count > 0) {
@@ -279,15 +293,15 @@ public class AnalyticsService {
         List<ForumAnalyticsDTO.CategoryStatsDTO> categories = categoryStats.stream()
                 .map(row -> new ForumAnalyticsDTO.CategoryStatsDTO(
                         row[0] != null ? row[0].toString() : "Uncategorized",
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setCategoryStats(categories);
 
         // Top posts
         List<ForumPost> topPosts = forumPostRepository.getTopPostsByViews(5);
         List<ForumAnalyticsDTO.TopPostDTO> topPostDTOs = topPosts.stream()
-                .map(post -> new ForumAnalyticsDTO.TopPostDTO(post.getId(), post.getTitle(), post.getViews(), post.getReplies()))
+                .map(post -> new ForumAnalyticsDTO.TopPostDTO(post.getId(), post.getTitle(), post.getViews(),
+                        post.getReplies()))
                 .collect(Collectors.toList());
         dto.setTopPosts(topPostDTOs);
 
@@ -330,8 +344,7 @@ public class AnalyticsService {
         List<ReportAnalyticsDTO.ReportTypeDTO> types = reportsByType.stream()
                 .map(row -> new ReportAnalyticsDTO.ReportTypeDTO(
                         row[0] != null ? row[0].toString() : "Unknown",
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setReportsByType(types);
 
@@ -340,8 +353,7 @@ public class AnalyticsService {
         List<ReportAnalyticsDTO.MonthlyReportDTO> trends = monthlyTrend.stream()
                 .map(row -> new ReportAnalyticsDTO.MonthlyReportDTO(
                         row[0].toString(),
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setMonthlyTrend(trends);
 
@@ -350,8 +362,7 @@ public class AnalyticsService {
         List<ReportAnalyticsDTO.MonthlyResolutionDTO> resolutions = monthlyResolutions.stream()
                 .map(row -> new ReportAnalyticsDTO.MonthlyResolutionDTO(
                         row[0].toString(),
-                        ((Number) row[1]).longValue()
-                ))
+                        ((Number) row[1]).longValue()))
                 .collect(Collectors.toList());
         dto.setMonthlyResolutions(resolutions);
 
@@ -366,7 +377,8 @@ public class AnalyticsService {
         Long actionsThisWeek = auditLogRepository.countByCreatedAtAfter(oneWeekAgo);
         dto.setTotalActionsThisWeek(actionsThisWeek != null ? actionsThisWeek : 0L);
 
-        // Common actions - you might need to implement this based on your AuditLog structure
+        // Common actions - you might need to implement this based on your AuditLog
+        // structure
         // For now, we'll leave it empty as the implementation depends on action types
 
         // Admin activity count
@@ -471,9 +483,11 @@ public class AnalyticsService {
     // Calculate engagement rates per student using weights:
     // Module 50%, Forum 30% (posts 60% & comments 40%), Self-Care 20%
     private Map<Long, Double> calculateEngagementRates() {
-        List<com.mentalhealthhub.model.User> students = userRepository.findByRole(com.mentalhealthhub.model.UserRole.STUDENT);
+        List<com.mentalhealthhub.model.User> students = userRepository
+                .findByRole(com.mentalhealthhub.model.UserRole.STUDENT);
         Map<Long, Double> result = new HashMap<>();
-        if (students == null || students.isEmpty()) return result;
+        if (students == null || students.isEmpty())
+            return result;
 
         // Prepare forum post and comment counts and maxima
         List<Object[]> postCounts = forumPostRepository.getUserParticipation();
@@ -483,7 +497,8 @@ public class AnalyticsService {
             Long userId = ((Number) row[0]).longValue();
             Long cnt = ((Number) row[1]).longValue();
             postMap.put(userId, cnt);
-            if (cnt > maxPosts) maxPosts = cnt;
+            if (cnt > maxPosts)
+                maxPosts = cnt;
         }
 
         List<Object[]> commentCounts = forumCommentRepository.getUserCommentCounts();
@@ -493,7 +508,8 @@ public class AnalyticsService {
             Long userId = ((Number) row[0]).longValue();
             Long cnt = ((Number) row[1]).longValue();
             commentMap.put(userId, cnt);
-            if (cnt > maxComments) maxComments = cnt;
+            if (cnt > maxComments)
+                maxComments = cnt;
         }
 
         // Self-care counts
@@ -504,7 +520,8 @@ public class AnalyticsService {
             Long userId = ((Number) row[0]).longValue();
             Long cnt = ((Number) row[1]).longValue();
             selfCareMap.put(userId, cnt);
-            if (cnt > maxSelfCare) maxSelfCare = cnt;
+            if (cnt > maxSelfCare)
+                maxSelfCare = cnt;
         }
 
         for (com.mentalhealthhub.model.User u : students) {
@@ -522,7 +539,8 @@ public class AnalyticsService {
                         count++;
                     }
                 }
-                if (count > 0) moduleScore = sum / count;
+                if (count > 0)
+                    moduleScore = sum / count;
             }
 
             // Forum score: normalized posts/comments
@@ -541,7 +559,8 @@ public class AnalyticsService {
             double rounded = Math.round(engagement * 100.0d) / 100.0d;
             // Debug logging to help track identical-rate issue
             if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Engagement calc for userId=%d: moduleScore=%.2f, posts=%d, postNorm=%.2f, comments=%d, commentNorm=%.2f, forumScore=%.2f, selfCare=%d, selfCareNorm=%.2f, engagement=%.2f", 
+                logger.debug(String.format(
+                        "Engagement calc for userId=%d: moduleScore=%.2f, posts=%d, postNorm=%.2f, comments=%d, commentNorm=%.2f, forumScore=%.2f, selfCare=%d, selfCareNorm=%.2f, engagement=%.2f",
                         userId,
                         moduleScore,
                         posts,
@@ -561,7 +580,8 @@ public class AnalyticsService {
 
     private java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> calculateEngagementList(Map<Long, Double> map) {
         java.util.List<com.mentalhealthhub.dto.EngagementRateDTO> list = new java.util.ArrayList<>();
-        if (map == null || map.isEmpty()) return list;
+        if (map == null || map.isEmpty())
+            return list;
 
         for (Map.Entry<Long, Double> e : map.entrySet()) {
             Long userId = e.getKey();
@@ -569,7 +589,8 @@ public class AnalyticsService {
             String name = "Unknown";
             try {
                 java.util.Optional<com.mentalhealthhub.model.User> uopt = userRepository.findById(userId);
-                if (uopt.isPresent()) name = uopt.get().getName();
+                if (uopt.isPresent())
+                    name = uopt.get().getName();
             } catch (Exception ex) {
                 logger.warn("Could not load user name for id " + userId, ex);
             }
@@ -581,9 +602,11 @@ public class AnalyticsService {
         return list;
     }
 
-    // Public helper to get engagement for a single user (uses the same calculation as the bulk method)
+    // Public helper to get engagement for a single user (uses the same calculation
+    // as the bulk method)
     public Double getEngagementForUser(Long userId) {
-        if (userId == null) return null;
+        if (userId == null)
+            return null;
         Map<Long, Double> map = calculateEngagementRates();
         return map.getOrDefault(userId, 0.0);
     }

@@ -5,7 +5,6 @@ import com.mentalhealthhub.model.SelfCareType;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.repository.SelfCareRepository;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,18 @@ import java.util.List;
 @RequestMapping("/self-care")
 public class SelfCareController {
 
-    @Autowired
-    private SelfCareRepository selfCareRepository;
+    private final SelfCareRepository selfCareRepository;
+
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject the required dependencies
+     * when creating an instance of SelfCareController.
+     * 
+     * @param selfCareRepository Repository for self-care data access
+     */
+    public SelfCareController(SelfCareRepository selfCareRepository) {
+        this.selfCareRepository = selfCareRepository;
+    }
 
     @GetMapping
     public String selfCarePage(HttpSession session, Model model) {

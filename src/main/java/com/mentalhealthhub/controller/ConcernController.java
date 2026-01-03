@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,22 +31,36 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Controller for managing concerns and reports
- * Handles CRUD operations, authorization, and reporting for mental health concerns
+ * Handles CRUD operations, authorization, and reporting for mental health
+ * concerns
  */
 @Controller
 public class ConcernController {
 
-    @Autowired
-    private ReportRepository reportRepository;
+    private final ReportRepository reportRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final UserRepository userRepository;
+    private final ReportService reportService;
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ReportService reportService;
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject all required dependencies
+     * when creating an instance of ConcernController.
+     * 
+     * @param reportRepository      Repository for report data access
+     * @param appointmentRepository Repository for appointment data access
+     * @param userRepository        Repository for user data access
+     * @param reportService         Service for report-related business logic
+     */
+    public ConcernController(ReportRepository reportRepository,
+            AppointmentRepository appointmentRepository,
+            UserRepository userRepository,
+            ReportService reportService) {
+        this.reportRepository = reportRepository;
+        this.appointmentRepository = appointmentRepository;
+        this.userRepository = userRepository;
+        this.reportService = reportService;
+    }
 
     // ==================== AUTHORIZATION HELPER METHODS ====================
     /**
@@ -82,11 +95,12 @@ public class ConcernController {
      * Checks if user can view a specific report
      */
     private boolean canViewReport(User user, Report report) {
-        if (user == null || report == null) return false;
+        if (user == null || report == null)
+            return false;
 
         // Student can view their own reports
-        if (isAuthenticatedStudent(user) && report.getStudent() != null && 
-            report.getStudent().getId().equals(user.getId())) {
+        if (isAuthenticatedStudent(user) && report.getStudent() != null &&
+                report.getStudent().getId().equals(user.getId())) {
             return true;
         }
 
@@ -105,7 +119,7 @@ public class ConcernController {
     @GetMapping("/concerns")
     public String viewConcernForm(HttpSession session, Model model, HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
-        
+
         // Authorization: Only authenticated students can access
         if (!isAuthenticatedStudent(user)) {
             return "redirect:/login";
@@ -124,9 +138,9 @@ public class ConcernController {
      */
     @PostMapping("/concerns/submit")
     public String submitConcern(@RequestParam(required = false, name = "concerns") String[] concerns,
-                               @RequestParam String description,
-                               @RequestParam(required = false) String urgency,
-                               HttpSession session, HttpServletRequest request) {
+            @RequestParam String description,
+            @RequestParam(required = false) String urgency,
+            HttpSession session, HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
 
         // Authorization: Only authenticated students can submit reports
@@ -135,13 +149,12 @@ public class ConcernController {
         }
 
         // Create report using service
-        String type = (concerns != null && concerns.length > 0) 
-            ? String.join(", ", concerns) 
-            : "Other";
+        String type = (concerns != null && concerns.length > 0)
+                ? String.join(", ", concerns)
+                : "Other";
 
         Report report = reportService.createReport(
-            user, type, description, urgency
-        );
+                user, type, description, urgency);
 
         // Redirect to confirmation or dashboard
         return "redirect:/concerns/list";
@@ -153,7 +166,7 @@ public class ConcernController {
     @GetMapping("/concerns/list")
     public String viewMyReports(HttpSession session, Model model, HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
-        
+
         // Authorization: Only authenticated users can access
         if (user == null) {
             return "redirect:/login";
@@ -175,7 +188,7 @@ public class ConcernController {
     @ResponseBody
     public ResponseEntity<?> getMyReports(HttpSession session) {
         User user = (User) session.getAttribute("user");
-        
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of());
         }
@@ -238,9 +251,10 @@ public class ConcernController {
      * View detailed information about a specific report
      */
     @GetMapping("/concerns/{id}")
-    public String viewReportDetail(@PathVariable Long id, HttpSession session, Model model, HttpServletRequest request) {
+    public String viewReportDetail(@PathVariable Long id, HttpSession session, Model model,
+            HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
-        
+
         if (user == null) {
             return "redirect:/login";
         }
@@ -260,12 +274,13 @@ public class ConcernController {
         if ("scheduled".equals(report.getStatus())) {
             appointment = appointmentRepository.findByReportIdWithProfessional(report.getId());
         }
-        
+
         // Fetch student's pending suggestion if status is reviewed
         Appointment suggestedAppointment = null;
         if ("reviewed".equals(report.getStatus())) {
             User student = report.getStudent();
-            List<Appointment> suggestions = appointmentRepository.findByStudentAndStatus(student, AppointmentStatus.STUDENT_PROPOSED);
+            List<Appointment> suggestions = appointmentRepository.findByStudentAndStatus(student,
+                    AppointmentStatus.STUDENT_PROPOSED);
             if (!suggestions.isEmpty()) {
                 suggestedAppointment = suggestions.get(0); // Get first pending suggestion
             }
@@ -282,7 +297,8 @@ public class ConcernController {
         model.addAttribute("page", "concerns/report-detail");
         model.addAttribute("title", "Report Details");
         model.addAttribute("activePage", "concerns");
-        model.addAttribute("canEdit", isAuthenticatedStaff(user) || isAuthenticatedProfessional(user) || isAuthenticatedAdmin(user));
+        model.addAttribute("canEdit",
+                isAuthenticatedStaff(user) || isAuthenticatedProfessional(user) || isAuthenticatedAdmin(user));
 
         return "layout";
     }
@@ -339,10 +355,10 @@ public class ConcernController {
      */
     @PostMapping("/concerns/staff-submit")
     public String staffSubmitConcern(@RequestParam(required = false, name = "concerns") String[] concerns,
-                                    @RequestParam String description,
-                                    @RequestParam(required = false) String urgency,
-                                    @RequestParam Long studentId,
-                                    HttpSession session, HttpServletRequest request) {
+            @RequestParam String description,
+            @RequestParam(required = false) String urgency,
+            @RequestParam Long studentId,
+            HttpSession session, HttpServletRequest request) {
         User staff = (User) session.getAttribute("user");
 
         // Authorization: Only staff can submit reports on behalf of students
@@ -357,9 +373,9 @@ public class ConcernController {
         }
 
         // Create report using service
-        String type = (concerns != null && concerns.length > 0) 
-            ? String.join(", ", concerns) 
-            : "Other";
+        String type = (concerns != null && concerns.length > 0)
+                ? String.join(", ", concerns)
+                : "Other";
 
         reportService.createReport(student, type, description, urgency);
 
@@ -367,7 +383,8 @@ public class ConcernController {
         return "redirect:/concerns/staff-report";
     }
 
-    // ==================== STAFF/PROFESSIONAL REPORT MANAGEMENT ====================
+    // ==================== STAFF/PROFESSIONAL REPORT MANAGEMENT
+    // ====================
     /**
      * Get all students (for staff/professional dropdown)
      */
@@ -404,8 +421,8 @@ public class ConcernController {
     @PostMapping("/concerns/api/{id}/status")
     @ResponseBody
     public ResponseEntity<?> updateReportStatus(@PathVariable Long id,
-                                               @RequestParam String status,
-                                               HttpSession session) {
+            @RequestParam String status,
+            HttpSession session) {
         User user = (User) session.getAttribute("user");
 
         // Authorization: Only staff, professionals, and admins can update reports
@@ -428,8 +445,8 @@ public class ConcernController {
     @PostMapping("/concerns/api/{id}/resolve")
     @ResponseBody
     public ResponseEntity<?> resolveReport(@PathVariable Long id,
-                                          @RequestParam String resolutionNotes,
-                                          HttpSession session) {
+            @RequestParam String resolutionNotes,
+            HttpSession session) {
         User user = (User) session.getAttribute("user");
 
         // Authorization: Only staff, professionals, and admins can resolve reports
@@ -505,8 +522,8 @@ public class ConcernController {
      */
     @GetMapping("/concerns/api/history")
     @ResponseBody
-    public ResponseEntity<?> getReportHistory(@RequestParam(required = false) Long studentId, 
-                                             HttpSession session) {
+    public ResponseEntity<?> getReportHistory(@RequestParam(required = false) Long studentId,
+            HttpSession session) {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
@@ -516,7 +533,8 @@ public class ConcernController {
         List<Report> historyReports;
 
         if (studentId != null) {
-            // Authorization: Only staff, professionals, and admins can view other student history
+            // Authorization: Only staff, professionals, and admins can view other student
+            // history
             if (!isAuthenticatedStaff(user) && !isAuthenticatedProfessional(user) && !isAuthenticatedAdmin(user)) {
                 // Students can only view their own history
                 if (!studentId.equals(user.getId())) {
@@ -569,7 +587,8 @@ public class ConcernController {
      * Display all reports for a specific student (staff and professional view)
      */
     @GetMapping("/staff/patients/{studentId}/reports")
-    public String viewStudentReports(@PathVariable Long studentId, HttpSession session, Model model, HttpServletRequest request) {
+    public String viewStudentReports(@PathVariable Long studentId, HttpSession session, Model model,
+            HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
 
         // Authorization: Only staff and professionals can access this page
@@ -598,7 +617,8 @@ public class ConcernController {
      * Display report details for staff and professionals
      */
     @GetMapping("/staff/reports/{id}")
-    public String viewStaffReportDetail(@PathVariable Long id, HttpSession session, Model model, HttpServletRequest request) {
+    public String viewStaffReportDetail(@PathVariable Long id, HttpSession session, Model model,
+            HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
 
         // Authorization: Only staff and professionals can access this page
@@ -624,15 +644,17 @@ public class ConcernController {
             System.out.println("Appointment found: " + (appointment != null ? appointment.getId() : "null"));
             if (appointment != null) {
                 System.out.println("Appointment Date: " + appointment.getAppointmentDate());
-                System.out.println("Appointment Time: " + appointment.getTimeSlotStart() + " - " + appointment.getTimeSlotEnd());
+                System.out.println(
+                        "Appointment Time: " + appointment.getTimeSlotStart() + " - " + appointment.getTimeSlotEnd());
             }
         }
-        
+
         // Fetch student's pending suggestion if status is reviewed
         Appointment suggestedAppointment = null;
         if ("reviewed".equals(report.getStatus())) {
             User student = report.getStudent();
-            List<Appointment> suggestions = appointmentRepository.findByStudentAndStatus(student, AppointmentStatus.STUDENT_PROPOSED);
+            List<Appointment> suggestions = appointmentRepository.findByStudentAndStatus(student,
+                    AppointmentStatus.STUDENT_PROPOSED);
             if (!suggestions.isEmpty()) {
                 suggestedAppointment = suggestions.get(0); // Get first pending suggestion
             }
@@ -653,5 +675,3 @@ public class ConcernController {
         return "layout";
     }
 }
-
-

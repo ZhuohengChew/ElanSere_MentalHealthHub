@@ -3,7 +3,6 @@ package com.mentalhealthhub.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +16,21 @@ import com.mentalhealthhub.repository.UserRepository;
 @Service
 public class AssessmentService {
 
-    @Autowired
-    private AssessmentRepository assessmentRepository;
+    private final AssessmentRepository assessmentRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject the required dependencies
+     * when creating an instance of AssessmentService.
+     * 
+     * @param assessmentRepository Repository for assessment data access
+     * @param userRepository       Repository for user data access
+     */
+    public AssessmentService(AssessmentRepository assessmentRepository, UserRepository userRepository) {
+        this.assessmentRepository = assessmentRepository;
+        this.userRepository = userRepository;
+    }
 
     // Define all 8 questions
     public List<AssessmentQuestionDTO> getAllQuestions() {

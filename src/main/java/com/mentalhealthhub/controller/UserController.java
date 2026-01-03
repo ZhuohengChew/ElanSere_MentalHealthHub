@@ -1,6 +1,5 @@
 package com.mentalhealthhub.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,26 +28,39 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final AdminUserService adminUserService;
+    private final AuditLogRepository auditLogRepository;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private AdminUserService adminUserService;
-
-    @Autowired
-    private AuditLogRepository auditLogRepository;
+    /**
+     * Constructor-based dependency injection.
+     * Spring IoC container will automatically inject all required dependencies
+     * when creating an instance of UserController.
+     * 
+     * @param userRepository     Repository for user data access
+     * @param userService        Service for user-related business logic
+     * @param adminUserService   Service for admin user management operations
+     * @param auditLogRepository Repository for audit log data access
+     */
+    public UserController(UserRepository userRepository,
+            UserService userService,
+            AdminUserService adminUserService,
+            AuditLogRepository auditLogRepository) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.adminUserService = adminUserService;
+        this.auditLogRepository = auditLogRepository;
+    }
 
     @GetMapping
     public String listUsers(Model model, HttpSession session,
-                            @RequestParam(value = "page", defaultValue = "0") int page,
-                            @RequestParam(value = "size", defaultValue = "10") int size,
-                            @RequestParam(value = "q", required = false) String q,
-                            @RequestParam(value = "role", required = false) String role,
-                            @RequestParam(value = "active", required = false) Boolean active,
-                            @RequestParam(value = "sort", defaultValue = "name") String sort) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "active", required = false) Boolean active,
+            @RequestParam(value = "sort", defaultValue = "name") String sort) {
         User user = (User) session.getAttribute("user");
         if (user == null || !user.getRole().toString().equals("ADMIN")) {
             return "redirect:/login";
@@ -56,16 +68,22 @@ public class UserController {
 
         UserRole roleEnum = null;
         if (role != null && !role.isEmpty()) {
-            try { roleEnum = UserRole.valueOf(role.toUpperCase()); } catch (Exception ignored) {}
+            try {
+                roleEnum = UserRole.valueOf(role.toUpperCase());
+            } catch (Exception ignored) {
+            }
         }
 
         Sort sortObj = Sort.by(Sort.Direction.ASC, "name");
         if (sort != null) {
-            if (sort.equals("role")) sortObj = Sort.by("role");
-            if (sort.equals("createdAt")) sortObj = Sort.by("createdAt");
+            if (sort.equals("role"))
+                sortObj = Sort.by("role");
+            if (sort.equals("createdAt"))
+                sortObj = Sort.by("createdAt");
         }
 
-        Page<User> usersPage = userRepository.searchUsers(q == null ? null : q.toLowerCase(), roleEnum, active, PageRequest.of(page, size, sortObj));
+        Page<User> usersPage = userRepository.searchUsers(q == null ? null : q.toLowerCase(), roleEnum, active,
+                PageRequest.of(page, size, sortObj));
 
         model.addAttribute("users", usersPage.getContent());
         model.addAttribute("usersPage", usersPage);
@@ -106,8 +124,8 @@ public class UserController {
 
     @GetMapping("/{id}/audit")
     public String viewAudit(@PathVariable Long id, Model model, HttpSession session,
-                           @RequestParam(value = "page", defaultValue = "0") int page,
-                           @RequestParam(value = "size", defaultValue = "20") int size) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size) {
         User user = (User) session.getAttribute("user");
         if (user == null || !user.getRole().toString().equals("ADMIN")) {
             return "redirect:/login";
@@ -118,7 +136,8 @@ public class UserController {
             return "redirect:/users";
         }
 
-        Page<AuditLog> auditPage = auditLogRepository.findByUserId(id, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<AuditLog> auditPage = auditLogRepository.findByUserId(id,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
 
         model.addAttribute("targetUser", targetUser);
         model.addAttribute("auditLogs", auditPage.getContent());
@@ -181,11 +200,11 @@ public class UserController {
 
     @PostMapping("/add")
     public String addUser(@RequestParam String name,
-                          @RequestParam String email,
-                          @RequestParam String password,
-                          @RequestParam String role,
-                          HttpSession session,
-                          RedirectAttributes redirectAttributes) {
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String role,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null || !currentUser.getRole().toString().equals("ADMIN")) {
             return "redirect:/login";
@@ -210,12 +229,12 @@ public class UserController {
 
     @PostMapping("/{id}/edit")
     public String editUser(@PathVariable Long id,
-                           @RequestParam(required = false) String name,
-                           @RequestParam(required = false) String email,
-                           @RequestParam(required = false) String role,
-                           @RequestParam(required = false) String profilePicture,
-                           HttpSession session,
-                           RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String profilePicture,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null || !currentUser.getRole().toString().equals("ADMIN")) {
             return "redirect:/login";
