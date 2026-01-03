@@ -9,7 +9,6 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +26,13 @@ import java.util.Optional;
 @RequestMapping("/modules")
 public class ModuleController {
 
-    @Autowired
-    private EducationalModuleRepository moduleRepository;
+    private final EducationalModuleRepository moduleRepository;
+    private final ModuleProgressRepository progressRepository;
 
-    @Autowired
-    private ModuleProgressRepository progressRepository;
+    public ModuleController(EducationalModuleRepository moduleRepository, ModuleProgressRepository progressRepository) {
+        this.moduleRepository = moduleRepository;
+        this.progressRepository = progressRepository;
+    }
 
     @GetMapping
     public String listModules(HttpSession session, Model model,

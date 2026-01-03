@@ -9,7 +9,6 @@ import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.ContentRepository;
 import com.mentalhealthhub.repository.EducationalModuleRepository;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +23,18 @@ import java.util.stream.Collectors;
 @RequestMapping("/admin/content")
 public class ContentController {
 
-    @Autowired
-    private ContentRepository contentRepository;
+    private final ContentRepository contentRepository;
+    private final EducationalModuleRepository moduleRepository;
+    private final com.mentalhealthhub.repository.ModuleProgressRepository progressRepository;
 
-    @Autowired
-    private EducationalModuleRepository moduleRepository;
+    public ContentController(
+            ContentRepository contentRepository,
+            EducationalModuleRepository moduleRepository,
+            com.mentalhealthhub.repository.ModuleProgressRepository progressRepository) {
+        this.contentRepository = contentRepository;
+        this.moduleRepository = moduleRepository;
+        this.progressRepository = progressRepository;
+    }
 
     @GetMapping
     public String listContent(HttpSession session, Model model,
@@ -216,9 +222,6 @@ public class ContentController {
         redirectAttributes.addFlashAttribute("success", "Module updated successfully!");
         return "redirect:/admin/content";
     }
-
-    @Autowired
-    private com.mentalhealthhub.repository.ModuleProgressRepository progressRepository;
 
     @PostMapping("/module/delete/{id}")
     @org.springframework.transaction.annotation.Transactional

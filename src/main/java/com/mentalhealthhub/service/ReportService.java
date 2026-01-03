@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +17,11 @@ import com.mentalhealthhub.repository.ReportRepository;
 @Transactional
 public class ReportService {
 
-    @Autowired
-    private ReportRepository reportRepository;
+    private final ReportRepository reportRepository;
+
+    public ReportService(ReportRepository reportRepository) {
+        this.reportRepository = reportRepository;
+    }
 
     // ==================== CREATE Operations ====================
     /**
@@ -161,16 +163,15 @@ public class ReportService {
      */
     public Map<String, Long> getReportStatistics() {
         return Map.of(
-            "pending", reportRepository.countByStatus("pending"),
-            "in_progress", reportRepository.countByStatus("in_progress"),
-            "reviewed", reportRepository.countByStatus("reviewed"),
-            "resolved", reportRepository.countByStatus("resolved"),
-            "closed", reportRepository.countByStatus("closed"),
-            "low_urgency", reportRepository.countByUrgency("low"),
-            "medium_urgency", reportRepository.countByUrgency("medium"),
-            "high_urgency", reportRepository.countByUrgency("high"),
-            "critical_urgency", reportRepository.countByUrgency("critical")
-        );
+                "pending", reportRepository.countByStatus("pending"),
+                "in_progress", reportRepository.countByStatus("in_progress"),
+                "reviewed", reportRepository.countByStatus("reviewed"),
+                "resolved", reportRepository.countByStatus("resolved"),
+                "closed", reportRepository.countByStatus("closed"),
+                "low_urgency", reportRepository.countByUrgency("low"),
+                "medium_urgency", reportRepository.countByUrgency("medium"),
+                "high_urgency", reportRepository.countByUrgency("high"),
+                "critical_urgency", reportRepository.countByUrgency("critical"));
     }
 
     /**
@@ -178,12 +179,11 @@ public class ReportService {
      */
     public Map<String, Long> getStudentReportStatistics(Long studentId) {
         return Map.of(
-            "total_reports", reportRepository.countByStudentId(studentId),
-            "pending", reportRepository.countByStudentAndStatus(studentId, "pending"),
-            "in_progress", reportRepository.countByStudentAndStatus(studentId, "in_progress"),
-            "resolved", reportRepository.countByStudentAndStatus(studentId, "resolved"),
-            "closed", reportRepository.countByStudentAndStatus(studentId, "closed")
-        );
+                "total_reports", reportRepository.countByStudentId(studentId),
+                "pending", reportRepository.countByStudentAndStatus(studentId, "pending"),
+                "in_progress", reportRepository.countByStudentAndStatus(studentId, "in_progress"),
+                "resolved", reportRepository.countByStudentAndStatus(studentId, "resolved"),
+                "closed", reportRepository.countByStudentAndStatus(studentId, "closed"));
     }
 
     /**
@@ -206,8 +206,8 @@ public class ReportService {
     public List<Report> getStudentReportHistory(Long studentId) {
         List<Report> allReports = reportRepository.findByStudentIdOrderBySubmittedAtDesc(studentId);
         return allReports.stream()
-            .filter(r -> "resolved".equals(r.getStatus()) || "closed".equals(r.getStatus()))
-            .collect(Collectors.toList());
+                .filter(r -> "resolved".equals(r.getStatus()) || "closed".equals(r.getStatus()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -222,17 +222,17 @@ public class ReportService {
         map.put("urgency", report.getUrgency());
         map.put("submittedAt", report.getSubmittedAt().toString());
         map.put("updatedAt", report.getUpdatedAt().toString());
-        
+
         if (report.getStudent() != null) {
             map.put("studentId", report.getStudent().getId());
             map.put("studentName", report.getStudent().getName());
         }
-        
+
         if ("resolved".equals(report.getStatus()) || "closed".equals(report.getStatus())) {
             map.put("resolutionNotes", report.getResolutionNotes());
             map.put("resolvedAt", report.getResolvedAt() != null ? report.getResolvedAt().toString() : null);
         }
-        
+
         return map;
     }
 
@@ -241,7 +241,7 @@ public class ReportService {
      */
     public List<Map<String, Object>> reportsToMapList(List<Report> reports) {
         return reports.stream()
-            .map(this::reportToMap)
-            .collect(Collectors.toList());
+                .map(this::reportToMap)
+                .collect(Collectors.toList());
     }
 }

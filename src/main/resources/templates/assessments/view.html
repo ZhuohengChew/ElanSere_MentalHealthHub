@@ -269,8 +269,8 @@
         <th:block th:if="${assessment.score != null}">
             <div class="stat-card">
                 <div class="stat-label">Score</div>
-                <div class="stat-value" th:text="${assessment.score}">85</div>
-                <div class="stat-label" style="font-size: 0.8em;">out of 100</div>
+                <div class="stat-value" th:text="${assessment.score}">32</div>
+                <div class="stat-label" style="font-size: 0.8em;">out of 32</div>
             </div>
 
             <div class="stat-card">
@@ -294,8 +294,8 @@
                 <th:block th:if="${assessment.score != null}">
                     <h5 style="margin-top: 30px; color: #667eea; font-weight: 600;">Performance Overview</h5>
                     <div class="score-bar" style="margin-bottom: 10px;">
-                        <div class="score-fill" th:style="'width: ' + ${assessment.score} + '%'">
-                            <span th:text="${assessment.score} + '%'">85%</span>
+                        <div class="score-fill" th:style="'width: ' + ${(assessment.score / 32.0) * 100} + '%'">
+                            <span th:text="${#numbers.formatDecimal((assessment.score / 32.0) * 100, 1, 1)} + '%'">100%</span>
                         </div>
                     </div>
                     <small class="text-muted">Your score on this assessment</small>
@@ -325,8 +325,8 @@
                             <i class="bi bi-percent"></i> Score
                         </div>
                         <div class="detail-value">
-                            <span class="h4" style="color: #667eea;" th:text="${assessment.score}">85</span>
-                            <span style="color: #999;">/100</span>
+                            <span class="h4" style="color: #667eea;" th:text="${assessment.score}">32</span>
+                            <span style="color: #999;">/32</span>
                         </div>
                     </div>
 

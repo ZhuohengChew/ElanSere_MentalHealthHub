@@ -1,8 +1,8 @@
 package com.mentalhealthhub.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -12,8 +12,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Autowired
-    private ReportAuthorizationInterceptor reportAuthorizationInterceptor;
+    private final ReportAuthorizationInterceptor reportAuthorizationInterceptor;
+
+    public WebMvcConfig(ReportAuthorizationInterceptor reportAuthorizationInterceptor) {
+        this.reportAuthorizationInterceptor = reportAuthorizationInterceptor;
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -21,5 +24,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(reportAuthorizationInterceptor)
                 .addPathPatterns("/concerns/**")
                 .addPathPatterns("/api/students");
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // Explicitly map root path to redirect to login
+        registry.addViewController("/").setViewName("redirect:/login");
     }
 }
