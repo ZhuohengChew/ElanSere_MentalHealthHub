@@ -63,16 +63,8 @@ public class PatientController {
             appointmentCounts.put(student.getId(), count);
         }
 
-        // For professionals, show only students who have appointments with them (their
-        // patients)
-        List<User> patientsList;
-        if (user.getRole() == UserRole.PROFESSIONAL) {
-            patientsList = allStudents.stream()
-                    .filter(s -> appointmentCounts.getOrDefault(s.getId(), 0L) > 0L)
-                    .collect(Collectors.toList());
-        } else {
-            patientsList = allStudents;
-        }
+        
+        List<User> patientsList = allStudents;
 
         model.addAttribute("patients", patientsList);
         model.addAttribute("appointmentCounts", appointmentCounts);
