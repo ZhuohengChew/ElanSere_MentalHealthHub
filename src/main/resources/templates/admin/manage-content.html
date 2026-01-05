@@ -96,19 +96,21 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select" name="filterType" th:value="${filterType}">
-                        <option value="all">All Types</option>
-                        <option value="article">Articles</option>
-                        <option value="video">Videos</option>
-                        <option value="resource">Resources</option>
-                        <option value="module">Modules</option>
+                    <select class="form-select" name="filterType">
+                        <option value="all" th:selected="${filterType == 'all'}">All Types</option>
+                        <option value="article" th:selected="${filterType == 'article'}">Articles</option>
+                        <option value="video" th:selected="${filterType == 'video'}">Videos</option>
+                        <option value="resource" th:selected="${filterType == 'resource'}">Resources</option>
+                        <option value="module" th:selected="${filterType == 'module'}">Modules</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select" name="filterStatus" th:value="${filterStatus}">
-                        <option value="all">All Status</option>
-                        <option value="published">Published</option>
-                        <option value="draft">Draft</option>
+                    <select class="form-select" name="filterStatus">
+                        <option value="all" th:selected="${filterStatus == 'all'}">All Status</option>
+                        <option value="active" th:selected="${filterStatus == 'active' or filterStatus == 'published'}">
+                            Active</option>
+                        <option value="inactive" th:selected="${filterStatus == 'inactive' or filterStatus == 'draft'}">
+                            Inactive</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -128,11 +130,7 @@
         <div class="card-header">
             <h5 class="mb-0">Content Library</h5>
             <small class="text-muted">
-                <span
-                    th:text="${(content != null ? content.size() : 0) + (modules != null ? modules.size() : 0)}">0</span>
-                item(s) found
-                (<span th:text="${content != null ? content.size() : 0}">0</span> content, <span
-                    th:text="${modules != null ? modules.size() : 0}">0</span> modules)
+                <span th:text="${modules != null ? modules.size() : 0}">0</span> item(s) found
             </small>
         </div>
         <div class="card-body">
@@ -149,56 +147,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="item : ${content}">
+                        <tr th:each="module : ${modules}">
                             <td>
                                 <div>
-                                    <div class="fw-medium" th:text="${item.title}">Title</div>
-                                    <div class="text-muted small mt-1"
-                                        style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;"
-                                        th:text="${item.description}">Description</div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span th:switch="${item.type.name()}">
-                                        <span th:case="'ARTICLE'">📄</span>
-                                        <span th:case="'VIDEO'">🎥</span>
-                                        <span th:case="'RESOURCE'">🔗</span>
-                                        <span th:case="'MODULE'">📚</span>
-                                    </span>
-                                    <span th:text="${#strings.capitalize(item.type.name().toLowerCase())}">Type</span>
-                                </div>
-                            </td>
-                            <td th:text="${item.category}">Category</td>
-                            <td>
-                                <span class="badge"
-                                    th:classappend="${item.status.name() == 'PUBLISHED'} ? 'bg-success' : 'bg-warning'"
-                                    th:text="${#strings.capitalize(item.status.name().toLowerCase())}">Status</span>
-                            </td>
-                            <td th:text="${#temporals.format(item.updatedAt, 'MMM dd, yyyy')}">Date</td>
-                            <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-primary" th:data-id="${item.id}"
-                                    th:data-title="${item.title}" th:data-type="${item.type.name().toLowerCase()}"
-                                    th:data-category="${item.category}" th:data-description="${item.description}"
-                                    th:data-content="${item.contentBody}" th:data-url="${item.url}"
-                                    th:data-status="${item.status.name().toLowerCase()}" th:data-is-module="false"
-                                    onclick="openEditModal(this)">
-                                    <span style="font-size: 0.9rem;">✏️</span>
-                                </button>
-                                <form th:action="@{'/admin/content/delete/' + ${item.id}}" method="post"
-                                    class="d-inline"
-                                    th:onsubmit="'return confirm(\'Are you sure you want to delete this content?\');'">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <span style="font-size: 0.9rem;">🗑️</span>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        <!-- Educational Modules (from modules.html) -->
-                        <tr th:each="module : ${modules}" style="background-color: #f8f9fa;">
-                            <td>
-                                <div>
-                                    <div class="fw-medium" th:text="${module.title}">Module Title</div>
+                                    <div class="fw-medium" th:text="${module.title}">Title</div>
                                     <div class="text-muted small mt-1"
                                         style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;"
                                         th:text="${module.description}">Description</div>
@@ -206,8 +158,15 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span>📚</span>
-                                    <span>Module</span>
+                                    <span th:if="${module.contentType != null}"
+                                        th:switch="${module.contentType.name()}">
+                                        <span th:case="'ARTICLE'">📄</span>
+                                        <span th:case="'VIDEO'">🎥</span>
+                                        <span th:case="'RESOURCE'">🔗</span>
+                                        <span th:case="'MODULE'">📚</span>
+                                    </span>
+                                    <span
+                                        th:text="${module.contentType != null ? #strings.capitalize(module.contentType.name().toLowerCase()) : 'Unknown'}">Type</span>
                                 </div>
                             </td>
                             <td th:text="${module.category}">Category</td>
@@ -217,25 +176,20 @@
                             </td>
                             <td th:text="${#temporals.format(module.updatedAt, 'MMM dd, yyyy')}">Date</td>
                             <td class="text-end">
-                                <!-- Module Actions -->
-                                <button type="button" class="btn btn-sm btn-outline-primary" th:data-id="${module.id}"
-                                    th:data-title="${module.title}" th:data-type="module"
-                                    th:data-category="${module.category}" th:data-description="${module.description}"
-                                    th:data-content="${module.content}" th:data-url="${module.imageUrl}"
-                                    th:data-status="${module.active ? 'published' : 'draft'}" th:data-is-module="true"
-                                    onclick="openEditModal(this)">
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                    th:onclick="'editContent(' + ${module.id} + ')'">
                                     <span style="font-size: 0.9rem;">✏️</span>
                                 </button>
                                 <form th:action="@{'/admin/content/module/delete/' + ${module.id}}" method="post"
                                     class="d-inline"
-                                    th:onsubmit="'return confirm(\'Are you sure you want to delete this module? This cannot be undone.\');'">
+                                    th:onsubmit="'return confirm(\'Are you sure you want to delete this content? This will also delete all user progress associated with it.\');'">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">
                                         <span style="font-size: 0.9rem;">🗑️</span>
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                        <tr th:if="${(content == null || content.isEmpty()) && (modules == null || modules.isEmpty())}">
+                        <tr th:if="${modules == null || modules.isEmpty()}">
                             <td colspan="6" class="text-center py-4 text-muted">
                                 No content found. Click "Add Content" to create your first item.
                             </td>
@@ -257,7 +211,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="contentForm" method="post" th:action="@{/admin/content/save}">
+            <form id="contentForm" method="post" th:action="@{/admin/content/module/save}">
                 <input type="hidden" id="contentId" name="id">
                 <div class="modal-body">
                     <div class="mb-3">
@@ -281,6 +235,10 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <label for="duration" class="form-label">Estimated Duration (minutes)</label>
+                        <input type="number" class="form-control" id="duration" name="duration" placeholder="e.g. 15">
+                    </div>
+                    <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                     </div>
@@ -289,8 +247,9 @@
                         <textarea class="form-control" id="contentBody" name="contentBody" rows="5"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="url" class="form-label">URL (Optional)</label>
-                        <input type="url" class="form-control" id="url" name="url" placeholder="https://...">
+                        <label for="url" class="form-label">Picture URL</label>
+                        <input type="url" class="form-control" id="url" name="url"
+                            placeholder="https://example.com/image.jpg">
                     </div>
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
@@ -309,49 +268,54 @@
     </div>
 </div>
 
-<script>
-    function openEditModal(button) {
-        const id = button.getAttribute('data-id');
-        const title = button.getAttribute('data-title');
-        const type = button.getAttribute('data-type');
-        const category = button.getAttribute('data-category');
-        const description = button.getAttribute('data-description');
-        const content = button.getAttribute('data-content');
-        const url = button.getAttribute('data-url');
-        const status = button.getAttribute('data-status');
-        const isModule = button.getAttribute('data-is-module') === 'true';
+<script th:inline="javascript">
+    const getContentUrl = /*[[@{/admin/content/get/}]]*/ '/admin/content/get/';
+    const getModuleUrl = /*[[@{/admin/content/module/get/}]]*/ '/admin/content/module/get/';
+    const saveContentUrl = /*[[@{/admin/content/save}]]*/ '/admin/content/save';
+    const saveModuleUrl = /*[[@{/admin/content/module/save}]]*/ '/admin/content/module/save';
 
-        document.getElementById('contentId').value = id;
-        document.getElementById('title').value = title;
-        document.getElementById('type').value = type.toLowerCase();
-        document.getElementById('category').value = category;
-        document.getElementById('description').value = description;
-        document.getElementById('contentBody').value = content;
-        document.getElementById('url').value = url;
-        document.getElementById('status').value = status.toLowerCase();
+    // Edit content function
+    function editContent(id) {
+        document.getElementById('contentForm').action = saveModuleUrl;
+        document.getElementById('type').disabled = false;
 
-        // Handle form action based on whether it's a module
-        const form = document.getElementById('contentForm');
-        if (isModule) {
-            form.action = '/admin/content/module/save';
-            // Force type to 'module'
-            document.getElementById('type').value = 'module';
-        } else {
-            form.action = '/admin/content/save';
-        }
+        fetch(getModuleUrl + id)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch content');
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return; // Handled by fallback
 
-        document.getElementById('modalTitle').textContent = isModule ? 'Edit Module' : 'Edit Content';
+                document.getElementById('contentId').value = data.id;
+                document.getElementById('title').value = data.title;
+                document.getElementById('type').value = data.contentType ? data.contentType.toLowerCase() : 'module';
+                document.getElementById('category').value = data.category;
+                document.getElementById('duration').value = data.durationMinutes || '';
+                document.getElementById('description').value = data.description;
+                document.getElementById('contentBody').value = data.content;
+                document.getElementById('url').value = data.url || data.imageUrl;
+                document.getElementById('status').value = data.active ? 'published' : 'draft';
 
-        const modal = new bootstrap.Modal(document.getElementById('addContentModal'));
-        modal.show();
+                document.getElementById('modalTitle').textContent = 'Edit Content';
+
+                var modal = new bootstrap.Modal(document.getElementById('addContentModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // alert('Error loading content details'); // Suppress alert if it's being handled
+            });
     }
 
-    // Reset form and action when modal is closed
+
+
+    // Reset form when modal is closed
     document.getElementById('addContentModal')?.addEventListener('hidden.bs.modal', function () {
-        const form = document.getElementById('contentForm');
-        form.reset();
-        form.action = '/admin/content/save'; // Reset to default
+        document.getElementById('contentForm').reset();
+        document.getElementById('contentForm').action = saveModuleUrl; // Default to save module
         document.getElementById('contentId').value = '';
         document.getElementById('modalTitle').textContent = 'Add New Content';
+        document.getElementById('type').disabled = false; // Re-enable type field
     });
 </script>

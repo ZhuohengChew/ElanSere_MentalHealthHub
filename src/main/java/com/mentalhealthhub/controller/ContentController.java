@@ -1,37 +1,33 @@
 package com.mentalhealthhub.controller;
 
-import com.mentalhealthhub.model.Content;
-import com.mentalhealthhub.model.ContentStatus;
 import com.mentalhealthhub.model.ContentType;
 import com.mentalhealthhub.model.EducationalModule;
 import com.mentalhealthhub.model.User;
 import com.mentalhealthhub.model.UserRole;
-import com.mentalhealthhub.repository.ContentRepository;
 import com.mentalhealthhub.repository.EducationalModuleRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/content")
 public class ContentController {
 
-    private final ContentRepository contentRepository;
     private final EducationalModuleRepository moduleRepository;
     private final com.mentalhealthhub.repository.ModuleProgressRepository progressRepository;
 
     public ContentController(
-            ContentRepository contentRepository,
             EducationalModuleRepository moduleRepository,
             com.mentalhealthhub.repository.ModuleProgressRepository progressRepository) {
-        this.contentRepository = contentRepository;
         this.moduleRepository = moduleRepository;
         this.progressRepository = progressRepository;
     }
@@ -46,140 +42,94 @@ public class ContentController {
             return "redirect:/login";
         }
 
-        List<Content> allContent = contentRepository.findAll();
-
-        // Get all EducationalModules and convert them to Content-like objects for
-        // display
+        // Fetch all modules (Unified Content)
         List<EducationalModule> allModules = moduleRepository.findAll();
+        // Sort by CreatedAt DESC (Newest first)
+        allModules.sort(
+                Comparator.comparing(EducationalModule::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed());
 
-        // Apply filters to Content
-        List<Content> filteredContent = allContent.stream()
-                .filter(content -> {
+        // Filter Logic
+        List<EducationalModule> filteredModules = allModules.stream()
+                .filter(m -> {
+                    // Search
                     boolean matchesSearch = search == null || search.isEmpty() ||
-                            content.getTitle().toLowerCase().contains(search.toLowerCase()) ||
-                            content.getDescription().toLowerCase().contains(search.toLowerCase());
+                            m.getTitle().toLowerCase().contains(search.toLowerCase()) ||
+                            (m.getDescription() != null
+                                    && m.getDescription().toLowerCase().contains(search.toLowerCase()));
 
-                    boolean matchesType = filterType == null || filterType.equals("all") ||
-                            content.getType().name().equalsIgnoreCase(filterType);
+                    // Filter Type
+                    boolean matchesType = true;
+                    if (filterType != null && !filterType.equals("all")) {
+                        // Handle null contentType by defaulting to MODULE or excluding
+                        matchesType = m.getContentType() != null &&
+                                m.getContentType().name().equalsIgnoreCase(filterType);
+                    }
 
-                    boolean matchesStatus = filterStatus == null || filterStatus.equals("all") ||
-                            content.getStatus().name().equalsIgnoreCase(filterStatus);
+                    // Filter Status
+                    boolean matchesStatus = true;
+                    if (filterStatus != null && !filterStatus.equals("all")) {
+                        boolean isActive = Boolean.TRUE.equals(m.getActive());
+                        if (filterStatus.equalsIgnoreCase("active") || filterStatus.equalsIgnoreCase("published")) {
+                            matchesStatus = isActive;
+                        } else if (filterStatus.equalsIgnoreCase("inactive")
+                                || filterStatus.equalsIgnoreCase("draft")) {
+                            matchesStatus = !isActive;
+                        }
+                    }
 
                     return matchesSearch && matchesType && matchesStatus;
                 })
                 .collect(Collectors.toList());
 
-        // Filter modules based on search
-        List<EducationalModule> filteredModules = allModules.stream()
-                .filter(module -> {
-                    if (search == null || search.isEmpty()) {
-                        return true;
-                    }
-                    return module.getTitle().toLowerCase().contains(search.toLowerCase()) ||
-                            module.getDescription().toLowerCase().contains(search.toLowerCase());
-                })
-                .collect(Collectors.toList());
+        // Global Statistics (from Database, per requirement)
+        long totalContent = allModules.size();
+        long publishedCount = allModules.stream().filter(m -> Boolean.TRUE.equals(m.getActive())).count();
+        long draftCount = totalContent - publishedCount;
 
-        // Calculate statistics including modules
-        long totalContent = allContent.size() + allModules.size();
-        long publishedCount = allContent.stream()
-                .filter(c -> c.getStatus() == ContentStatus.PUBLISHED)
-                .count() + allModules.stream().filter(m -> m.getActive()).count();
-        long draftCount = allContent.stream()
-                .filter(c -> c.getStatus() == ContentStatus.DRAFT)
-                .count() + allModules.stream().filter(m -> !m.getActive()).count();
         Set<String> categories = new java.util.HashSet<>();
-        allContent.forEach(c -> categories.add(c.getCategory()));
-        allModules.forEach(m -> categories.add(m.getCategory()));
+        allModules.forEach(m -> {
+            if (m.getCategory() != null)
+                categories.add(m.getCategory());
+        });
 
         model.addAttribute("user", user);
-        model.addAttribute("content", filteredContent);
-        model.addAttribute("modules", filteredModules);
+        model.addAttribute("modules", filteredModules); // Only display filtered
         model.addAttribute("totalContent", totalContent);
         model.addAttribute("publishedCount", publishedCount);
         model.addAttribute("draftCount", draftCount);
         model.addAttribute("categoryCount", categories.size());
+
+        // Pass filters back to view for sticky inputs
         model.addAttribute("search", search);
-        model.addAttribute("filterType", filterType);
-        model.addAttribute("filterStatus", filterStatus);
+        // Ensure we pass the exact value used in <option value="...">
+        model.addAttribute("filterType", filterType != null ? filterType : "all");
+        model.addAttribute("filterStatus", filterStatus != null ? filterStatus : "all");
+
         model.addAttribute("page", "admin/manage-content");
         model.addAttribute("title", "Content Management");
         model.addAttribute("activePage", "content-management");
-
         return "layout";
     }
 
-    @PostMapping("/save")
-    public String saveContent(@RequestParam(required = false) Long id,
-            @RequestParam String title,
-            @RequestParam String type,
-            @RequestParam String category,
-            @RequestParam String description,
-            @RequestParam(required = false) String contentBody,
-            @RequestParam(required = false) String url,
-            @RequestParam String status,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+    @GetMapping("/module/get/{id}")
+    @ResponseBody
+    public ResponseEntity<EducationalModule> getModule(@PathVariable Long id, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null || user.getRole() != UserRole.ADMIN) {
-            return "redirect:/login";
+            return ResponseEntity.status(403).build();
         }
-
-        Content content;
-        if (id != null) {
-            content = contentRepository.findById(id).orElse(new Content());
-        } else {
-            content = new Content();
-            content.setCreatedAt(LocalDateTime.now());
-        }
-
-        content.setTitle(title);
-        content.setType(ContentType.valueOf(type.toUpperCase()));
-        content.setCategory(category);
-        content.setDescription(description);
-        content.setContent(contentBody);
-        content.setUrl(url);
-        content.setStatus(ContentStatus.valueOf(status.toUpperCase()));
-        content.setUpdatedAt(LocalDateTime.now());
-
-        contentRepository.save(content);
-
-        // If content type is MODULE, also create/update EducationalModule
-        if (content.getType() == ContentType.MODULE) {
-            EducationalModule module;
-            java.util.Optional<EducationalModule> existingModule = moduleRepository.findByTitle(content.getTitle());
-            if (existingModule.isPresent()) {
-                module = existingModule.get();
-            } else {
-                module = new EducationalModule();
-            }
-
-            module.setTitle(content.getTitle());
-            module.setDescription(content.getDescription());
-            module.setCategory(content.getCategory());
-            module.setContent(content.getContent());
-            module.setImageUrl(content.getUrl()); // Use URL as image URL
-            module.setDurationMinutes(15); // Default duration, can be enhanced
-            module.setActive(content.getStatus() == ContentStatus.PUBLISHED);
-
-            if (module.getCreatedAt() == null) {
-                module.setCreatedAt(LocalDateTime.now());
-            }
-            module.setUpdatedAt(LocalDateTime.now());
-
-            moduleRepository.save(module);
-        }
-
-        redirectAttributes.addFlashAttribute("success",
-                id != null ? "Content updated successfully!" : "Content added successfully!");
-
-        return "redirect:/admin/content";
+        return moduleRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/module/save")
     public String saveModule(@RequestParam(required = false) Long id,
             @RequestParam String title,
+            @RequestParam String type,
             @RequestParam String category,
+            @RequestParam(required = false) Integer duration,
             @RequestParam String description,
             @RequestParam(required = false) String contentBody,
             @RequestParam(required = false) String url,
@@ -200,11 +150,16 @@ public class ContentController {
         }
 
         module.setTitle(title);
-        module.setDescription(description);
+        module.setContentType(ContentType.valueOf(type.toUpperCase()));
         module.setCategory(category);
+        module.setDurationMinutes(duration);
+        module.setDescription(description);
         module.setContent(contentBody);
-        module.setImageUrl(url); // Map URL to ImageURL
-        module.setActive(status.equalsIgnoreCase("published"));
+        module.setUrl(url); // Generic URL field
+        module.setImageUrl(url); // Map URL to ImageURL as requested (Picture URL)
+
+        // Status mapping: "published" or "active"
+        module.setActive(status.equalsIgnoreCase("published") || status.equalsIgnoreCase("active"));
         module.setUpdatedAt(LocalDateTime.now());
 
         // Ensure non-null duration
@@ -214,12 +169,8 @@ public class ContentController {
 
         moduleRepository.save(module);
 
-        // Sync with Content if exists (optional, but good for consistency given current
-        // logic)
-        // For now, we'll keep them somewhat separate as per user instruction to just
-        // "edit module"
-
-        redirectAttributes.addFlashAttribute("success", "Module updated successfully!");
+        redirectAttributes.addFlashAttribute("success",
+                (id != null ? "Content updated" : "Content created") + " successfully!");
         return "redirect:/admin/content";
     }
 
@@ -240,38 +191,39 @@ public class ContentController {
 
             // Hard delete the module
             moduleRepository.delete(module);
-            redirectAttributes.addFlashAttribute("success", "Module deleted successfully!");
+            redirectAttributes.addFlashAttribute("success", "Item deleted successfully!");
         } else {
-            redirectAttributes.addFlashAttribute("error", "Module not found.");
+            redirectAttributes.addFlashAttribute("error", "Item not found.");
         }
 
         return "redirect:/admin/content";
     }
 
-    @PostMapping("/delete/{id}")
-    public String deleteContent(@PathVariable Long id,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-        User user = (User) session.getAttribute("user");
-        if (user == null || user.getRole() != UserRole.ADMIN) {
-            return "redirect:/login";
+    // Add ContentViewModel inner class for unified view
+    public static class ContentViewModel {
+        public Long id;
+        public String title;
+        public String type;
+        public String category;
+        public String description;
+        public String content;
+        public String url;
+        public String status;
+        public java.time.LocalDateTime updatedAt;
+        public boolean isModule;
+
+        public ContentViewModel(Long id, String title, String type, String category, String description, String content,
+                String url, String status, java.time.LocalDateTime updatedAt, boolean isModule) {
+            this.id = id;
+            this.title = title;
+            this.type = type;
+            this.category = category;
+            this.description = description;
+            this.content = content;
+            this.url = url;
+            this.status = status;
+            this.updatedAt = updatedAt;
+            this.isModule = isModule;
         }
-
-        // Check if content is a module before deleting
-        Content content = contentRepository.findById(id).orElse(null);
-        if (content != null && content.getType() == ContentType.MODULE) {
-            // Deactivate or delete corresponding EducationalModule
-            java.util.Optional<EducationalModule> module = moduleRepository.findByTitle(content.getTitle());
-            if (module.isPresent()) {
-                EducationalModule eduModule = module.get();
-                eduModule.setActive(false); // Deactivate instead of delete to preserve data
-                moduleRepository.save(eduModule);
-            }
-        }
-
-        contentRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("success", "Content deleted successfully!");
-
-        return "redirect:/admin/content";
     }
 }
