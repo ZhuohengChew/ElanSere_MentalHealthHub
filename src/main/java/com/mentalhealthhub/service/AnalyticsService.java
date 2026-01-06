@@ -182,6 +182,10 @@ public class AnalyticsService {
                 .collect(Collectors.toList());
         dto.setMonthlyCompletions(monthlyComps);
 
+        // Get total assessments completed
+        Long totalAssessments = assessmentRepository.count();
+        dto.setTotalAssessments(totalAssessments);
+
         return dto;
     }
 

@@ -15,6 +15,7 @@ public class MentalHealthTrendsDTO {
     
     private List<MonthlyTrendDTO> trendData;
     private List<MonthlyCompletionDTO> monthlyCompletions;
+    private Long totalAssessments;  // Total number of assessments completed
 
     public MentalHealthTrendsDTO() {}
 
@@ -89,6 +90,14 @@ public class MentalHealthTrendsDTO {
 
     public void setMonthlyCompletions(List<MonthlyCompletionDTO> monthlyCompletions) {
         this.monthlyCompletions = monthlyCompletions;
+    }
+
+    public Long getTotalAssessments() {
+        return totalAssessments;
+    }
+
+    public void setTotalAssessments(Long totalAssessments) {
+        this.totalAssessments = totalAssessments;
     }
 
     // Inner class for monthly trends

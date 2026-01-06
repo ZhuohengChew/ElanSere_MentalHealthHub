@@ -108,7 +108,7 @@ async function populateUserAnalytics(data) {
     updateStatCard('activeUsers', formatNumber(data.activeUsers || 0));
     updateStatCard('inactiveUsers', formatNumber(data.inactiveUsers || 0));
     updateStatCard('studentCount', formatNumber(data.studentsCount || 0));
-    updateStatCard('professionalCount', formatNumber(data.professionalsCount || 0));
+    updateStatCard('professionalCount', formatNumber((data.professionalsCount || 0) + (data.staffCount || 0)));
     updateStatCard('staffCount', formatNumber(data.staffCount || 0));
     
     // User Distribution Chart (Doughnut)
@@ -171,6 +171,7 @@ async function populateMentalHealthTrends(data) {
     updateStatCard('avgStressLevel', (data.averageStressLevel || 0).toFixed(1));
     updateStatCard('avgAnxietyLevel', (data.averageAnxietyLevel || 0).toFixed(1));
     updateStatCard('avgWellbeing', (data.averageWellbeingScore || 0).toFixed(2));
+    updateStatCard('totalAssessments', formatNumber(data.totalAssessments || 0));
     
     // Mental Health Distribution Chart (Bar)
     if (document.getElementById('mentalHealthDistributionChart')) {
@@ -724,7 +725,6 @@ async function populateReportAnalytics(data) {
     updateStatCard('pendingReports', formatNumber(data.pendingReports || 0));
     updateStatCard('resolvedReports', formatNumber(data.resolvedReports || 0));
     updateStatCard('avgResolutionTime', (data.averageResolutionTimeHours || 0).toFixed(1));
-    updateStatCard('totalAssessments', formatNumber(data.totalCompletions || 0));
     
     // Report Status Chart
     if (document.getElementById('reportStatusChart')) {
