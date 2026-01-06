@@ -324,3 +324,4 @@ public class AppointmentService {
         return start1.isBefore(end2) && end1.isAfter(start2);
     }
 }
+
