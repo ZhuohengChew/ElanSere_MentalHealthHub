@@ -71,16 +71,20 @@ public class ModuleController {
                 Comparator.comparing(EducationalModule::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()))
                         .reversed()));
 
-        // Calculate overall progress
+        // Calculate overall progress based on ALL active modules (not just filtered
+        // ones)
+        long totalActiveModules = moduleRepository.countByActiveTrue();
         long completedCount = progressRepository.countByUserAndCompletedTrue(user);
-        double progressPercentage = modules.isEmpty() ? 0 : (completedCount * 100.0 / modules.size());
+
+        // Prevent division by zero if there are no modules
+        double progressPercentage = totalActiveModules == 0 ? 0 : (completedCount * 100.0 / totalActiveModules);
 
         model.addAttribute("user", user);
         model.addAttribute("modules", modules);
         model.addAttribute("userProgress", userProgress);
         model.addAttribute("progressMap", progressMap);
         model.addAttribute("completedCount", completedCount);
-        model.addAttribute("totalModules", modules.size());
+        model.addAttribute("totalModules", totalActiveModules);
         model.addAttribute("progressPercentage", progressPercentage);
         model.addAttribute("search", search);
         model.addAttribute("category", category);
