@@ -37,10 +37,10 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
     Double getAverageScoreByCategory(@Param("category") String category);
 
     @Query(value = "SELECT " +
-            "SUM(CASE WHEN total_score >= 0 AND total_score <= 20 THEN 1 ELSE 0 END) as low, " +
-            "SUM(CASE WHEN total_score >= 21 AND total_score <= 40 THEN 1 ELSE 0 END) as mild, " +
-            "SUM(CASE WHEN total_score >= 41 AND total_score <= 60 THEN 1 ELSE 0 END) as moderate, " +
-            "SUM(CASE WHEN total_score >= 61 AND total_score <= 100 THEN 1 ELSE 0 END) as high " +
+            "SUM(CASE WHEN total_score >= 0 AND total_score <= 8 THEN 1 ELSE 0 END) as low, " +
+            "SUM(CASE WHEN total_score >= 9 AND total_score <= 16 THEN 1 ELSE 0 END) as mild, " +
+            "SUM(CASE WHEN total_score >= 17 AND total_score <= 24 THEN 1 ELSE 0 END) as moderate, " +
+            "SUM(CASE WHEN total_score >= 25 AND total_score <= 32 THEN 1 ELSE 0 END) as high " +
             "FROM assessments",
             nativeQuery = true)
     Object getScoreDistribution();
@@ -52,10 +52,11 @@ public interface AssessmentRepository extends JpaRepository<Assessment, Long> {
             nativeQuery = true)
     List<Object[]> getMonthlyCompletionTrend();
 
-    @Query(value = "SELECT DATE_FORMAT(completed_at, '%Y-%m') AS month, AVG(total_score) as avgScore " +
+    @Query(value = "SELECT DATE_FORMAT(completed_at, '%Y-%m-%d') AS month, AVG(total_score) as avgScore " +
             "FROM assessments " +
-            "GROUP BY DATE_FORMAT(completed_at, '%Y-%m') " +
-            "ORDER BY month DESC",
+            "WHERE completed_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) " +
+            "GROUP BY DATE_FORMAT(completed_at, '%Y-%m-%d') " +
+            "ORDER BY month ASC",
             nativeQuery = true)
     List<Object[]> getMentalHealthScoreTrend();
 }

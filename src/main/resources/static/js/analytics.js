@@ -179,7 +179,7 @@ async function populateMentalHealthTrends(data) {
             {
                 type: 'bar',
                 data: {
-                    labels: ['Low (0-20)', 'Mild (21-40)', 'Moderate (41-60)', 'High (61-100)'],
+                    labels: ['Low (0-8)', 'Mild (9-16)', 'Moderate (17-24)', 'High (25-32)'],
                     datasets: [{
                         label: 'Number of Students',
                         data: [
@@ -221,7 +221,18 @@ async function populateMentalHealthTrends(data) {
     
     // Mental Health Trend Chart (Line)
     if (document.getElementById('mentalHealthTrendChart') && data.trendData) {
-        const labels = data.trendData.map(d => d.month);
+        const labels = data.trendData.map(d => {
+            // Convert YYYY-MM-DD to MMM DD format
+            const parts = d.month.split('-');
+            if (parts.length === 3) {
+                const year = parts[0];
+                const month = parseInt(parts[1]) - 1; // 0-indexed
+                const day = parseInt(parts[2]);
+                const date = new Date(year, month, day);
+                return date.toLocaleString('en-US', { month: 'short', day: 'numeric' });
+            }
+            return d.month;
+        });
         const scores = data.trendData.map(d => (d.averageScore || 0).toFixed(1));
         
         charts.mhTrend = new Chart(
@@ -258,7 +269,7 @@ async function populateMentalHealthTrends(data) {
                     scales: {
                         y: { 
                             beginAtZero: true,
-                            max: 100
+                            max: 32
                         }
                     }
                 }
@@ -329,7 +340,17 @@ async function populateAppointmentAnalytics(data) {
     
     // Monthly Appointment Trend Chart
     if (document.getElementById('appointmentTrendChart') && data.monthlyData) {
-        const labels = data.monthlyData.map(d => d.month);
+        const labels = data.monthlyData.map(d => {
+            // Convert YYYY-MM to MMM YYYY format
+            const parts = d.month.split('-');
+            if (parts.length === 2) {
+                const year = parts[0];
+                const monthNum = parseInt(parts[1]) - 1; // 0-indexed
+                const date = new Date(year, monthNum, 1);
+                return date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+            }
+            return d.month;
+        });
         const counts = data.monthlyData.map(d => d.count);
         
         charts.appointmentTrend = new Chart(
@@ -417,7 +438,17 @@ async function populateModuleAnalytics(data) {
     
     // Module Completion Trend Chart
     if (document.getElementById('moduleCompletionTrendChart') && data.monthlyCompletions) {
-        const labels = data.monthlyCompletions.map(d => d.month);
+        const labels = data.monthlyCompletions.map(d => {
+            // Convert YYYY-MM to MMM YYYY format
+            const parts = d.month.split('-');
+            if (parts.length === 2) {
+                const year = parts[0];
+                const monthNum = parseInt(parts[1]) - 1; // 0-indexed
+                const date = new Date(year, monthNum, 1);
+                return date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+            }
+            return d.month;
+        });
         const counts = data.monthlyCompletions.map(d => d.count);
         
         charts.moduleCompletion = new Chart(
@@ -602,7 +633,6 @@ async function populateForumAnalytics(data) {
     updateStatCard('totalForumPosts', formatNumber(data.totalPosts || 0));
     updateStatCard('totalForumComments', formatNumber(data.totalComments || 0));
     updateStatCard('avgViewsPerPost', (data.averageViewsPerPost || 0).toFixed(1));
-    updateStatCard('avgRepliesPerPost', (data.averageRepliesPerPost || 0).toFixed(1));
     
     // Forum Category Chart
     if (document.getElementById('forumCategoryChart') && data.categoryStats) {

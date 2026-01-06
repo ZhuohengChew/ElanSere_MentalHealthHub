@@ -87,7 +87,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query(value = "SELECT DATE_FORMAT(r.submitted_at, '%Y-%m') AS month, COUNT(*) " +
             "FROM reports r " +
             "GROUP BY DATE_FORMAT(r.submitted_at, '%Y-%m') " +
-            "ORDER BY month DESC",
+            "ORDER BY month ASC",
             nativeQuery = true)
     List<Object[]> getMonthlyReportTrend();
 
@@ -95,7 +95,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             "FROM reports r " +
             "WHERE r.resolved_at IS NOT NULL " +
             "GROUP BY DATE_FORMAT(r.resolved_at, '%Y-%m') " +
-            "ORDER BY month DESC",
+            "ORDER BY month ASC",
             nativeQuery = true)
     List<Object[]> getMonthlyResolutions();
 }
