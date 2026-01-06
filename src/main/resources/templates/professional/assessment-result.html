@@ -332,10 +332,10 @@
                             <i class="bi bi-award"></i> Result
                         </div>
                         <div style="margin-top: 10px;">
-                            <span class="result-badge" 
-                                th:classappend="${assessment.result == 'Excellent' ? 'excellent' : assessment.result == 'Good' ? 'good' : assessment.result == 'Fair' ? 'fair' : 'poor'}"
-                                th:text="${assessment.result}">
-                                Good
+                            <span class="result-badge"
+                                  th:classappend="${assessment.category == 'LOW' ? 'excellent' : assessment.category == 'MILD' ? 'good' : assessment.category == 'MODERATE' ? 'fair' : 'poor'}"
+                                  th:text="${assessment.result}">
+                                Low levels of mental health concerns
                             </span>
                         </div>
                     </div>
@@ -346,16 +346,20 @@
                             <i class="bi bi-graph-up"></i> Performance
                         </div>
                         <div style="margin-top: 10px;">
-                            <th:block th:if="${assessment.score >= 80}">
+                            <!-- Inverted scoring: HIGH score = LOW concerns = Excellent (24-32) -->
+                            <th:block th:if="${assessment.score >= 24}">
                                 <span class="badge bg-success">Excellent Performance</span>
                             </th:block>
-                            <th:block th:if="${assessment.score >= 60 && assessment.score < 80}">
+                            <!-- MILD category: Good (16-23) -->
+                            <th:block th:if="${assessment.score >= 16 && assessment.score < 24}">
                                 <span class="badge bg-info">Good Performance</span>
                             </th:block>
-                            <th:block th:if="${assessment.score >= 40 && assessment.score < 60}">
+                            <!-- MODERATE category: Average (8-15) -->
+                            <th:block th:if="${assessment.score >= 8 && assessment.score < 16}">
                                 <span class="badge bg-warning">Average Performance</span>
                             </th:block>
-                            <th:block th:if="${assessment.score < 40}">
+                            <!-- SEVERE category: Needs Improvement (0-7) -->
+                            <th:block th:if="${assessment.score < 8}">
                                 <span class="badge bg-danger">Needs Improvement</span>
                             </th:block>
                         </div>

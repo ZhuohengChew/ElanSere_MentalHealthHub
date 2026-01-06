@@ -82,28 +82,33 @@ public class AssessmentService {
         assessment.setQ7Score(answers.get(6));
         assessment.setQ8Score(answers.get(7));
 
-        // Calculate total score
-        int totalScore = answers.stream().mapToInt(Integer::intValue).sum();
-        assessment.setTotalScore(totalScore);
-        assessment.setScore(totalScore); // Legacy field
+        // Calculate symptom score (sum of answers, where higher = more symptoms)
+        int symptomScore = answers.stream().mapToInt(Integer::intValue).sum();
+
+        // Invert score: worst case (all symptoms = 32) → 0, best case (no symptoms = 0)
+        // → 32
+        // Display score represents wellbeing: higher = better mental health
+        int displayScore = 32 - symptomScore;
+        assessment.setTotalScore(displayScore);
+        assessment.setScore(displayScore); // Legacy field
 
         // Store answers as string
         assessment.setAnswers(String.join(",", answers.stream().map(String::valueOf).toArray(String[]::new)));
 
-        // Categorize based on total score (0-32 possible)
-        // Higher score = More symptoms = Higher severity
+        // Categorize based on display score (0-32 possible)
+        // Higher display score = Fewer symptoms = Better mental health
         String category;
         String resultMessage;
-        if (totalScore <= 8) {
+        if (displayScore >= 24) { // 24-32: Few symptoms (0-8 symptom score)
             category = "LOW";
             resultMessage = "Low levels of mental health concerns";
-        } else if (totalScore <= 16) {
+        } else if (displayScore >= 16) { // 16-23: Some symptoms (9-16 symptom score)
             category = "MILD";
             resultMessage = "Mild mental health symptoms";
-        } else if (totalScore <= 24) {
+        } else if (displayScore >= 8) { // 8-15: Moderate symptoms (17-24 symptom score)
             category = "MODERATE";
             resultMessage = "Moderate mental health symptoms";
-        } else {
+        } else { // 0-7: Many symptoms (25-32 symptom score)
             category = "SEVERE";
             resultMessage = "Severe mental health symptoms";
         }
@@ -113,7 +118,7 @@ public class AssessmentService {
         // Generate content summary
         StringBuilder content = new StringBuilder();
         content.append("Assessment Results:\n\n");
-        content.append("Total Score: ").append(totalScore).append("/32\n");
+        content.append("Total Score: ").append(displayScore).append("/32\n");
         content.append("Category: ").append(category).append("\n\n");
         content.append("Question Responses:\n");
         List<AssessmentQuestionDTO> questions = getAllQuestions();
@@ -130,10 +135,9 @@ public class AssessmentService {
         int stressScore = (answers.get(0) != null ? answers.get(0) : 0) +
                 (answers.get(1) != null ? answers.get(1) : 0); // Q1 + Q2
         int anxietyScore = (answers.get(2) != null ? answers.get(2) : 0) * 2; // Q3 * 2
-        // Wellbeing score is inverted: higher total symptoms = lower wellbeing
-        // Range: 0-32 symptoms → 32-0 wellbeing, then normalize to percentage 0-100
-        int rawWellbeing = 32 - totalScore; // 0..32
-        double wellbeingPercent = (rawWellbeing / 32.0) * 100.0;
+        // Wellbeing score: displayScore already represents wellbeing (0-32)
+        // Normalize to percentage 0-100
+        double wellbeingPercent = (displayScore / 32.0) * 100.0;
         // Round to 2 decimal places
         double wellbeingRounded = Math.round(wellbeingPercent * 100.0) / 100.0;
 
@@ -185,8 +189,9 @@ public class AssessmentService {
                 (assessment.getQ7Score() != null ? assessment.getQ7Score() : 0) +
                 (assessment.getQ8Score() != null ? assessment.getQ8Score() : 0); // Max 16
 
+        // Return display score (already inverted) in the DTO
         return new AssessmentResultDTO(
-                assessment.getTotalScore(),
+                assessment.getTotalScore(), // This is now the display score (0-32, higher = better)
                 assessment.getCategory(),
                 message,
                 recommendation,

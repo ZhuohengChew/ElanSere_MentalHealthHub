@@ -30,6 +30,7 @@
 
             <!--/*===== PROFESSIONAL Links =====*/-->
             <div th:if="${session.userRole == 'PROFESSIONAL'}">
+
                 <a th:href="@{/appointments/my-schedule}" class="nav-link" th:classappend="${activePage == 'schedule' ? 'active' : ''}">
                     <i class="bi bi-calendar-week"></i> My Schedule
                 </a>
@@ -39,6 +40,7 @@
                 <a th:href="@{/professional/reports}" class="nav-link" th:classappend="${activePage == 'review-reports' ? 'active' : ''}">
                     <i class="bi bi-file-earmark-text"></i> Review Reports
                 </a>
+                
             </div>
             
             <!--/*===== STAFF Links =====*/-->
