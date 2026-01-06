@@ -45,17 +45,17 @@
                     <h6 class="mb-0">Today's Schedule</h6>
                 </div>
                 <div class="card-body">
-                    <div class="list-group list-group-flush">
+                    <div class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
                         <div th:if="${todayAppointments == null or #lists.isEmpty(todayAppointments)}" class="text-center py-4 text-muted">
                             No sessions scheduled for today
                         </div>
                         <div th:each="apt : ${todayAppointments}" class="list-group-item">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <h6 class="mb-1" th:text="${apt.student.name} + ' - ' + ${#temporals.format(apt.appointmentDate,'hh:mm a')}">Student - 00:00</h6>
+                                    <h6 class="mb-1" th:text="${apt.student.name} + ' - ' + ${#temporals.format(apt.timeSlotStart,'hh:mm a')} + ' to ' + ${#temporals.format(apt.timeSlotEnd,'hh:mm a')}">Student - 00:00 to 01:00</h6>
                                     <small class="text-muted" th:text="${apt.notes} ?: 'Session'">Session details</small>
                                 </div>
-                                <span class="badge" th:classappend="${apt.status != null ? (apt.status.name() == 'SCHEDULED' ? ' bg-info' : (apt.status.name() == 'COMPLETED' ? ' bg-success' : ' bg-danger')) : ' bg-secondary'}" th:text="${apt.status} ?: 'Pending'">Status</span>
+                                <span class="badge" th:classappend="${apt.status != null ? (apt.status.name() == 'APPROVED' ? ' bg-success' : (apt.status.name() == 'PENDING' ? ' bg-warning text-dark' : ' bg-danger')) : ' bg-secondary'}" th:text="${apt.status} ?: 'Pending'">Status</span>
                             </div>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
                                     </td>
                                     <td th:text="${report.student.name} ?: 'N/A'">Patient Name</td>
                                     <td>
-                                        <small th:text="${#temporals.format(report.submittedAt, 'dd MMM yyyy')}" class="text-muted">Date</small>
+                                        <small th:text="${#temporals.format(report.updatedAt, 'dd MMM yyyy')}" class="text-muted">Date</small>
                                     </td>
                                     <td>
                                         <a th:if="${report.id}" th:href="@{/professional/reports/{id}(id=${report.id})}" class="btn btn-sm btn-outline-info">
