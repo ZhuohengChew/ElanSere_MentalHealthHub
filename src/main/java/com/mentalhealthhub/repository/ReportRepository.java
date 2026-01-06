@@ -2,7 +2,6 @@ package com.mentalhealthhub.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -62,6 +61,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     @Query("SELECT COUNT(r) FROM Report r WHERE r.student.id = :studentId")
     long countByStudentId(@Param("studentId") Long studentId);
+
+    @Query("SELECT COUNT(r) FROM Report r WHERE r.status != 'resolved'")
+    long countUnresolvedReports();
 
     // Find by resolved status for history
     @Query("SELECT r FROM Report r WHERE r.status = 'resolved' OR r.status = 'closed' ORDER BY r.resolvedAt DESC")
