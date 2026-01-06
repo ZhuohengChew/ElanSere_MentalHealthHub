@@ -261,8 +261,10 @@ public class AuthController {
                 LocalDate todayProf = LocalDate.now();
                 List<Appointment> todayAppointments = profAppointments.stream()
                         .filter(a -> a.getAppointmentDate() != null
-                                && a.getAppointmentDate().isEqual(todayProf))
-                        .sorted(Comparator.comparing(Appointment::getAppointmentDate))
+                                && a.getAppointmentDate().isEqual(todayProf)
+                                && a.getStatus() != null
+                                && (a.getStatus() == AppointmentStatus.APPROVED || a.getStatus() == AppointmentStatus.PENDING))
+                        .sorted(Comparator.comparing(Appointment::getTimeSlotStart))
                         .collect(Collectors.toList());
 
                 long todayCount = todayAppointments.size();
@@ -280,7 +282,9 @@ public class AuthController {
                         .filter(u -> u.getRole() == UserRole.STUDENT)
                         .collect(Collectors.toList());
 
-                List<Report> reports = reportRepository.findAll();
+                List<Report> reports = reportRepository.findAll().stream()
+                        .sorted(Comparator.comparing(Report::getUpdatedAt).reversed())
+                        .collect(Collectors.toList());
 
                 model.addAttribute("todayAppointmentsCount", todayCount);
                 model.addAttribute("activeClientsCount", activeClients);
