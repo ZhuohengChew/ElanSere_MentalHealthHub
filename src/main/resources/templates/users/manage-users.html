@@ -209,10 +209,6 @@
                             <option value="ADMIN">Administrator</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="editProfilePicture" class="form-label">Profile Picture (URL)</label>
-                        <input type="text" class="form-control" id="editProfilePicture" name="profilePicture">
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -351,13 +347,11 @@
             var name = button.getAttribute('data-name');
             var email = button.getAttribute('data-email');
             var role = button.getAttribute('data-role');
-            var picture = button.getAttribute('data-picture');
 
             document.getElementById('editUserId').value = id;
             document.getElementById('editName').value = name;
             document.getElementById('editEmail').value = email;
             document.getElementById('editRole').value = role;
-            document.getElementById('editProfilePicture').value = picture || '';
         });
     }
 
@@ -370,7 +364,6 @@
             var name = document.getElementById('editName').value;
             var email = document.getElementById('editEmail').value;
             var role = document.getElementById('editRole').value;
-            var picture = document.getElementById('editProfilePicture').value;
 
             if (!userId || !name || !email) {
                 showNotification('Please fill in all required fields', 'warning');
@@ -386,8 +379,7 @@
                     body: new URLSearchParams({
                         name: name,
                         email: email,
-                        role: role,
-                        profilePicture: picture || ''
+                        role: role
                     })
                 });
 
