@@ -14,8 +14,8 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6 class="text-muted mb-2">Total Users</h6>
-                        <div class="stat-number">1,248</div>
-                        <small class="text-success"><i class="bi bi-arrow-up"></i> +52 this month</small>
+                        <div class="stat-number" id="adminTotalUsers">-</div>
+                        <small class="text-success"><i class="bi bi-arrow-up"></i> <span id="adminNewUsersMonth">-</span> this month</small>
                     </div>
                     <i class="bi bi-people text-primary" style="font-size: 1.5rem;"></i>
                 </div>
@@ -25,9 +25,9 @@
             <div class="stat-card" style="border-left: 4px solid #7FB685;">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h6 class="text-muted mb-2">Active Sessions</h6>
-                        <div class="stat-number">347</div>
-                        <small class="text-muted">Real-time users</small>
+                        <h6 class="text-muted mb-2">Total Appointments</h6>
+                        <div class="stat-number" id="adminTotalAppointments">-</div>
+                        <small class="text-muted">All time</small>
                     </div>
                     <i class="bi bi-activity text-success" style="font-size: 1.5rem;"></i>
                 </div>
@@ -38,8 +38,8 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6 class="text-muted mb-2">System Health</h6>
-                        <div class="stat-number">98.5%</div>
-                        <small class="text-muted">Uptime this month</small>
+                        <div class="stat-number" id="adminAverageWellbeing">-</div>
+                        <small class="text-muted">Average wellbeing</small>
                     </div>
                     <i class="bi bi-heart-pulse text-success" style="font-size: 1.5rem;"></i>
                 </div>
@@ -50,8 +50,8 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6 class="text-muted mb-2">Engagement Rate</h6>
-                        <div class="stat-number">76%</div>
-                        <small class="text-success"><i class="bi bi-arrow-up"></i> +4% from last month</small>
+                        <div class="stat-number" id="adminAverageEngagement">-</div>
+                        <small class="text-muted">Average engagement</small>
                     </div>
                     <i class="bi bi-graph-up text-warning" style="font-size: 1.5rem;"></i>
                 </div>
@@ -59,41 +59,6 @@
         </div>
     </div>
 
-    <!-- System Activity -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header border-0">
-                    <h6 class="mb-0">Recent System Activity</h6>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex gap-3">
-                            <i class="bi bi-info-circle text-info" style="font-size: 1.25rem;"></i>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-500">New user registration batch completed</p>
-                                <small class="text-muted">15 minutes ago</small>
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex gap-3">
-                            <i class="bi bi-check-circle text-success" style="font-size: 1.25rem;"></i>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-500">Daily backup completed successfully</p>
-                                <small class="text-muted">2 hours ago</small>
-                            </div>
-                        </div>
-                        <div class="list-group-item d-flex gap-3">
-                            <i class="bi bi-exclamation-circle text-warning" style="font-size: 1.25rem;"></i>
-                            <div class="flex-grow-1">
-                                <p class="mb-0 fw-500">System maintenance scheduled for next week</p>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Quick Actions -->
     <div class="row">
@@ -110,11 +75,11 @@
             </a>
         </div>
         <div class="col-md-3 mb-3">
-            <a th:href="@{/settings}" class="card text-decoration-none text-reset h-100 hover-shadow">
+            <a th:href="@{/admin/content}" class="card text-decoration-none text-reset h-100 hover-shadow">
                 <div class="card-body text-center">
-                    <i class="bi bi-gear" style="font-size: 2rem; color: #7FB685;"></i>
-                    <h6 class="mt-3 mb-1">System Settings</h6>
-                    <small class="text-muted">Configure system parameters</small>
+                    <i class="bi bi-file-earmark-text" style="font-size: 2rem; color: #7FB685;"></i>
+                    <h6 class="mt-3 mb-1">Content Management</h6>
+                    <small class="text-muted">Manage system content</small>
                 </div>
             </a>
         </div>
@@ -128,13 +93,18 @@
             </a>
         </div>
         <div class="col-md-3 mb-3">
-            <a href="#" class="card text-decoration-none text-reset h-100 hover-shadow">
+            <a th:href="@{/settings}" class="card text-decoration-none text-reset h-100 hover-shadow">
                 <div class="card-body text-center">
-                    <i class="bi bi-database" style="font-size: 2rem; color: #FF9F1C;"></i>
-                    <h6 class="mt-3 mb-1">Backups</h6>
-                    <small class="text-muted">Manage system backups</small>
+                    <i class="bi bi-gear" style="font-size: 2rem; color: #FF9F1C;"></i>
+                    <h6 class="mt-3 mb-1">Settings</h6>
+                    <small class="text-muted">Configure settings</small>
+                </div>
+            </a>
+        </div>
                 </div>
             </a>
         </div>
     </div>
 </div>
+
+<script th:src="@{/static/js/admin-dashboard.js}"></script>
