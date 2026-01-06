@@ -1,5 +1,7 @@
 package com.mentalhealthhub.dto;
 
+import java.util.Map;
+
 public class UserAnalyticsDTO {
     private Long totalUsers;
     private Long activeUsers;
@@ -13,6 +15,7 @@ public class UserAnalyticsDTO {
     private Double averageStressLevel;
     private Double averageAnxietyLevel;
     private Double averageWellbeingScore;
+    private Map<String, Long> userRegistrationTrend;
 
     public UserAnalyticsDTO() {}
 
@@ -117,5 +120,13 @@ public class UserAnalyticsDTO {
 
     public void setAverageWellbeingScore(Double averageWellbeingScore) {
         this.averageWellbeingScore = averageWellbeingScore;
+    }
+
+    public Map<String, Long> getUserRegistrationTrend() {
+        return userRegistrationTrend;
+    }
+
+    public void setUserRegistrationTrend(Map<String, Long> userRegistrationTrend) {
+        this.userRegistrationTrend = userRegistrationTrend;
     }
 }

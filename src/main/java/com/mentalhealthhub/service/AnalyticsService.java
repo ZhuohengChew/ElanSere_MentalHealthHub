@@ -100,6 +100,13 @@ public class AnalyticsService {
         dto.setAverageAnxietyLevel(userRepository.getAverageAnxietyLevel());
         dto.setAverageWellbeingScore(userRepository.getAverageWellbeingScore());
 
+        // Registration trend by month (YYYY-MM) for last months
+        try {
+            dto.setUserRegistrationTrend(userRepository.getUserRegistrationTrend());
+        } catch (Exception e) {
+            logger.warn("Could not load user registration trend", e);
+        }
+
         return dto;
     }
 
