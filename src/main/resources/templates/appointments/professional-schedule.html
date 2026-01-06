@@ -233,8 +233,10 @@
             const isToday = cellDate.toDateString() === today.toDateString();
             const isSelected = document.getElementById('appointmentDateFilter').value === dateStr;
             
-            // Check for ALL appointments on this date (including hidden ones)
-            const appointmentsOnDate = Array.from(document.querySelectorAll('tbody tr')).filter(row => row.getAttribute('data-date') === dateStr);
+            // Check for appointments on this date (rejected appointments are removed from DOM)
+            const appointmentsOnDate = Array.from(document.querySelectorAll('tbody tr')).filter(row => {
+                return row.getAttribute('data-date') === dateStr;
+            });
             const hasAppointments = appointmentsOnDate.length > 0;
             const hasPendingAppointments = appointmentsOnDate.some(row => row.getAttribute('data-status') === 'PENDING');
             const hasApprovedAppointments = appointmentsOnDate.some(row => row.getAttribute('data-status') === 'APPROVED');
@@ -436,6 +438,7 @@
                     `;
                     
                     updateCounters();
+                    renderCalendar();
                     
                     // Add success message
                     showNotification('Appointment approved successfully', 'success');
@@ -464,13 +467,16 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Find and update the row
+                // Find and remove the row from DOM
                 const row = document.querySelector(`tbody tr[data-id="${appointmentId}"]`);
                 if (row) {
-                    // Remove the row immediately instead of showing locked state
-                    row.style.display = 'none';
+                    // Remove the row completely from DOM
+                    row.remove();
                     
+                    // Re-apply current filters
+                    filterAppointments();
                     updateCounters();
+                    renderCalendar();
                     
                     // Add success message
                     showNotification('Appointment rejected', 'info');

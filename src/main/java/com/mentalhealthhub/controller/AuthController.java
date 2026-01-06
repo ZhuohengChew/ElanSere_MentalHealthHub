@@ -1,6 +1,7 @@
 package com.mentalhealthhub.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -259,6 +260,8 @@ public class AuthController {
                 dashboardPage = "dashboard/professional-dashboard";
                 List<Appointment> profAppointments = appointmentRepository.findByProfessional(user);
                 LocalDate todayProf = LocalDate.now();
+                LocalDateTime now = LocalDateTime.now();
+                
                 List<Appointment> todayAppointments = profAppointments.stream()
                         .filter(a -> a.getAppointmentDate() != null
                                 && a.getAppointmentDate().isEqual(todayProf)
@@ -274,8 +277,17 @@ public class AuthController {
                         .distinct()
                         .count();
 
+                // Sessions completed: approved appointments where end time has passed
                 long sessionsCompleted = profAppointments.stream()
-                        .filter(a -> a.getStatus() != null && a.getStatus() == AppointmentStatus.COMPLETED)
+                        .filter(a -> a.getStatus() != null && a.getStatus() == AppointmentStatus.APPROVED
+                                && a.getAppointmentDate() != null && a.getTimeSlotEnd() != null)
+                        .filter(a -> {
+                            LocalDateTime appointmentEndDateTime = LocalDateTime.of(
+                                a.getAppointmentDate(),
+                                a.getTimeSlotEnd()
+                            );
+                            return appointmentEndDateTime.isBefore(now);
+                        })
                         .count();
 
                 List<?> patientsList = userRepository.findAll().stream()
@@ -286,12 +298,19 @@ public class AuthController {
                         .sorted(Comparator.comparing(Report::getUpdatedAt).reversed())
                         .collect(Collectors.toList());
 
+                // Calculate average wellbeing score across all students
+                Double averageWellbeingScore = userRepository.getAverageWellbeingScore();
+                double displayWellbeingScore = (averageWellbeingScore != null && !averageWellbeingScore.isNaN()) 
+                        ? Math.round(averageWellbeingScore * 10.0) / 10.0 
+                        : 0.0;
+
                 model.addAttribute("todayAppointmentsCount", todayCount);
                 model.addAttribute("activeClientsCount", activeClients);
                 model.addAttribute("sessionsCompleted", sessionsCompleted);
                 model.addAttribute("todayAppointments", todayAppointments);
                 model.addAttribute("patientsList", patientsList);
                 model.addAttribute("reports", reports);
+                model.addAttribute("averageWellbeingScore", displayWellbeingScore);
                 break;
             case ADMIN:
                 dashboardPage = "dashboard/admin-dashboard";

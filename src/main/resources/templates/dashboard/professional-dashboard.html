@@ -32,8 +32,8 @@
         <div class="col-md-3">
             <div class="stat-card">
                 <h6 class="text-muted">Client Satisfaction</h6>
-                <div class="stat-number">4.8</div>
-                <small class="text-success">/5.0 average</small>
+                <div class="stat-number" th:text="${averageWellbeingScore} ?: 0">0</div>
+                <small class="text-success">/100.0 average wellbeing</small>
             </div>
         </div>
     </div>
