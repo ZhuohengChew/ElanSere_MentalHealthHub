@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,26 +34,30 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final ReportRepository reportRepository;
+    private final UserService userService;
+    private final SelfCareRepository selfCareRepository;
+    private final EducationalModuleRepository educationalModuleRepository;
+    private final ModuleProgressRepository moduleProgressRepository;
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private ReportRepository reportRepository;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private SelfCareRepository selfCareRepository;
-
-    @Autowired
-    private EducationalModuleRepository educationalModuleRepository;
-
-    @Autowired
-    private ModuleProgressRepository moduleProgressRepository;
+    public AuthController(
+            UserRepository userRepository,
+            AppointmentRepository appointmentRepository,
+            ReportRepository reportRepository,
+            UserService userService,
+            SelfCareRepository selfCareRepository,
+            EducationalModuleRepository educationalModuleRepository,
+            ModuleProgressRepository moduleProgressRepository) {
+        this.userRepository = userRepository;
+        this.appointmentRepository = appointmentRepository;
+        this.reportRepository = reportRepository;
+        this.userService = userService;
+        this.selfCareRepository = selfCareRepository;
+        this.educationalModuleRepository = educationalModuleRepository;
+        this.moduleProgressRepository = moduleProgressRepository;
+    }
 
     @GetMapping("/")
     public String index() {
@@ -76,7 +79,6 @@ public class AuthController {
             HttpSession session,
             Model model) {
         try {
-            // Authenticate user
             Optional<User> userOpt = userService.authenticateUser(email, password);
 
             if (userOpt.isEmpty()) {
@@ -86,7 +88,6 @@ public class AuthController {
 
             User user = userOpt.get();
 
-            // If role is specified, verify it matches user's role
             if (role != null && !role.isEmpty()) {
                 UserRole selectedRole = UserRole.valueOf(role.toUpperCase());
                 if (user.getRole() != selectedRole) {
@@ -95,7 +96,6 @@ public class AuthController {
                 }
             }
 
-            // Set session attributes
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getId());
             session.setAttribute("userRole", user.getRole().toString());
@@ -124,7 +124,6 @@ public class AuthController {
             HttpSession session,
             Model model) {
         try {
-            // Validate password match
             if (!password.equals(confirmPassword)) {
                 model.addAttribute("error", "Passwords do not match");
                 model.addAttribute("email", email);
@@ -132,7 +131,6 @@ public class AuthController {
                 return "auth/register";
             }
 
-            // Validate password length
             if (password.length() < 6) {
                 model.addAttribute("error", "Password must be at least 6 characters long");
                 model.addAttribute("email", email);
@@ -140,7 +138,6 @@ public class AuthController {
                 return "auth/register";
             }
 
-            // Validate role
             UserRole userRole;
             try {
                 userRole = UserRole.valueOf(role.toUpperCase());
@@ -151,10 +148,8 @@ public class AuthController {
                 return "auth/register";
             }
 
-            // Register user
             User user = userService.registerUser(email, password, name, userRole);
 
-            // Auto-login after registration
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getId());
             session.setAttribute("userRole", user.getRole().toString());
@@ -191,10 +186,8 @@ public class AuthController {
         String dashboardPage;
         switch (user.getRole()) {
             case STUDENT:
-                // ===== Student dashboard dynamic data =====
-                // 1. Mood this week (based on self-care mood tracking)
                 LocalDate todayDate = LocalDate.now();
-                LocalDate weekAgo = todayDate.minusDays(6); // last 7 days including today
+                LocalDate weekAgo = todayDate.minusDays(6);
                 List<SelfCare> moodEntries = selfCareRepository
                         .findByUserAndTypeAndActivityDateBetween(user, SelfCareType.MOOD, weekAgo, todayDate);
 
@@ -217,7 +210,6 @@ public class AuthController {
                     model.addAttribute("hasMoodData", false);
                 }
 
-                // 2. Educational modules progress
                 List<EducationalModule> activeModules = educationalModuleRepository
                         .findByActiveTrueOrderByCreatedAtDesc();
                 int totalModules = activeModules.size();
@@ -228,14 +220,14 @@ public class AuthController {
                 model.addAttribute("totalModules", totalModules);
                 model.addAttribute("remainingModules", remainingModules);
 
-                // 3. Next appointment
                 LocalDate today = LocalDate.now();
                 List<Appointment> studentAppointments = appointmentRepository.findByStudent(user);
 
                 Appointment nextAppointment = studentAppointments.stream()
                         .filter(a -> a.getAppointmentDate() != null
                                 && a.getAppointmentDate().isAfter(today)
-                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.PENDING || a.getStatus() == AppointmentStatus.APPROVED))
+                                && (a.getStatus() == null || a.getStatus() == AppointmentStatus.PENDING
+                                        || a.getStatus() == AppointmentStatus.APPROVED))
                         .sorted(Comparator.comparing(Appointment::getAppointmentDate))
                         .findFirst()
                         .orElse(null);
@@ -281,15 +273,13 @@ public class AuthController {
                         .count();
 
                 long sessionsCompleted = profAppointments.stream()
-                        .filter(a -> a.getStatus() != null && a.getStatus().name().equals("COMPLETED"))
+                        .filter(a -> a.getStatus() != null && a.getStatus() == AppointmentStatus.COMPLETED)
                         .count();
 
-                // Show ALL students as active patients (not just those with appointments)
                 List<?> patientsList = userRepository.findAll().stream()
                         .filter(u -> u.getRole() == UserRole.STUDENT)
                         .collect(Collectors.toList());
 
-                // Fetch all reports
                 List<Report> reports = reportRepository.findAll();
 
                 model.addAttribute("todayAppointmentsCount", todayCount);
@@ -319,7 +309,6 @@ public class AuthController {
             return "redirect:/login";
         }
 
-        // Only admins can manage users
         if (user.getRole() != UserRole.ADMIN) {
             return "redirect:/dashboard";
         }
@@ -340,7 +329,6 @@ public class AuthController {
             return "redirect:/login";
         }
 
-        // Only admins can view analytics
         if (user.getRole() != UserRole.ADMIN) {
             return "redirect:/dashboard";
         }
@@ -352,7 +340,6 @@ public class AuthController {
         return "layout";
     }
 
-    // ===== Helper methods for student dashboard =====
     private int getMoodScore(String mood) {
         if (mood == null) {
             return 50;
@@ -400,5 +387,4 @@ public class AuthController {
             return "😢";
         }
     }
-
 }

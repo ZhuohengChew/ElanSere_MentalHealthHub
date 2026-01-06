@@ -32,6 +32,7 @@ spring:
   
   mvc:
     static-path-pattern: /static/**
+    throw-exception-if-no-handler-found: false
 
 server:
   port: 8888

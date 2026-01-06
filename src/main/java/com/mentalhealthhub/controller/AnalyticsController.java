@@ -1,6 +1,5 @@
 package com.mentalhealthhub.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,8 +11,11 @@ import com.mentalhealthhub.service.AnalyticsService;
 @CrossOrigin(origins = "*")
 public class AnalyticsController {
 
-    @Autowired
-    private AnalyticsService analyticsService;
+    private final AnalyticsService analyticsService;
+
+    public AnalyticsController(AnalyticsService analyticsService) {
+        this.analyticsService = analyticsService;
+    }
 
     // User Analytics
     @GetMapping("/users")

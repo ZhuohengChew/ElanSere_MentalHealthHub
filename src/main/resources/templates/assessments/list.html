@@ -30,7 +30,7 @@
                                 <h6 class="mb-1" th:text="${assessment.title}">Assessment Title</h6>
                                 <small class="text-muted" th:text="${assessment.description}">Description</small>
                                 <br>
-                                <small class="text-success" th:if="${assessment.score != null}">Score: <span th:text="${assessment.score}"></span>/100</small>
+                                <small class="text-success" th:if="${assessment.score != null}">Score: <span th:text="${assessment.score}"></span>/32</small>
                             </div>
                             <div class="text-end">
                                 <small class="text-muted" th:text="${#temporals.format(assessment.createdAt, 'dd MMM yyyy')}">Date</small>

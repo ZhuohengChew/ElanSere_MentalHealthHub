@@ -9,7 +9,6 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +21,19 @@ import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/modules")
 public class ModuleController {
 
-    @Autowired
-    private EducationalModuleRepository moduleRepository;
+    private final EducationalModuleRepository moduleRepository;
+    private final ModuleProgressRepository progressRepository;
 
-    @Autowired
-    private ModuleProgressRepository progressRepository;
+    public ModuleController(EducationalModuleRepository moduleRepository, ModuleProgressRepository progressRepository) {
+        this.moduleRepository = moduleRepository;
+        this.progressRepository = progressRepository;
+    }
 
     @GetMapping
     public String listModules(HttpSession session, Model model,
@@ -59,6 +61,15 @@ public class ModuleController {
         for (ModuleProgress progress : userProgress) {
             progressMap.put(progress.getModule().getId(), progress);
         }
+
+        // Sort modules: Incomplete first, then Completed. Secondary sort: CreatedAt
+        // DESC (Newest first)
+        modules.sort(Comparator.comparing((EducationalModule m) -> {
+            ModuleProgress p = progressMap.get(m.getId());
+            return p != null && Boolean.TRUE.equals(p.getCompleted()); // Incomplete (false) first
+        }).thenComparing(
+                Comparator.comparing(EducationalModule::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed()));
 
         // Calculate overall progress
         long completedCount = progressRepository.countByUserAndCompletedTrue(user);

@@ -10,9 +10,12 @@ import java.util.List;
 @Repository
 public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findByStatus(ContentStatus status);
+
     List<Content> findByType(ContentType type);
+
     List<Content> findByCategory(String category);
+
     List<Content> findByStatusAndType(ContentStatus status, ContentType type);
+
     List<Content> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description);
 }
-

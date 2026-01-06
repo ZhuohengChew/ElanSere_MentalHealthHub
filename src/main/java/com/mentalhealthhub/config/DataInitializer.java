@@ -3,7 +3,6 @@ package com.mentalhealthhub.config;
 import com.mentalhealthhub.model.*;
 import com.mentalhealthhub.repository.*;
 import com.mentalhealthhub.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,20 +12,24 @@ import java.time.LocalDateTime;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-        @Autowired
-        private EducationalModuleRepository moduleRepository;
+        private final EducationalModuleRepository moduleRepository;
+        private final ForumPostRepository forumPostRepository;
+        private final ForumCommentRepository commentRepository;
+        private final UserRepository userRepository;
+        private final UserService userService;
 
-        @Autowired
-        private ForumPostRepository forumPostRepository;
-
-        @Autowired
-        private ForumCommentRepository commentRepository;
-
-        @Autowired
-        private UserRepository userRepository;
-
-        @Autowired
-        private UserService userService;
+        public DataInitializer(
+                        EducationalModuleRepository moduleRepository,
+                        ForumPostRepository forumPostRepository,
+                        ForumCommentRepository commentRepository,
+                        UserRepository userRepository,
+                        UserService userService) {
+                this.moduleRepository = moduleRepository;
+                this.forumPostRepository = forumPostRepository;
+                this.commentRepository = commentRepository;
+                this.userRepository = userRepository;
+                this.userService = userService;
+        }
 
         @Override
         public void run(String... args) {

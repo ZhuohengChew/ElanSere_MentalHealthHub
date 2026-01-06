@@ -29,6 +29,13 @@ public class EducationalModule {
     private String content; // Module content/lessons
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ContentType contentType = ContentType.MODULE; // Default to MODULE
+
+    @Column
+    private String url;
+
+    @Column(nullable = false)
     private Boolean active = true;
 
     @Column(nullable = false)
@@ -135,5 +142,20 @@ public class EducationalModule {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-}
 
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+}
