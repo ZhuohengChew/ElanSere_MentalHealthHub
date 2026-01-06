@@ -54,9 +54,17 @@ public class PatientController {
         // Create a map of student ID to appointment count for easy lookup in template
         Map<Long, Long> appointmentCounts = new HashMap<>();
         for (User student : allStudents) {
-            long count = appointments.stream()
-                .filter(apt -> apt.getStudent() != null && apt.getStudent().getId().equals(student.getId()))
-                .count();
+            long count;
+            if (user.getRole() == UserRole.PROFESSIONAL) {
+                // For professionals, count only their appointments with the student
+                count = appointments.stream()
+                    .filter(apt -> apt.getStudent() != null && apt.getStudent().getId().equals(student.getId()))
+                    .count();
+            } else {
+                // For staff, count ALL appointments the student has made (regardless of status or professional)
+                List<Appointment> studentAppointments = appointmentRepository.findByStudent(student);
+                count = studentAppointments.size();
+            }
             appointmentCounts.put(student.getId(), count);
         }
 
