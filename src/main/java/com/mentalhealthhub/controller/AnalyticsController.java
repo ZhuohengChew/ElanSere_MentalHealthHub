@@ -1,21 +1,9 @@
 package com.mentalhealthhub.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.mentalhealthhub.dto.AdminActivityDTO;
-import com.mentalhealthhub.dto.AppointmentAnalyticsDTO;
-import com.mentalhealthhub.dto.ComprehensiveAnalyticsDTO;
-import com.mentalhealthhub.dto.ForumAnalyticsDTO;
-import com.mentalhealthhub.dto.MentalHealthTrendsDTO;
-import com.mentalhealthhub.dto.ModuleAnalyticsDTO;
-import com.mentalhealthhub.dto.ReportAnalyticsDTO;
-import com.mentalhealthhub.dto.SelfCareAnalyticsDTO;
-import com.mentalhealthhub.dto.StaffDashboardMetricsDTO;
-import com.mentalhealthhub.dto.UserAnalyticsDTO;
+import com.mentalhealthhub.dto.*;
 import com.mentalhealthhub.service.AnalyticsService;
 
 @RestController
@@ -90,12 +78,5 @@ public class AnalyticsController {
     public ResponseEntity<ComprehensiveAnalyticsDTO> getComprehensiveAnalytics() {
         ComprehensiveAnalyticsDTO analytics = analyticsService.getComprehensiveAnalytics();
         return ResponseEntity.ok(analytics);
-    }
-
-    // Staff Dashboard Metrics
-    @GetMapping("/staff/dashboard-metrics")
-    public ResponseEntity<StaffDashboardMetricsDTO> getStaffDashboardMetrics() {
-        StaffDashboardMetricsDTO metrics = analyticsService.getStaffDashboardMetrics();
-        return ResponseEntity.ok(metrics);
     }
 }

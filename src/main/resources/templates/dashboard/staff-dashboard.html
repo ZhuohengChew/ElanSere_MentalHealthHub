@@ -24,8 +24,8 @@
                         </div>
                     </div>
                     <h6 class="text-muted mb-1">Students Monitored</h6>
-                    <h3 class="mb-0" id="studentsMonitored">-</h3>
-                    <small class="text-muted">Total students</small>
+                    <h3 class="mb-0">24</h3>
+                    <small class="text-muted">In your cohort</small>
                 </div>
             </div>
         </div>
@@ -38,8 +38,8 @@
                         </div>
                     </div>
                     <h6 class="text-muted mb-1">Active Concerns</h6>
-                    <h3 class="mb-0" id="activeConcerns">-</h3>
-                    <small class="text-muted">Unresolved reports</small>
+                    <h3 class="mb-0">3</h3>
+                    <small class="text-muted">Require attention</small>
                 </div>
             </div>
         </div>
@@ -48,12 +48,12 @@
                 <div class="card-body">
                     <div class="mb-2">
                         <div class="bg-gradient-to-br from-[#20B2AA] to-[#17A2B8] p-3 rounded-lg d-inline-block">
-                            <span style="font-size: 2rem;">📋</span>
+                            <span style="font-size: 2rem;">📚</span>
                         </div>
                     </div>
-                    <h6 class="text-muted mb-1">Assessments Done</h6>
-                    <h3 class="mb-0" id="assessmentsDone">-</h3>
-                    <small class="text-muted">Total assessments</small>
+                    <h6 class="text-muted mb-1">Training Progress</h6>
+                    <h3 class="mb-0">75%</h3>
+                    <small class="text-muted">2 of 3 modules complete</small>
                 </div>
             </div>
         </div>
@@ -66,62 +66,119 @@
                         </div>
                     </div>
                     <h6 class="text-muted mb-1">Wellness Score</h6>
-                    <h3 class="mb-0" id="avgWellnessScore">-</h3>
-                    <small class="text-muted">Average wellness</small>
+                    <h3 class="mb-0">82%</h3>
+                    <small class="text-muted">Average cohort wellness</small>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row mb-4">
+        <!-- Recent Student Activity -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-left: 4px solid #6A8EAE;">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <span style="font-size: 1.5rem;">📊</span> Recent Student Activity
+                    </h5>
+                    <small class="text-muted">Overview of student engagement with mental health resources</small>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">✅</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #1234</p>
+                                    <p class="mb-0 small text-muted">Completed self-assessment</p>
+                                </div>
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">📅</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #5678</p>
+                                    <p class="mb-0 small text-muted">Booked telehealth appointment</p>
+                                </div>
+                                <small class="text-muted">5 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">⚠️</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #9012</p>
+                                    <p class="mb-0 small text-danger">Reported concern (High urgency)</p>
+                                </div>
+                                <small class="text-muted">1 day ago</small>
+                            </div>
+                        </div>
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="font-size: 1.5rem;">💚</div>
+                                <div class="flex-grow-1">
+                                    <p class="mb-0 small fw-medium">Student #3456</p>
+                                    <p class="mb-0 small text-muted">Accessed self-care tools</p>
+                                </div>
+                                <small class="text-muted">2 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Student Analytics Report -->
-        <div class="col-md-12 mb-4">
+        <div class="col-md-6 mb-4">
             <div class="card h-100" style="border-left: 4px solid #20B2AA;">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">
                         <span style="font-size: 1.5rem;">📈</span> Student Analytics Report
                     </h5>
-                    <small class="text-muted">Key mental health metrics for monitored students</small>
+                    <small class="text-muted">Key metrics for monitored students</small>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="small fw-medium">Average Wellness Score</span>
-                                    <span class="small fw-medium text-success" id="analyticsWellnessScore">-</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" id="wellnessProgressBar" role="progressbar" style="width: 0%"></div>
-                                </div>
-                                <small class="text-muted">Out of 100</small>
-                            </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Assessment Completion Rate</span>
+                            <span class="small fw-medium text-primary">89%</span>
                         </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="small fw-medium">Average Anxiety Level</span>
-                                    <span class="small fw-medium text-warning" id="analyticsAnxietyScore">-</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-warning" id="anxietyProgressBar" role="progressbar" style="width: 0%"></div>
-                                </div>
-                                <small class="text-muted">Out of 100</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="small fw-medium">Average Stress Level</span>
-                                    <span class="small fw-medium text-danger" id="analyticsStressScore">-</span>
-                                </div>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-danger" id="stressProgressBar" role="progressbar" style="width: 0%"></div>
-                                </div>
-                                <small class="text-muted">Out of 100</small>
-                            </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 89%"></div>
                         </div>
                     </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Active Engagement</span>
+                            <span class="small fw-medium text-danger">76%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 76%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Support Resource Usage</span>
+                            <span class="small fw-medium text-purple">92%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="background-color: #8E44AD; width: 92%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small">Appointment Attendance</span>
+                            <span class="small fw-medium text-warning">85%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-outline-primary w-100">
+                        <span style="font-size: 1.2rem;">📄</span> View Detailed Report
+                    </a>
                 </div>
             </div>
         </div>
@@ -179,46 +236,3 @@
         color: #8E44AD;
     }
 </style>
-
-<script>
-function loadStaffDashboardData() {
-    // Get the base URL (handles different context paths)
-    const baseUrl = window.location.pathname.split('/dashboard')[0]; // e.g., /mentalhealthhub
-    const apiUrl = baseUrl + '/api/analytics/staff/dashboard-metrics';
-    
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            // Update stat cards
-            document.getElementById('studentsMonitored').textContent = data.totalStudents || 0;
-            document.getElementById('activeConcerns').textContent = data.unresolvedReports || 0;
-            document.getElementById('assessmentsDone').textContent = data.assessmentsDone || 0;
-            document.getElementById('avgWellnessScore').textContent = (data.averageWellnessScore || 0).toFixed(1);
-            
-            // Update analytics report
-            const wellnessScore = data.averageWellnessScore || 0;
-            const anxietyScore = data.averageAnxietyLevel || 0;
-            const stressScore = data.averageStressLevel || 0;
-            
-            document.getElementById('analyticsWellnessScore').textContent = wellnessScore.toFixed(1);
-            document.getElementById('wellnessProgressBar').style.width = Math.min(wellnessScore, 100) + '%';
-            
-            document.getElementById('analyticsAnxietyScore').textContent = anxietyScore.toFixed(1);
-            document.getElementById('anxietyProgressBar').style.width = Math.min(anxietyScore, 100) + '%';
-            
-            document.getElementById('analyticsStressScore').textContent = stressScore.toFixed(1);
-            document.getElementById('stressProgressBar').style.width = Math.min(stressScore, 100) + '%';
-        })
-        .catch(error => {
-            console.error('Error loading dashboard metrics:', error);
-            // Set default values if API fails
-            document.getElementById('studentsMonitored').textContent = '0';
-            document.getElementById('activeConcerns').textContent = '0';
-            document.getElementById('assessmentsDone').textContent = '0';
-            document.getElementById('avgWellnessScore').textContent = '0';
-        });
-}
-
-// Load data on page load
-document.addEventListener('DOMContentLoaded', loadStaffDashboardData);
-</script>
