@@ -58,6 +58,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT AVG(CAST(u.wellbeingScore AS DOUBLE)) FROM User u WHERE u.wellbeingScore IS NOT NULL AND u.deletedAt IS NULL")
     Double getAverageWellbeingScore();
 
-    @Query(value = "SELECT DATE_FORMAT(u.created_at, '%Y-%m') as month, COUNT(u.id) FROM users u WHERE u.deleted_at IS NULL GROUP BY DATE_FORMAT(u.created_at, '%Y-%m') ORDER BY month DESC", nativeQuery = true)
-    java.util.Map<String, Long> getUserRegistrationTrend();
+    @Query(value = "SELECT DATE_FORMAT(u.created_at, '%Y-%m') as month, COUNT(u.id) as cnt FROM users u WHERE u.deleted_at IS NULL GROUP BY DATE_FORMAT(u.created_at, '%Y-%m') ORDER BY month DESC", nativeQuery = true)
+    java.util.List<Object[]> getUserRegistrationTrendRaw();
 }

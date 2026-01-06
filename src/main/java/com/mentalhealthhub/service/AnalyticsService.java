@@ -105,10 +105,21 @@ public class AnalyticsService {
             java.time.YearMonth nowYm = java.time.YearMonth.now();
             java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM");
 
-            java.util.Map<String, Long> rawTrend = null;
+            java.util.Map<String, Long> rawTrend = new java.util.HashMap<>();
             try {
-                rawTrend = userRepository.getUserRegistrationTrend();
-                logger.info("Raw registration trend from DB: " + rawTrend);
+                java.util.List<Object[]> results = userRepository.getUserRegistrationTrendRaw();
+                logger.info("Raw registration trend results count: " + (results != null ? results.size() : 0));
+                
+                if (results != null && !results.isEmpty()) {
+                    for (Object[] row : results) {
+                        if (row != null && row.length >= 2) {
+                            String month = (String) row[0];
+                            Long count = ((Number) row[1]).longValue();
+                            rawTrend.put(month, count);
+                            logger.info("Registration trend - Month: " + month + ", Count: " + count);
+                        }
+                    }
+                }
             } catch (Exception e) {
                 logger.error("Error loading raw user registration trend from repository", e);
             }
@@ -118,7 +129,7 @@ public class AnalyticsService {
                 java.time.YearMonth ym = nowYm.minusMonths(i);
                 String key = ym.format(fmt);
                 Long cnt = 0L;
-                if (rawTrend != null && rawTrend.containsKey(key)) {
+                if (rawTrend.containsKey(key)) {
                     Long val = rawTrend.get(key);
                     cnt = val != null ? val : 0L;
                 }
