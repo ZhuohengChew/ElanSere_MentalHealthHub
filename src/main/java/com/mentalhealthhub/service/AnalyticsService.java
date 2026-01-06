@@ -21,7 +21,6 @@ import com.mentalhealthhub.dto.MentalHealthTrendsDTO;
 import com.mentalhealthhub.dto.ModuleAnalyticsDTO;
 import com.mentalhealthhub.dto.ReportAnalyticsDTO;
 import com.mentalhealthhub.dto.SelfCareAnalyticsDTO;
-import com.mentalhealthhub.dto.StaffDashboardMetricsDTO;
 import com.mentalhealthhub.dto.UserAnalyticsDTO;
 import com.mentalhealthhub.model.AppointmentStatus;
 import com.mentalhealthhub.model.ForumPost;
@@ -636,36 +635,5 @@ public class AnalyticsService {
             return null;
         Map<Long, Double> map = calculateEngagementRates();
         return map.getOrDefault(userId, 0.0);
-    }
-
-    // ==================== Staff Dashboard Metrics ====================
-    public StaffDashboardMetricsDTO getStaffDashboardMetrics() {
-        StaffDashboardMetricsDTO dto = new StaffDashboardMetricsDTO();
-        
-        // Total students count
-        long totalStudents = userRepository.countByRole(UserRole.STUDENT);
-        dto.setTotalStudents(totalStudents);
-        
-        // Unresolved reports count (reports where status is not 'RESOLVED')
-        long unresolvedReports = reportRepository.countUnresolvedReports();
-        dto.setUnresolvedReports(unresolvedReports);
-        
-        // Total assessments done
-        long assessmentsDone = assessmentRepository.count();
-        dto.setAssessmentsDone(assessmentsDone);
-        
-        // Average wellness score (wellbeingScore in the model)
-        Double avgWellness = userRepository.getAverageWellbeingScore();
-        dto.setAverageWellnessScore(avgWellness != null ? avgWellness : 0.0);
-        
-        // Average anxiety level
-        Double avgAnxiety = userRepository.getAverageAnxietyLevel();
-        dto.setAverageAnxietyLevel(avgAnxiety != null ? avgAnxiety : 0.0);
-        
-        // Average stress level
-        Double avgStress = userRepository.getAverageStressLevel();
-        dto.setAverageStressLevel(avgStress != null ? avgStress : 0.0);
-        
-        return dto;
     }
 }

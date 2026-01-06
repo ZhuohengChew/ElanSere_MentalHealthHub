@@ -232,14 +232,9 @@
             const dateStr = getLocalDateString(cellDate);
             const isToday = cellDate.toDateString() === today.toDateString();
             const isSelected = document.getElementById('appointmentDateFilter').value === dateStr;
+            const hasAppointments = Array.from(document.querySelectorAll('tbody tr:not([style*="display: none"])')).some(row => row.getAttribute('data-date') === dateStr);
             
-            // Check for ALL appointments on this date (including hidden ones)
-            const appointmentsOnDate = Array.from(document.querySelectorAll('tbody tr')).filter(row => row.getAttribute('data-date') === dateStr);
-            const hasAppointments = appointmentsOnDate.length > 0;
-            const hasPendingAppointments = appointmentsOnDate.some(row => row.getAttribute('data-status') === 'PENDING');
-            const hasApprovedAppointments = appointmentsOnDate.some(row => row.getAttribute('data-status') === 'APPROVED');
-            
-            let cellStyle = 'padding: 8px; cursor: pointer; border-radius: 4px; font-size: 14px; position: relative; ';
+            let cellStyle = 'padding: 8px; cursor: pointer; border-radius: 4px; font-size: 14px; ';
             let cellClass = '';
             
             if (isSelected) {
@@ -252,23 +247,9 @@
                 cellStyle += 'color: #333;';
             }
             
-            // Build indicator dots
-            let indicatorDots = '';
-            if (hasAppointments) {
-                indicatorDots = '<div style="display: flex; justify-content: center; gap: 3px; margin-top: 2px;">';
-                if (hasApprovedAppointments) {
-                    indicatorDots += '<span style="width: 6px; height: 6px; background-color: #007bff; border-radius: 50%; display: inline-block;" title="Has appointments"></span>';
-                }
-                if (hasPendingAppointments) {
-                    indicatorDots += '<span style="width: 6px; height: 6px; background-color: #ffc107; border-radius: 50%; display: inline-block;" title="Has pending appointments"></span>';
-                }
-                indicatorDots += '</div>';
-            }
-            
             html += `
                 <div style="${cellStyle}" onclick="selectDate('${dateStr}')" title="${hasAppointments ? 'Has appointments' : 'No appointments'}">
                     ${day}
-                    ${indicatorDots}
                 </div>
             `;
         }
