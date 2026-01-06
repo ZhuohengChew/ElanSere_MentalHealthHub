@@ -52,6 +52,8 @@ public class UserService {
 
     /**
      * Authenticate user with email and password
+     * Returns Optional.of(user) if password matches (regardless of active status)
+     * Returns Optional.empty() if email not found or password doesn't match
      */
     public Optional<User> authenticateUser(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
@@ -61,11 +63,6 @@ public class UserService {
         }
 
         User user = userOpt.get();
-
-        // Check if user is active
-        if (!user.getActive()) {
-            return Optional.empty();
-        }
 
         // Check password (supports both hashed and plain text for migration)
         String storedPassword = user.getPassword();
