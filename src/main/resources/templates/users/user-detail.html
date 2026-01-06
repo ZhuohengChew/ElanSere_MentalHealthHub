@@ -43,10 +43,6 @@
                         <button type="submit" class="btn btn-warning btn-sm">Reset Password</button>
                     </form>
 
-                    <form method="post" th:action="@{/users/{id}/archive(id=${user.id})}" style="display: inline;">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Archive</button>
-                    </form>
-
                     <a th:href="@{/users/{id}/audit(id=${user.id})}" class="btn btn-outline-secondary btn-sm">View Audit</a>
                 </div>
             </div>

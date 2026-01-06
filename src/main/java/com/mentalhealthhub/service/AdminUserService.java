@@ -81,22 +81,6 @@ public class AdminUserService {
         auditLogRepository.save(log);
     }
 
-    public void archiveUser(Long id, Long adminId) {
-        Optional<User> opt = userRepository.findById(id);
-        if (opt.isEmpty())
-            throw new IllegalArgumentException("User not found");
-        User u = opt.get();
-        u.setDeletedAt(LocalDateTime.now());
-        u.setActive(false);
-        u.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(u);
-
-        // Log the action
-        AuditLog log = new AuditLog(adminId, "USER_ARCHIVED", id,
-                "Archived user: " + u.getEmail());
-        auditLogRepository.save(log);
-    }
-
     public String resetPassword(Long id, Long adminId) {
         Optional<User> opt = userRepository.findById(id);
         if (opt.isEmpty())

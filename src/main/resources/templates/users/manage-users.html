@@ -112,10 +112,6 @@
                                             <button type="submit" class="btn btn-sm btn-outline-success">Activate</button>
                                         </form>
 
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#archiveConfirmModal" th:attr="data-id=${usr.id}" th:if="${currentUser.role.name() == 'ADMIN'}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-
                                         <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetConfirmModal" th:attr="data-id=${usr.id}" th:if="${currentUser.role.name() == 'ADMIN'}">Reset Password</button>
                                     </td>
                                 </tr>
@@ -193,7 +189,7 @@
                 <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editUserForm" th:action="@{/users/0/edit}" method="post">
+            <form id="editUserForm">
                 <div class="modal-body">
                     <input type="hidden" id="editUserId" name="id" />
                     <div class="mb-3">
@@ -220,26 +216,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" id="saveChangesBtn" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
-
-<!-- Archive Confirmation Modal -->
-<div class="modal fade" id="archiveConfirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p>Are you sure you want to archive this user? This hides the user from the main list.</p>
-                <div class="text-end">
-                    <form id="archiveForm" th:action="@{/users/0/archive}" method="post">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Archive</button>
-                    </form>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -264,6 +243,105 @@
 </div>
 
 <script>
+    // Helper function to show notifications (Toast-style) - MUST BE FIRST
+    function showNotification(message, type) {
+        console.log('showNotification called with:', message, type);
+        
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toastContainer';
+            toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 99999;';
+            document.body.appendChild(toastContainer);
+            console.log('Toast container created');
+        }
+        
+        // Set background color based on type
+        let bgColor = '#28a745'; // success
+        let symbol = '✓';
+        if (type === 'danger') {
+            bgColor = '#dc3545';
+            symbol = '✕';
+        } else if (type === 'warning') {
+            bgColor = '#ffc107';
+            symbol = '⚠';
+        } else if (type === 'info') {
+            bgColor = '#17a2b8';
+            symbol = 'ℹ';
+        }
+        
+        // Create toast element with simple styling
+        const toastDiv = document.createElement('div');
+        toastDiv.style.cssText = `
+            background-color: ${bgColor}; 
+            color: white; 
+            border-radius: 8px; 
+            padding: 16px 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            min-width: 300px;
+            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
+            animation: slideIn 0.3s ease-in-out;
+        `;
+        
+        const title = type === 'success' ? 'Success!' : type === 'danger' ? 'Error!' : type === 'warning' ? 'Warning!' : 'Info';
+        
+        toastDiv.innerHTML = `
+            <div style="font-size: 1.5rem; min-width: 30px; text-align: center;">${symbol}</div>
+            <div>
+                <div style="font-weight: 600; margin-bottom: 2px;">${title}</div>
+                <div style="font-size: 0.95rem;">${message}</div>
+            </div>
+            <button type="button" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-left: auto;" onclick="this.closest('div').parentElement.removeChild(this.closest('div'));">×</button>
+        `;
+        
+        toastContainer.appendChild(toastDiv);
+        console.log('Toast element added to container');
+        
+        // Auto-remove after 4 seconds
+        setTimeout(function() {
+            if (toastDiv.parentNode) {
+                toastDiv.remove();
+            }
+        }, 4000);
+    }
+    
+    // Add CSS animation for toast slide-in
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Check if there's a pending notification from previous operation
+    // Check immediately, don't wait for DOMContentLoaded as it may have already fired
+    const notificationMessage = sessionStorage.getItem('notificationMessage');
+    const notificationType = sessionStorage.getItem('notificationType');
+    
+    if (notificationMessage && notificationType) {
+        // Show notification immediately or after a short delay
+        setTimeout(function() {
+            showNotification(notificationMessage, notificationType);
+            console.log('Displaying persisted notification:', notificationMessage);
+            // Clear sessionStorage
+            sessionStorage.removeItem('notificationMessage');
+            sessionStorage.removeItem('notificationType');
+        }, 100);
+    }
+
     // Populate edit modal when opened
     var editModal = document.getElementById('editUserModal');
     if (editModal) {
@@ -280,21 +358,70 @@
             document.getElementById('editEmail').value = email;
             document.getElementById('editRole').value = role;
             document.getElementById('editProfilePicture').value = picture || '';
-
-            // set form action to correct user id
-            var form = document.getElementById('editUserForm');
-            form.setAttribute('action', '/users/' + id + '/edit');
         });
     }
 
-    // Archive modal wiring
-    var archiveModal = document.getElementById('archiveConfirmModal');
-    if (archiveModal) {
-        archiveModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var form = document.getElementById('archiveForm');
-            form.setAttribute('action', '/users/' + id + '/archive');
+    // Save Changes button handler - AJAX submit
+    var saveChangesBtn = document.getElementById('saveChangesBtn');
+    if (saveChangesBtn) {
+        saveChangesBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            var userId = document.getElementById('editUserId').value;
+            var name = document.getElementById('editName').value;
+            var email = document.getElementById('editEmail').value;
+            var role = document.getElementById('editRole').value;
+            var picture = document.getElementById('editProfilePicture').value;
+
+            if (!userId || !name || !email) {
+                showNotification('Please fill in all required fields', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/mentalhealthhub/users/' + userId + '/edit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        name: name,
+                        email: email,
+                        role: role,
+                        profilePicture: picture || ''
+                    })
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Response was not JSON:', response.status, response.statusText);
+                    showNotification('Server error: ' + response.statusText, 'danger');
+                    return;
+                }
+                
+                if (response.ok && data.success) {
+                    // Store notification in sessionStorage to show after reload
+                    sessionStorage.setItem('notificationMessage', 'User updated successfully!');
+                    sessionStorage.setItem('notificationType', 'success');
+                    console.log('Notification stored in sessionStorage');
+                    
+                    // Close modal
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+                    if (modal) modal.hide();
+                    
+                    // Reload page immediately
+                    setTimeout(function() {
+                        console.log('Reloading page...');
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    showNotification(data.error || 'Failed to update user', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred: ' + error.message, 'danger');
+            }
         });
     }
 
@@ -305,7 +432,7 @@
             var button = event.relatedTarget;
             var id = button.getAttribute('data-id');
             var form = document.getElementById('resetForm');
-            form.setAttribute('action', '/users/' + id + '/reset-password');
+            form.setAttribute('action', '/mentalhealthhub/users/' + id + '/reset-password');
         });
     }
 </script>

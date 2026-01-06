@@ -100,11 +100,35 @@ public class AnalyticsService {
         dto.setAverageAnxietyLevel(userRepository.getAverageAnxietyLevel());
         dto.setAverageWellbeingScore(userRepository.getAverageWellbeingScore());
 
-        // Registration trend by month (YYYY-MM) for last months
+        // Build user registration trend for the last 6 months (keys: yyyy-MM)
         try {
-            dto.setUserRegistrationTrend(userRepository.getUserRegistrationTrend());
-        } catch (Exception e) {
-            logger.warn("Could not load user registration trend", e);
+            java.time.YearMonth nowYm = java.time.YearMonth.now();
+            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM");
+
+            java.util.Map<String, Long> rawTrend = null;
+            try {
+                rawTrend = userRepository.getUserRegistrationTrend();
+                logger.info("Raw registration trend from DB: " + rawTrend);
+            } catch (Exception e) {
+                logger.error("Error loading raw user registration trend from repository", e);
+            }
+
+            java.util.LinkedHashMap<String, Long> trend = new java.util.LinkedHashMap<>();
+            for (int i = 5; i >= 0; i--) {
+                java.time.YearMonth ym = nowYm.minusMonths(i);
+                String key = ym.format(fmt);
+                Long cnt = 0L;
+                if (rawTrend != null && rawTrend.containsKey(key)) {
+                    Long val = rawTrend.get(key);
+                    cnt = val != null ? val : 0L;
+                }
+                trend.put(key, cnt);
+            }
+            logger.info("Final registration trend: " + trend);
+            dto.setUserRegistrationTrend(trend);
+        } catch (Exception ex) {
+            logger.error("Error building user registration trend", ex);
+            dto.setUserRegistrationTrend(new java.util.LinkedHashMap<>());
         }
 
         return dto;

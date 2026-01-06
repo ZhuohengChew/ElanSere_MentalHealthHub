@@ -166,16 +166,7 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @PostMapping("/{id}/archive")
-    public String archiveUser(@PathVariable Long id, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null || !user.getRole().toString().equals("ADMIN")) {
-            return "redirect:/login";
-        }
 
-        adminUserService.archiveUser(id, user.getId());
-        return "redirect:/users";
-    }
 
     @PostMapping("/{id}/reset-password")
     public String resetPassword(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
@@ -219,16 +210,18 @@ public class UserController {
     }
 
     @PostMapping("/{id}/edit")
-    public String editUser(@PathVariable Long id,
+    public org.springframework.http.ResponseEntity<?> editUser(@PathVariable Long id,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String profilePicture,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
         if (currentUser == null || !currentUser.getRole().toString().equals("ADMIN")) {
-            return "redirect:/login";
+            return org.springframework.http.ResponseEntity.status(401).body(
+                    new java.util.HashMap<String, String>() {{
+                        put("error", "Unauthorized");
+                    }});
         }
 
         try {
@@ -237,11 +230,17 @@ public class UserController {
             dto.email = email;
             dto.role = role;
             dto.profilePicture = profilePicture;
-            adminUserService.updateUser(id, dto, currentUser.getId());
-            redirectAttributes.addFlashAttribute("successMessage", "User updated");
+            User updated = adminUserService.updateUser(id, dto, currentUser.getId());
+            return org.springframework.http.ResponseEntity.ok(
+                    new java.util.HashMap<String, String>() {{
+                        put("success", "User updated successfully");
+                        put("userName", updated.getName());
+                    }});
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(new java.util.HashMap<String, String>() {{
+                        put("error", e.getMessage());
+                    }});
         }
-        return "redirect:/users";
     }
 }

@@ -937,16 +937,35 @@ async function fetchUserRegistrationTrend() {
     try {
         const response = await fetch(buildApiUrl('/api/analytics/users'));
         const data = await response.json();
+        
+        // Format labels from YYYY-MM to MMM YYYY
+        const rawLabels = Object.keys(data.userRegistrationTrend || {});
+        const formattedLabels = rawLabels.map(label => {
+            // Parse YYYY-MM format
+            const parts = label.split('-');
+            if (parts.length === 2) {
+                const year = parts[0];
+                const monthNum = parseInt(parts[1]) - 1; // 0-indexed
+                const date = new Date(year, monthNum, 1);
+                return date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+            }
+            return label;
+        });
+        
         // Parse data into chart format
         return {
-            labels: Object.keys(data.userRegistrationTrend || {}),
+            labels: formattedLabels,
             datasets: [{
                 label: 'New Users',
                 data: Object.values(data.userRegistrationTrend || {}),
                 borderColor: THEME_COLORS.secondary,
                 backgroundColor: 'rgba(127, 182, 133, 0.1)',
                 tension: 0.3,
-                fill: true
+                fill: true,
+                pointRadius: 5,
+                pointBackgroundColor: THEME_COLORS.secondary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
             }]
         };
     } catch (error) {

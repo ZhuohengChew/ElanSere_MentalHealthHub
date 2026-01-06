@@ -1,7 +1,6 @@
 package com.mentalhealthhub.service;
 
 import com.mentalhealthhub.model.User;
-import java.time.LocalDateTime;
 import com.mentalhealthhub.model.UserRole;
 import com.mentalhealthhub.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,17 +36,16 @@ public class UserService {
         // Hash password
         String hashedPassword = passwordEncoder.encode(password);
 
-        // Create new user
+        // Create new user with created_at timestamp
         User user = User.builder()
-            .email(email)
-            .password(hashedPassword)
-            .name(name)
-            .role(role)
-            .active(true)
-            .build();
-
-        // Ensure createdAt is set for self-registered users so analytics queries include them
-        user.setCreatedAt(LocalDateTime.now());
+                .email(email)
+                .password(hashedPassword)
+                .name(name)
+                .role(role)
+                .active(true)
+                .build();
+        user.setCreatedAt(java.time.LocalDateTime.now());
+        user.setUpdatedAt(java.time.LocalDateTime.now());
 
         return userRepository.save(user);
     }
