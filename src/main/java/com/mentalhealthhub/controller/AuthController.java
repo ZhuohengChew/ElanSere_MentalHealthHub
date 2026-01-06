@@ -89,6 +89,12 @@ public class AuthController {
 
             User user = userOpt.get();
 
+            // Check if user account is deactivated
+            if (!user.getActive()) {
+                model.addAttribute("error", "Your account has been deactivated by the admin.");
+                return "auth/login";
+            }
+
             if (role != null && !role.isEmpty()) {
                 UserRole selectedRole = UserRole.valueOf(role.toUpperCase());
                 if (user.getRole() != selectedRole) {
