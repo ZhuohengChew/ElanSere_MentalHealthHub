@@ -70,7 +70,7 @@
                 </div>
                 <div class="card-body">
                     <div th:if="${patientsList == null or #lists.isEmpty(patientsList)}" class="text-center py-4 text-muted">No patients</div>
-                    <ul class="list-group" th:unless="${patientsList == null or #lists.isEmpty(patientsList)}">
+                    <ul class="list-group" th:unless="${patientsList == null or #lists.isEmpty(patientsList)}" style="max-height: 400px; overflow-y: auto;">
                         <li class="list-group-item" th:each="p : ${patientsList}">
                             <div class="d-flex justify-content-between align-items-center gap-2">
                                 <div class="flex-grow-1">
